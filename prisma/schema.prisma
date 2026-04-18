@@ -61,3 +61,11 @@ model KiteConfig {
   tokenExpiry DateTime?
   updatedAt   DateTime  @updatedAt
 }
+
+model KiteSnapshot {
+  userId         String   @id
+  holdingsJson   String
+  positionsJson  String
+  mfHoldingsJson String
+  syncedAt       DateTime @default(now())
+}

@@ -1,30 +1,21 @@
 import { prisma } from "@/lib/prisma";
-import { createKiteClient } from "@/lib/kite";
 import { portfolioSummary, fdAccrualTimeline, type Holding, type MFHolding, type FDRecord } from "@/lib/analytics";
 import { OverviewClient } from "./overview-client";
 import { getSessionUserId } from "@/lib/session";
 
 async function getData(userId: string | null) {
-  const [fds, kiteConfig] = await Promise.all([
+  const [fds, kiteConfig, snapshot] = await Promise.all([
     prisma.fixedDeposit.findMany({
       where: { userId: userId ?? "" },
       orderBy: { maturityDate: "asc" },
       include: { renewals: { orderBy: { renewalNumber: "asc" } } },
     }),
     userId ? prisma.kiteConfig.findUnique({ where: { userId } }) : null,
+    userId ? prisma.kiteSnapshot.findUnique({ where: { userId } }) : null,
   ]);
 
-  let holdings: Holding[] = [];
-  let mfHoldings: MFHolding[] = [];
-  if (kiteConfig?.accessToken && kiteConfig.tokenExpiry && new Date(kiteConfig.tokenExpiry) > new Date()) {
-    try {
-      const kc = createKiteClient(kiteConfig.apiKey);
-      kc.setAccessToken(kiteConfig.accessToken);
-      [holdings, mfHoldings] = await Promise.all([kc.getHoldings(), kc.getMFHoldings()]);
-    } catch {
-      // silently fall through — show what we have
-    }
-  }
+  const holdings: Holding[] = snapshot ? JSON.parse(snapshot.holdingsJson) : [];
+  const mfHoldings: MFHolding[] = snapshot ? JSON.parse(snapshot.mfHoldingsJson) : [];
 
   const fdRecords: FDRecord[] = fds.map((fd) => {
     const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
