@@ -92,7 +92,7 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
           </div>
           <div className="flex items-center gap-2">
             <Link
-              href={`/dashboard/fd/new?renewedFromId=${fd.id}`}
+              href={`/dashboard/fd/renew/${fd.id}`}
               className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-xs font-headline font-bold transition-colors"
             >
               <RefreshCw size={11} /> Renew
