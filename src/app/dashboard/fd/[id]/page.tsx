@@ -32,8 +32,9 @@ function computeAccruedInterest(principal: number, rate: number, startDate: Date
   return principal * (Math.pow(1 + rate / 100 / n, n * years) - 1);
 }
 
-export default async function FDDetailPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function FDDetailPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ addPrevious?: string }> }) {
   const { id } = await params;
+  const { addPrevious } = await searchParams;
   const userId = await getSessionUserId();
   const fd = await prisma.fixedDeposit.findUnique({
     where: { id },
@@ -81,6 +82,23 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
       <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-xs text-[#cbc4d0] hover:text-[#e4e1e6] transition-colors">
         <ArrowLeft size={12} /> Back to Fixed Deposits
       </Link>
+
+      {addPrevious && fd.renewals.length === 0 && (
+        <div className="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs text-amber-400 font-headline font-bold">Complete the renewal history</p>
+            <p className="text-[11px] text-[#cbc4d0] mt-0.5 leading-relaxed">
+              This FD was previously renewed. Use the <strong className="text-[#e4e1e6]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
+            </p>
+          </div>
+          <Link
+            href={`/dashboard/fd/renew/${id}`}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+          >
+            <RefreshCw size={11} /> Add Renewal
+          </Link>
+        </div>
+      )}
 
       {/* Header */}
       <div className="bg-[#1b1b1e] ghost-border rounded-xl p-5">
