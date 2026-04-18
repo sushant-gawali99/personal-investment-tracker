@@ -1,8 +1,15 @@
+import { headers } from "next/headers";
 import { KiteSettingsForm } from "./kite-settings-form";
+import { CopyableUrl } from "./copyable-url";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 
 export default async function SettingsPage() {
+  const headersList = await headers();
+  const host = headersList.get("x-forwarded-host") ?? headersList.get("host") ?? "localhost:3000";
+  const protocol = headersList.get("x-forwarded-proto") ?? "http";
+  const baseUrl = `${protocol}://${host}`;
+
   const userId = await getSessionUserId();
   const config = userId ? await prisma.kiteConfig.findUnique({ where: { userId } }) : null;
   const isConnected =
@@ -31,9 +38,7 @@ export default async function SettingsPage() {
               developers.kite.trade
             </a>
             . Set the redirect URL to{" "}
-            <code className="text-xs bg-[#1b1b1e] px-1.5 py-0.5 rounded mono text-[#d2bcfa]">
-              http://localhost:3001/api/kite/callback
-            </code>
+            <CopyableUrl url={`${baseUrl}/api/kite/callback`} />
           </p>
         </div>
         <KiteSettingsForm
