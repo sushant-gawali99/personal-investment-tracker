@@ -4,6 +4,7 @@ import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, RefreshCw } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 
 function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onClose: () => void }) {
@@ -400,19 +401,26 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             <p className="text-xs text-[#cbc4d0]">Fill in the details for this period</p>
           </div>
           <div className="grid grid-cols-2 gap-4">
+            {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
+              <div key={key}>
+                <label className={labelCls}>{key === "startDate" ? "Start Date" : "Maturity Date"}</label>
+                <DatePicker
+                  value={r[key]}
+                  onChange={(v) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, [key]: v } : p))}
+                />
+              </div>
+            ))}
             {[
-              { label: "Start Date", key: "startDate", type: "date" },
-              { label: "Maturity Date", key: "maturityDate", type: "date" },
-              { label: "Principal (₹)", key: "principal", type: "number" },
-              { label: "Interest Rate (% p.a.)", key: "interestRate", type: "number" },
-              { label: "Tenure (months)", key: "tenureMonths", type: "number" },
-              { label: "Maturity Amount (₹)", key: "maturityAmount", type: "number" },
-            ].map(({ label, key, type }) => (
+              { label: "Principal (₹)", key: "principal" },
+              { label: "Interest Rate (% p.a.)", key: "interestRate" },
+              { label: "Tenure (months)", key: "tenureMonths" },
+              { label: "Maturity Amount (₹)", key: "maturityAmount" },
+            ].map(({ label, key }) => (
               <div key={key}>
                 <label className={labelCls}>{label}</label>
                 <input
-                  type={type}
-                  step={type === "number" ? "0.01" : undefined}
+                  type="number"
+                  step="0.01"
                   className={inputCls}
                   value={r[key as keyof PriorRenewal]}
                   onChange={(e) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, [key]: e.target.value } : p))}
@@ -460,13 +468,13 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
 
           <div>
-            <label htmlFor="startDate" className={labelCls}>Start Date *</label>
-            <input id="startDate" type="date" className={inputCls} value={form.startDate} onChange={(e) => set("startDate", e.target.value)} required />
+            <label className={labelCls}>Start Date *</label>
+            <DatePicker value={form.startDate} onChange={(v) => set("startDate", v)} required />
           </div>
 
           <div>
-            <label htmlFor="maturityDate" className={labelCls}>Maturity Date *</label>
-            <input id="maturityDate" type="date" className={inputCls} value={form.maturityDate} onChange={(e) => set("maturityDate", e.target.value)} required />
+            <label className={labelCls}>Maturity Date *</label>
+            <DatePicker value={form.maturityDate} onChange={(v) => set("maturityDate", v)} required />
           </div>
 
           <div>

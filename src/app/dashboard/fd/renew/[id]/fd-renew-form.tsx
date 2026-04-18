@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { DatePicker } from "@/components/ui/date-picker";
 
 const inputCls = "w-full bg-[#0e0e11] ghost-border rounded-lg px-3 py-2.5 text-sm text-[#e4e1e6] placeholder:text-[#cbc4d0] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/40 transition-colors";
 const labelCls = "block text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label mb-1.5";
@@ -72,11 +73,11 @@ export function FDRenewForm({ fd }: Props) {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className={labelCls}>Renewal Date *</label>
-          <input type="date" className={inputCls} value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+          <DatePicker value={startDate} onChange={setStartDate} required />
         </div>
         <div>
           <label className={labelCls}>Due Date (Maturity) *</label>
-          <input type="date" className={inputCls} value={maturityDate} onChange={(e) => setMaturityDate(e.target.value)} required />
+          <DatePicker value={maturityDate} onChange={setMaturityDate} required />
         </div>
         <div>
           <label className={labelCls}>Deposit Amount (₹) *</label>
