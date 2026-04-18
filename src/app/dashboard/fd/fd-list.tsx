@@ -24,13 +24,17 @@ type Filter = "all" | "active" | "matured";
 export function FDList({ fds }: { fds: FD[] }) {
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
+  const [bankFilter, setBankFilter] = useState<string>("all");
   const [deleting, setDeleting] = useState<string | null>(null);
   const now = new Date();
 
+  const banks = Array.from(new Set(fds.map((fd) => fd.bankName))).sort();
+
   const filtered = fds.filter((fd) => {
     const matured = new Date(fd.maturityDate) <= now;
-    if (filter === "active") return !matured;
-    if (filter === "matured") return matured;
+    if (filter === "active" && matured) return false;
+    if (filter === "matured" && !matured) return false;
+    if (bankFilter !== "all" && fd.bankName !== bankFilter) return false;
     return true;
   });
 
@@ -61,22 +65,46 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   return (
     <div className="space-y-4">
-      {/* Filter tabs */}
-      <div className="flex items-center gap-1 p-1 bg-[#0e0e11] ghost-border rounded-xl w-fit">
-        {(["all", "active", "matured"] as Filter[]).map((f) => (
+      {/* Filters */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex items-center gap-1 p-1 bg-[#0e0e11] ghost-border rounded-xl w-fit">
+          {(["all", "active", "matured"] as Filter[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                "px-4 py-1.5 rounded-lg text-xs font-headline font-bold transition-colors capitalize",
+                filter === f
+                  ? "bg-primary text-[#00382f] shadow-[0_0_12px_rgba(0,223,193,0.2)]"
+                  : "text-[#cbc4d0] hover:text-[#e4e1e6]"
+              )}
+            >
+              {f} ({counts[f]})
+            </button>
+          ))}
+        </div>
+
+        <select
+          value={bankFilter}
+          onChange={(e) => setBankFilter(e.target.value)}
+          className="bg-[#0e0e11] ghost-border rounded-xl px-3 py-2 text-xs font-headline font-bold text-[#e4e1e6] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/40 transition-colors cursor-pointer"
+        >
+          <option value="all">All banks ({fds.length})</option>
+          {banks.map((b) => (
+            <option key={b} value={b}>
+              {b} ({fds.filter((fd) => fd.bankName === b).length})
+            </option>
+          ))}
+        </select>
+
+        {(bankFilter !== "all" || filter !== "all") && (
           <button
-            key={f}
-            onClick={() => setFilter(f)}
-            className={cn(
-              "px-4 py-1.5 rounded-lg text-xs font-headline font-bold transition-colors capitalize",
-              filter === f
-                ? "bg-primary text-[#00382f] shadow-[0_0_12px_rgba(0,223,193,0.2)]"
-                : "text-[#cbc4d0] hover:text-[#e4e1e6]"
-            )}
+            onClick={() => { setFilter("all"); setBankFilter("all"); }}
+            className="text-[11px] text-[#cbc4d0] hover:text-[#e4e1e6] font-headline font-bold underline underline-offset-2"
           >
-            {f} ({counts[f]})
+            Clear filters
           </button>
-        ))}
+        )}
       </div>
 
       {/* FD table */}
