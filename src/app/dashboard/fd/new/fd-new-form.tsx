@@ -1,10 +1,73 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X } from "lucide-react";
+import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, ZoomIn } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onClose: () => void }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const [error, setError] = useState("");
+  const [capturing, setCapturing] = useState(false);
+
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({ video: { facingMode: "environment" }, audio: false })
+      .then((stream) => {
+        streamRef.current = stream;
+        if (videoRef.current) videoRef.current.srcObject = stream;
+      })
+      .catch(() => setError("Camera access denied or unavailable."));
+    return () => { streamRef.current?.getTracks().forEach((t) => t.stop()); };
+  }, []);
+
+  function capture() {
+    if (!videoRef.current) return;
+    setCapturing(true);
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    canvas.getContext("2d")!.drawImage(videoRef.current, 0, 0);
+    canvas.toBlob((blob) => {
+      if (blob) onCapture(new File([blob], `capture-${Date.now()}.jpg`, { type: "image/jpeg" }));
+      streamRef.current?.getTracks().forEach((t) => t.stop());
+      onClose();
+    }, "image/jpeg", 0.92);
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
+      <div className="bg-[#0e0e11] ghost-border rounded-2xl overflow-hidden w-full max-w-lg">
+        <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(73,69,78,0.15)]">
+          <p className="font-headline font-bold text-sm text-[#e4e1e6]">Take Photo</p>
+          <button onClick={onClose} className="text-[#cbc4d0] hover:text-[#e4e1e6]"><X size={16} /></button>
+        </div>
+        <div className="p-4 space-y-4">
+          {error ? (
+            <p className="text-xs text-[#ffafd7] bg-[#ffafd7]/5 border border-[#ffafd7]/20 rounded-lg px-3 py-2">{error}</p>
+          ) : (
+            <video ref={videoRef} autoPlay playsInline className="w-full rounded-xl aspect-[4/3] bg-black object-cover" />
+          )}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={capture}
+              disabled={!!error || capturing}
+              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors"
+            >
+              <Camera size={13} /> Capture
+            </button>
+            <button type="button" onClick={onClose} className="rounded-lg ghost-border px-4 py-2.5 text-xs font-headline font-bold text-[#cbc4d0] hover:text-[#e4e1e6] transition-colors">
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 interface FDForm {
   bankName: string; fdNumber: string; accountNumber: string;
@@ -42,6 +105,7 @@ function ImageDropZone({
   onFile: (f: File) => void; onClear: () => void;
   disabled: boolean;
 }) {
+  const [showCamera, setShowCamera] = useState(false);
   const onDrop = useCallback((files: File[]) => { if (files[0]) onFile(files[0]); }, [onFile]);
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop, accept: { "image/jpeg": [], "image/png": [], "image/webp": [] },
@@ -55,27 +119,43 @@ function ImageDropZone({
         <div className="relative rounded-xl ghost-border overflow-hidden group">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt={label} className="w-full h-36 object-cover" />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
             <button type="button" onClick={onClear} className="flex items-center gap-1.5 text-[#e4e1e6] text-xs font-headline font-bold bg-[#0e0e11]/80 rounded-lg px-3 py-1.5">
               <X size={12} /> Remove
             </button>
           </div>
         </div>
       ) : (
-        <div
-          {...getRootProps()}
-          className={cn(
-            "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors",
-            isDragActive
-              ? "border-primary bg-primary/5"
-              : "border-[#49454e]/40 hover:border-primary/40 hover:bg-primary/5",
-            disabled && "pointer-events-none opacity-40"
-          )}
-        >
-          <input {...getInputProps()} />
-          <Upload size={18} className="mx-auto mb-2 text-[#cbc4d0]" />
-          <p className="text-xs text-[#cbc4d0]">{isDragActive ? "Drop here" : hint}</p>
+        <div className="space-y-2">
+          <div
+            {...getRootProps()}
+            className={cn(
+              "rounded-xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors",
+              isDragActive
+                ? "border-primary bg-primary/5"
+                : "border-[#49454e]/40 hover:border-primary/40 hover:bg-primary/5",
+              disabled && "pointer-events-none opacity-40"
+            )}
+          >
+            <input {...getInputProps()} />
+            <Upload size={16} className="mx-auto mb-1.5 text-[#cbc4d0]" />
+            <p className="text-xs text-[#cbc4d0]">{isDragActive ? "Drop here" : hint}</p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowCamera(true)}
+            disabled={disabled}
+            className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-[#49454e]/40 hover:border-primary/40 hover:bg-primary/5 py-2 text-xs text-[#cbc4d0] hover:text-primary font-headline font-bold transition-colors disabled:opacity-40"
+          >
+            <Camera size={12} /> Use Camera
+          </button>
         </div>
+      )}
+      {showCamera && (
+        <CameraModal
+          onCapture={(f) => { onFile(f); setShowCamera(false); }}
+          onClose={() => setShowCamera(false)}
+        />
       )}
     </div>
   );
