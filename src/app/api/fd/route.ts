@@ -32,6 +32,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
+  const duplicate = await prisma.fixedDeposit.findFirst({
+    where: {
+      userId,
+      bankName,
+      principal: Number(principal),
+      startDate: new Date(startDate),
+    },
+  });
+  if (duplicate) {
+    return NextResponse.json(
+      { error: "A Fixed Deposit with the same bank, principal, and start date already exists." },
+      { status: 409 }
+    );
+  }
+
   const fd = await prisma.fixedDeposit.create({
     data: {
       userId,
