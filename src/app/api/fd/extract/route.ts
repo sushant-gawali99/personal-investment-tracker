@@ -29,7 +29,8 @@ Rules:
 - If compounding frequency is not mentioned, default to "quarterly" for compound type
 - maturityInstruction: "renew_principal_interest" = auto-renew with interest; "renew_principal" = auto-renew principal, payout interest; "payout" = credit to savings on maturity
 - payoutFrequency: how interest is paid out. "on_maturity" for cumulative/reinvest FDs; monthly/quarterly/etc for non-cumulative payouts
-- Renewal details and nominee are usually printed on the back side of the receipt
+- Renewal details and nominee are usually printed or handwritten on the back side of the receipt — look carefully for handwritten annotations, checkboxes, stamps, or pen-filled fields
+- Even if text is handwritten, faded, or partially legible, make your best effort to extract it
 - Return ONLY the JSON, no explanation`;
 
 const PROMPT_SINGLE = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This image shows a Fixed Deposit certificate/receipt.");
