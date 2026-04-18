@@ -32,7 +32,7 @@ Rules:
 - payoutFrequency: how interest is paid out. "on_maturity" for cumulative/reinvest FDs; monthly/quarterly/etc for non-cumulative payouts
 - Renewal details and nominee are usually printed or handwritten on the back side of the receipt — look carefully for handwritten annotations, checkboxes, stamps, or pen-filled fields
 - Even if text is handwritten, faded, or partially legible, make your best effort to extract it
-- renewalNumber: if the certificate mentions "Renewal No.", "Renewal Count", or similar, extract that number (e.g. "Renewal No: 2" → 2). null if not mentioned or it's the original FD
+- renewalNumber: check the back side carefully for handwritten renewal annotations — look for "Renewal No.", "Renewal:", "Renewed", tally marks, or any number written near a date that suggests how many times this FD has been renewed. Even partial or unclear handwriting should be interpreted as a best guess. null only if there is clearly no renewal indication
 - Return ONLY the JSON, no explanation`;
 
 const PROMPT_SINGLE = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This image shows a Fixed Deposit certificate/receipt.");
