@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Trash2 } from "lucide-react";
+import { AlertTriangle, Trash2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 
@@ -93,8 +93,12 @@ export function FDList({ fds }: { fds: FD[] }) {
           const maturityValue = fd.maturityAmount ?? fd.principal;
           const interest = maturityValue - fd.principal;
 
+          const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - maturity.getTime()) / 86400000) : 0;
+
           const statusBadge = isMatured ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#49454e]/30 text-[#cbc4d0] font-headline font-bold">Matured</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-400 flex items-center gap-1 font-headline font-bold">
+              <CheckCircle2 size={9} /> Matured
+            </span>
           ) : days <= 7 ? (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ffafd7]/10 text-[#ffafd7] flex items-center gap-1 font-headline font-bold">
               <AlertTriangle size={9} />{days}d left
@@ -109,13 +113,18 @@ export function FDList({ fds }: { fds: FD[] }) {
             <Link
               href={`/dashboard/fd/${fd.id}`}
               key={fd.id}
-              className="block bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3 hover:border-[#49454e]/60 hover:bg-[#1f1f22] transition-colors"
+              className={cn(
+                "block rounded-xl p-4 space-y-3 transition-colors",
+                isMatured
+                  ? "bg-amber-400/5 border border-amber-400/25 hover:border-amber-400/40 hover:bg-amber-400/8"
+                  : "bg-[#1b1b1e] ghost-border hover:border-[#49454e]/60 hover:bg-[#1f1f22]"
+              )}
             >
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#ffafd7]/10 flex items-center justify-center">
-                    <span className="font-headline font-black text-xs text-[#ffafd7]">
+                  <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", isMatured ? "bg-amber-400/10" : "bg-[#ffafd7]/10")}>
+                    <span className={cn("font-headline font-black text-xs", isMatured ? "text-amber-400" : "text-[#ffafd7]")}>
                       {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
                     </span>
                   </div>
@@ -166,8 +175,10 @@ export function FDList({ fds }: { fds: FD[] }) {
                     style={{ width: `${progress}%` }}
                   />
                 </div>
-                <p className="text-[10px] text-[#cbc4d0] text-center">
-                  {fd.tenureMonths}m tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed`}
+                <p className="text-[10px] text-center font-headline font-bold" style={{ color: isMatured ? "rgb(251 191 36)" : undefined }}>
+                  {isMatured
+                    ? `Matured ${maturedDaysAgo === 0 ? "today" : `${maturedDaysAgo}d ago`} · ready to renew or withdraw`
+                    : `${fd.tenureMonths}m tenure · ${Math.round(progress)}% elapsed`}
                 </p>
               </div>
             </Link>

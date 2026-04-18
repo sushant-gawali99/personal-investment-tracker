@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, AlertTriangle, FileText, RefreshCw } from "lucide-react";
+import { ArrowLeft, AlertTriangle, FileText, RefreshCw, CheckCircle2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -82,6 +82,26 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-xs text-[#cbc4d0] hover:text-[#e4e1e6] transition-colors">
         <ArrowLeft size={12} /> Back to Fixed Deposits
       </Link>
+
+      {isMatured && (
+        <div className="bg-amber-400/8 border border-amber-400/30 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <CheckCircle2 size={18} className="text-amber-400 shrink-0" />
+            <div>
+              <p className="text-sm text-amber-400 font-headline font-bold">This FD has matured</p>
+              <p className="text-[11px] text-[#cbc4d0] mt-0.5">
+                Matured on {formatDate(activeMaturity)} · {Math.floor((now.getTime() - activeMaturity.getTime()) / 86400000)} days ago · {formatINR(maturityValue)} available
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/dashboard/fd/renew/${fd.id}`}
+            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-amber-400 px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+          >
+            <RefreshCw size={11} /> Renew Now
+          </Link>
+        </div>
+      )}
 
       {addPrevious && fd.renewals.length === 0 && (
         <div className="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3 flex items-start justify-between gap-4">
