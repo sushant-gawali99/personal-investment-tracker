@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
   const bytes = Buffer.from(await file.arrayBuffer());
   const ext = file.type.split("/")[1] || "bin";
   const name = `${randomBytes(10).toString("hex")}.${ext}`;
-  const dir = join(process.cwd(), "public", "uploads", "fd");
+  const dir = process.env.UPLOAD_DIR ?? join(process.cwd(), "public", "uploads", "fd");
   await mkdir(dir, { recursive: true });
   await writeFile(join(dir, name), bytes);
 
-  return NextResponse.json({ url: `/uploads/fd/${name}` });
+  return NextResponse.json({ url: `/api/fd/image/${name}` });
 }
