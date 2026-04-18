@@ -9,6 +9,7 @@ async function getData(userId: string | null) {
     prisma.fixedDeposit.findMany({
       where: { userId: userId ?? "" },
       orderBy: { maturityDate: "asc" },
+      include: { renewals: { orderBy: { renewalNumber: "asc" } } },
     }),
     userId ? prisma.kiteConfig.findUnique({ where: { userId } }) : null,
   ]);
@@ -25,10 +26,21 @@ async function getData(userId: string | null) {
     }
   }
 
-  const fdRecords: FDRecord[] = fds.map((fd) => ({
-    ...fd,
-    compoundFreq: fd.compoundFreq ?? null,
-  }));
+  const fdRecords: FDRecord[] = fds.map((fd) => {
+    const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+    return {
+      id: fd.id,
+      bankName: fd.bankName,
+      principal: latest?.principal ?? fd.principal,
+      interestRate: latest?.interestRate ?? fd.interestRate,
+      tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+      startDate: latest?.startDate ?? fd.startDate,
+      maturityDate: latest?.maturityDate ?? fd.maturityDate,
+      maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,
+      interestType: fd.interestType,
+      compoundFreq: fd.compoundFreq ?? null,
+    };
+  });
 
   const summary = portfolioSummary(holdings, fdRecords, mfHoldings);
   const timeline = fdAccrualTimeline(fdRecords, 24);

@@ -7,9 +7,24 @@ import { getSessionUserId } from "@/lib/session";
 
 export default async function FDPage() {
   const userId = await getSessionUserId();
-  const fds = await prisma.fixedDeposit.findMany({
+  const rawFds = await prisma.fixedDeposit.findMany({
     where: { userId: userId ?? "" },
     orderBy: { maturityDate: "asc" },
+    include: { renewals: { orderBy: { renewalNumber: "asc" } } },
+  });
+
+  // Resolve each FD to its latest renewal values
+  const fds = rawFds.map((fd) => {
+    const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+    return {
+      ...fd,
+      principal: latest?.principal ?? fd.principal,
+      interestRate: latest?.interestRate ?? fd.interestRate,
+      tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+      startDate: latest?.startDate ?? fd.startDate,
+      maturityDate: latest?.maturityDate ?? fd.maturityDate,
+      maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,
+    };
   });
 
   const totalPrincipal = fds.reduce((s, fd) => s + fd.principal, 0);
