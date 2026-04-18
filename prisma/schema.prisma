@@ -28,6 +28,9 @@ model FixedDeposit {
   notes          String?
   sourceImageUrl     String?
   sourceImageBackUrl String?
+  renewedFromId  String?
+  renewedFrom    FixedDeposit?  @relation("RenewalChain", fields: [renewedFromId], references: [id])
+  renewals       FixedDeposit[] @relation("RenewalChain")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

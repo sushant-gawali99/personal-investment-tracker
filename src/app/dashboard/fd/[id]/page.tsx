@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, AlertTriangle, FileText } from "lucide-react";
+import { ArrowLeft, AlertTriangle, FileText, RefreshCw, ArrowRight } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -35,7 +35,10 @@ function computeAccruedInterest(principal: number, rate: number, startDate: Date
 export default async function FDDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const userId = await getSessionUserId();
-  const fd = await prisma.fixedDeposit.findUnique({ where: { id } });
+  const fd = await prisma.fixedDeposit.findUnique({
+    where: { id },
+    include: { renewedFrom: true, renewals: { orderBy: { startDate: "asc" } } },
+  });
   if (!fd) notFound();
   if (fd.userId && fd.userId !== "" && fd.userId !== userId) notFound();
 
@@ -87,7 +90,15 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
               </div>
             </div>
           </div>
-          <FDDeleteButton id={fd.id} />
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/dashboard/fd/new?renewedFromId=${fd.id}`}
+              className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+            >
+              <RefreshCw size={11} /> Renew
+            </Link>
+            <FDDeleteButton id={fd.id} />
+          </div>
         </div>
 
         {/* Progress */}
@@ -203,6 +214,43 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
       </div>
+
+      {/* Renewal chain */}
+      {(fd.renewedFrom || fd.renewals.length > 0) && (
+        <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3">
+          <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal History</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            {fd.renewedFrom && (
+              <>
+                <Link
+                  href={`/dashboard/fd/${fd.renewedFrom.id}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0e0e11] ghost-border text-xs text-[#cbc4d0] hover:text-primary transition-colors"
+                >
+                  <span className="font-headline font-bold">{fd.renewedFrom.bankName}</span>
+                  <span className="mono text-[10px]">{formatDate(fd.renewedFrom.startDate)} → {formatDate(fd.renewedFrom.maturityDate)}</span>
+                </Link>
+                <ArrowRight size={12} className="text-[#49454e] shrink-0" />
+              </>
+            )}
+            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary font-headline font-bold">
+              Current · {formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}
+            </span>
+            {fd.renewals.map((r) => (
+              <>
+                <ArrowRight key={`arrow-${r.id}`} size={12} className="text-[#49454e] shrink-0" />
+                <Link
+                  key={r.id}
+                  href={`/dashboard/fd/${r.id}`}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0e0e11] ghost-border text-xs text-[#cbc4d0] hover:text-primary transition-colors"
+                >
+                  <span className="font-headline font-bold">{r.bankName}</span>
+                  <span className="mono text-[10px]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
+                </Link>
+              </>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

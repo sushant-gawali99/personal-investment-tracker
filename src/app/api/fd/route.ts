@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     tenureMonths, startDate, maturityDate, maturityAmount,
     interestType, compoundFreq,
     maturityInstruction, payoutFrequency, nomineeName, nomineeRelation,
-    notes, sourceImageUrl, sourceImageBackUrl,
+    notes, sourceImageUrl, sourceImageBackUrl, renewedFromId,
   } = body;
 
   if (!bankName || !principal || !interestRate || !tenureMonths || !startDate || !maturityDate) {
@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
       notes: notes || null,
       sourceImageUrl: sourceImageUrl || null,
       sourceImageBackUrl: sourceImageBackUrl || null,
+      renewedFromId: renewedFromId || null,
     },
   });
 

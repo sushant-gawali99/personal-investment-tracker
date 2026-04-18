@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, ZoomIn } from "lucide-react";
+import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, RefreshCw } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onClose: () => void }) {
@@ -161,9 +161,19 @@ function ImageDropZone({
   );
 }
 
-export function FDNewForm() {
+type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; nomineeName: string | null; nomineeRelation: string | null } | null;
+
+export function FDNewForm({ renewedFrom }: { renewedFrom?: RenewedFrom }) {
   const router = useRouter();
-  const [form, setForm] = useState<FDForm>(empty);
+  const [form, setForm] = useState<FDForm>(() => renewedFrom ? {
+    ...empty,
+    bankName: renewedFrom.bankName,
+    startDate: new Date(renewedFrom.maturityDate).toISOString().split("T")[0],
+    interestRate: renewedFrom.interestRate.toString(),
+    tenureMonths: renewedFrom.tenureMonths.toString(),
+    nomineeName: renewedFrom.nomineeName ?? "",
+    nomineeRelation: renewedFrom.nomineeRelation ?? "",
+  } : empty);
   const [frontFile, setFrontFile] = useState<File | null>(null);
   const [backFile, setBackFile] = useState<File | null>(null);
   const [frontPreview, setFrontPreview] = useState<string | null>(null);
@@ -174,6 +184,8 @@ export function FDNewForm() {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
   const [showOptional, setShowOptional] = useState(false);
+  const [renewalNumber, setRenewalNumber] = useState<number | null>(null);
+  const [dismissedRenewalWarning, setDismissedRenewalWarning] = useState(false);
 
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -221,6 +233,7 @@ export function FDNewForm() {
         nomineeRelation: e.nomineeRelation ?? "",
         notes: "",
       });
+      setRenewalNumber(e.renewalNumber ?? null);
       setExtracted(true);
     } catch {
       setExtractError("Extraction failed. Please fill in manually.");
@@ -259,6 +272,7 @@ export function FDNewForm() {
           maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
           sourceImageUrl,
           sourceImageBackUrl,
+          renewedFromId: renewedFrom?.id ?? null,
         }),
       });
       const json = await res.json();
@@ -274,6 +288,13 @@ export function FDNewForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {renewedFrom && (
+        <div className="flex items-center gap-2 text-xs text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2">
+          <RefreshCw size={12} />
+          <span>Renewing <strong>{renewedFrom.bankName}</strong>{renewedFrom.fdNumber ? ` · FD #${renewedFrom.fdNumber}` : ""} — start date pre-filled with previous maturity date</span>
+        </div>
+      )}
+
       {/* AI Digitize panel */}
       <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
         <div className="flex items-center gap-3">
@@ -326,6 +347,18 @@ export function FDNewForm() {
           <div className="flex items-center gap-2 text-xs text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2">
             <Sparkles size={12} />
             <span>Details extracted — review and confirm below</span>
+          </div>
+        )}
+
+        {extracted && renewalNumber !== null && renewalNumber > 0 && !renewedFrom && !dismissedRenewalWarning && (
+          <div className="bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2.5 space-y-1.5">
+            <p className="text-xs text-amber-400 font-headline font-bold">This appears to be Renewal #{renewalNumber}</p>
+            <p className="text-[11px] text-[#cbc4d0] leading-relaxed">
+              The certificate suggests this FD has been renewed {renewalNumber} time{renewalNumber > 1 ? "s" : ""} before.
+              If the previous {renewalNumber > 1 ? "renewals exist" : "FD exists"} in MyFolio, save this FD first, then link them using the <strong className="text-[#e4e1e6]">Renew</strong> button on each FD&apos;s detail page.
+              If they don&apos;t exist yet, you can add them afterwards and build the chain.
+            </p>
+            <button type="button" onClick={() => setDismissedRenewalWarning(true)} className="text-[11px] text-[#cbc4d0] hover:text-[#e4e1e6] underline">Dismiss</button>
           </div>
         )}
       </div>

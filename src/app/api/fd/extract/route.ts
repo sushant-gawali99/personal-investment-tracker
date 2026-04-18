@@ -19,7 +19,8 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
   "maturityInstruction": "renew_principal_interest" | "renew_principal" | "payout" | null,
   "payoutFrequency": "on_maturity" | "monthly" | "quarterly" | "half_yearly" | "annually" | null,
   "nomineeName": string | null,
-  "nomineeRelation": string | null
+  "nomineeRelation": string | null,
+  "renewalNumber": number | null
 }
 
 Rules:
@@ -31,6 +32,7 @@ Rules:
 - payoutFrequency: how interest is paid out. "on_maturity" for cumulative/reinvest FDs; monthly/quarterly/etc for non-cumulative payouts
 - Renewal details and nominee are usually printed or handwritten on the back side of the receipt — look carefully for handwritten annotations, checkboxes, stamps, or pen-filled fields
 - Even if text is handwritten, faded, or partially legible, make your best effort to extract it
+- renewalNumber: if the certificate mentions "Renewal No.", "Renewal Count", or similar, extract that number (e.g. "Renewal No: 2" → 2). null if not mentioned or it's the original FD
 - Return ONLY the JSON, no explanation`;
 
 const PROMPT_SINGLE = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This image shows a Fixed Deposit certificate/receipt.");
