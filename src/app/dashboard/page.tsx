@@ -7,7 +7,7 @@ import { getSessionUserId } from "@/lib/session";
 async function getData(userId: string | null) {
   const [fds, kiteConfig] = await Promise.all([
     prisma.fixedDeposit.findMany({
-      where: { OR: [{ userId: userId ?? "" }, { userId: "" }] },
+      where: { userId: userId ?? "" },
       orderBy: { maturityDate: "asc" },
     }),
     userId ? prisma.kiteConfig.findUnique({ where: { userId } }) : null,

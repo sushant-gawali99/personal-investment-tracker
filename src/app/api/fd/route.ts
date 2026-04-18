@@ -8,7 +8,7 @@ export async function GET() {
   const userId = result;
 
   const fds = await prisma.fixedDeposit.findMany({
-    where: { OR: [{ userId }, { userId: "" }] },
+    where: { userId },
     orderBy: { maturityDate: "asc" },
   });
   return NextResponse.json({ fds });

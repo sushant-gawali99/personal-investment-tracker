@@ -8,7 +8,7 @@ import { getSessionUserId } from "@/lib/session";
 export default async function FDPage() {
   const userId = await getSessionUserId();
   const fds = await prisma.fixedDeposit.findMany({
-    where: { OR: [{ userId: userId ?? "" }, { userId: "" }] },
+    where: { userId: userId ?? "" },
     orderBy: { maturityDate: "asc" },
   });
 
