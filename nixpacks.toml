@@ -1,5 +1,5 @@
-[phases.setup]
-nixPkgs = ["nodejs_24"]
+[variables]
+NODE_VERSION = "22.13.0"
 
 [phases.install]
 cmds = ["npm ci"]
