@@ -272,15 +272,22 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...form,
-          principal: parseFloat(form.principal),
-          interestRate: parseFloat(form.interestRate),
-          tenureMonths: parseInt(form.tenureMonths),
-          maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
+          // If prior renewals exist, FD record stores the ORIGINAL data (priorRenewals[0])
+          // otherwise stores AI-extracted data as-is
+          principal: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].principal) : parseFloat(form.principal),
+          interestRate: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].interestRate) : parseFloat(form.interestRate),
+          tenureMonths: priorRenewals.length > 0 ? parseInt(priorRenewals[0].tenureMonths) : parseInt(form.tenureMonths),
+          startDate: priorRenewals.length > 0 ? priorRenewals[0].startDate : form.startDate,
+          maturityDate: priorRenewals.length > 0 ? priorRenewals[0].maturityDate : form.maturityDate,
+          maturityAmount: priorRenewals.length > 0
+            ? (priorRenewals[0].maturityAmount ? parseFloat(priorRenewals[0].maturityAmount) : null)
+            : (form.maturityAmount ? parseFloat(form.maturityAmount) : null),
           sourceImageUrl,
           sourceImageBackUrl,
+          // Renewals: intermediate priors (R1..Rn-1) + current AI data as last renewal
           ...(priorRenewals.length > 0 ? {
             renewals: [
-              ...priorRenewals.map((r, i) => ({
+              ...priorRenewals.slice(1).map((r, i) => ({
                 renewalNumber: i + 1,
                 startDate: r.startDate,
                 maturityDate: r.maturityDate,
@@ -290,7 +297,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
                 maturityAmount: r.maturityAmount ? parseFloat(r.maturityAmount) : null,
               })),
               {
-                renewalNumber: priorRenewals.length + 1,
+                renewalNumber: priorRenewals.length,
                 startDate: form.startDate,
                 maturityDate: form.maturityDate,
                 principal: parseFloat(form.principal),
