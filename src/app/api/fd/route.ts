@@ -35,14 +35,15 @@ export async function POST(req: NextRequest) {
   const duplicate = await prisma.fixedDeposit.findFirst({
     where: {
       userId,
-      bankName,
-      principal: Number(principal),
-      startDate: new Date(startDate),
+      OR: [
+        { bankName, principal: Number(principal), startDate: new Date(startDate) },
+        ...(fdNumber ? [{ fdNumber }] : []),
+      ],
     },
   });
   if (duplicate) {
     return NextResponse.json(
-      { error: "A Fixed Deposit with the same bank, principal, and start date already exists." },
+      { error: "A Fixed Deposit with the same details already exists." },
       { status: 409 }
     );
   }
