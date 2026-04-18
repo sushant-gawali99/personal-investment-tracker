@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Trash2, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -80,110 +79,101 @@ export function FDList({ fds }: { fds: FD[] }) {
         ))}
       </div>
 
-      {/* FD cards grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {filtered.map((fd) => {
-          const start = new Date(fd.startDate);
-          const maturity = new Date(fd.maturityDate);
-          const isMatured = maturity <= now;
-          const days = daysUntil(maturity);
-          const totalDays = (maturity.getTime() - start.getTime()) / 86400000;
-          const elapsedDays = (now.getTime() - start.getTime()) / 86400000;
-          const progress = Math.min(100, Math.max(0, (elapsedDays / totalDays) * 100));
-          const maturityValue = fd.maturityAmount ?? fd.principal;
-          const interest = maturityValue - fd.principal;
-
-          const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - maturity.getTime()) / 86400000) : 0;
-
-          const statusBadge = isMatured ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-400 flex items-center gap-1 font-headline font-bold">
-              <CheckCircle2 size={9} /> Matured
-            </span>
-          ) : days <= 7 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ffafd7]/10 text-[#ffafd7] flex items-center gap-1 font-headline font-bold">
-              <AlertTriangle size={9} />{days}d left
-            </span>
-          ) : days <= 30 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-headline font-bold">{days}d left</span>
-          ) : (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-headline font-bold">{days}d left</span>
-          );
-
-          return (
-            <Link
-              href={`/dashboard/fd/${fd.id}`}
-              key={fd.id}
-              className={cn(
-                "block rounded-xl p-4 space-y-3 transition-colors",
-                isMatured
-                  ? "bg-amber-400/5 border border-amber-400/25 hover:border-amber-400/40 hover:bg-amber-400/8"
-                  : "bg-[#1b1b1e] ghost-border hover:border-[#49454e]/60 hover:bg-[#1f1f22]"
-              )}
-            >
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", isMatured ? "bg-amber-400/10" : "bg-[#ffafd7]/10")}>
-                    <span className={cn("font-headline font-black text-xs", isMatured ? "text-amber-400" : "text-[#ffafd7]")}>
-                      {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
-                    </span>
-                  </div>
-                  <div>
-                    <p className="font-headline font-bold text-sm text-[#e4e1e6]">{fd.bankName}</p>
-                    {fd.fdNumber && <p className="text-[10px] text-[#cbc4d0] mono mt-0.5">{fd.fdNumber}</p>}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  {statusBadge}
-                  <button
-                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteFD(fd.id); }}
-                    disabled={deleting === fd.id}
-                    className="p-1.5 rounded-lg hover:bg-[#ffafd7]/10 text-[#cbc4d0] hover:text-[#ffafd7] transition-colors disabled:opacity-40"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              </div>
-
-              {/* Amount breakdown */}
-              <div className="grid grid-cols-3 gap-3">
+      {/* FD table */}
+      <div className="bg-[#1b1b1e] ghost-border rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-[rgba(73,69,78,0.2)] bg-[#0e0e11]/40">
                 {[
-                  { label: "Principal", value: formatINR(fd.principal), color: "text-[#e4e1e6]", border: "border-[#49454e]/40" },
-                  { label: "Interest", value: `+${formatINR(interest)}`, color: "text-primary", border: "border-primary/30" },
-                  { label: "At Maturity", value: formatINR(maturityValue), color: "text-[#d2bcfa]", border: "border-[#d2bcfa]/30" },
-                ].map(({ label, value, color, border }) => (
-                  <div key={label} className={cn("border-l-2 pl-3", border)}>
-                    <p className="text-[9px] text-[#cbc4d0] uppercase tracking-wider font-label">{label}</p>
-                    <p className={cn("mono text-sm font-bold mt-0.5", color)}>{value}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Progress bar */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-[10px]">
-                  <span className="text-[#cbc4d0]">{formatDate(fd.startDate)}</span>
-                  <span className="text-[#e4e1e6] font-headline font-bold">{fd.interestRate}% p.a.</span>
-                  <span className="text-[#cbc4d0]">{formatDate(fd.maturityDate)}</span>
-                </div>
-                <div className="h-1.5 rounded-full bg-[#2a2a2d] overflow-hidden">
-                  <div
+                  "Bank",
+                  "FD No.",
+                  "Principal",
+                  "Rate",
+                  "Tenure",
+                  "Start",
+                  "Maturity",
+                  "At Maturity",
+                  "Status",
+                  "",
+                ].map((h, i) => (
+                  <th
+                    key={i}
                     className={cn(
-                      "h-full rounded-full transition-all",
-                      isMatured ? "bg-[#49454e]" : "bg-gradient-to-r from-[#ffafd7]/60 to-[#ffafd7]"
+                      "text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label font-normal px-3 py-2.5",
+                      i === 2 || i === 3 || i === 7 ? "text-right" : "text-left"
                     )}
-                    style={{ width: `${progress}%` }}
-                  />
-                </div>
-                <p className="text-[10px] text-center font-headline font-bold" style={{ color: isMatured ? "rgb(251 191 36)" : undefined }}>
-                  {isMatured
-                    ? `Matured ${maturedDaysAgo === 0 ? "today" : `${maturedDaysAgo}d ago`} · ready to renew or withdraw`
-                    : `${fd.tenureMonths}m tenure · ${Math.round(progress)}% elapsed`}
-                </p>
-              </div>
-            </Link>
-          );
-        })}
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((fd) => {
+                const maturity = new Date(fd.maturityDate);
+                const isMatured = maturity <= now;
+                const days = daysUntil(maturity);
+                const maturityValue = fd.maturityAmount ?? fd.principal;
+                const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - maturity.getTime()) / 86400000) : 0;
+
+                const statusBadge = isMatured ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-400 font-headline font-bold">
+                    <CheckCircle2 size={9} />
+                    {maturedDaysAgo === 0 ? "Matured today" : `Matured ${maturedDaysAgo}d ago`}
+                  </span>
+                ) : days <= 7 ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#ffafd7]/10 text-[#ffafd7] font-headline font-bold">
+                    <AlertTriangle size={9} />{days}d left
+                  </span>
+                ) : days <= 30 ? (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-headline font-bold">{days}d left</span>
+                ) : (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-headline font-bold">{days}d left</span>
+                );
+
+                return (
+                  <tr
+                    key={fd.id}
+                    onClick={() => router.push(`/dashboard/fd/${fd.id}`)}
+                    className={cn(
+                      "border-b border-[rgba(73,69,78,0.12)] last:border-0 cursor-pointer transition-colors",
+                      isMatured ? "bg-amber-400/[0.03] hover:bg-amber-400/[0.07]" : "hover:bg-[#0e0e11]/50"
+                    )}
+                  >
+                    <td className="px-3 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", isMatured ? "bg-amber-400/10" : "bg-[#ffafd7]/10")}>
+                          <span className={cn("font-headline font-black text-[10px]", isMatured ? "text-amber-400" : "text-[#ffafd7]")}>
+                            {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                          </span>
+                        </div>
+                        <span className="font-headline font-bold text-[#e4e1e6] text-xs">{fd.bankName}</span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-3 text-[11px] text-[#cbc4d0] mono">{fd.fdNumber ?? "—"}</td>
+                    <td className="px-3 py-3 text-right mono text-[#e4e1e6]">{formatINR(fd.principal)}</td>
+                    <td className="px-3 py-3 text-right mono text-[#e4e1e6]">{fd.interestRate}%</td>
+                    <td className="px-3 py-3 text-[#cbc4d0]">{fd.tenureMonths}m</td>
+                    <td className="px-3 py-3 text-[#cbc4d0] text-xs">{formatDate(fd.startDate)}</td>
+                    <td className="px-3 py-3 text-[#cbc4d0] text-xs">{formatDate(fd.maturityDate)}</td>
+                    <td className="px-3 py-3 text-right mono text-[#d2bcfa] font-bold">{formatINR(maturityValue)}</td>
+                    <td className="px-3 py-3">{statusBadge}</td>
+                    <td className="px-3 py-3 text-right">
+                      <button
+                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteFD(fd.id); }}
+                        disabled={deleting === fd.id}
+                        className="p-1.5 rounded-lg hover:bg-[#ffafd7]/10 text-[#cbc4d0] hover:text-[#ffafd7] transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
