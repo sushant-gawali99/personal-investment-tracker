@@ -75,8 +75,11 @@ export async function POST(req: NextRequest) {
     });
 
     if (Array.isArray(renewals) && renewals.length > 0) {
-      await tx.fDRenewal.createMany({
-        data: renewals.map((r: { renewalNumber: number; startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; maturityAmount?: number; maturityInstruction?: string; payoutFrequency?: string }) => ({
+      const validRenewals = renewals.filter((r: { startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number }) =>
+        r.startDate && r.maturityDate && !isNaN(new Date(r.startDate).getTime()) && !isNaN(new Date(r.maturityDate).getTime()) && Number(r.principal) > 0 && Number(r.interestRate) > 0 && Number(r.tenureMonths) > 0
+      );
+      if (validRenewals.length > 0) await tx.fDRenewal.createMany({
+        data: validRenewals.map((r: { renewalNumber: number; startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; maturityAmount?: number; maturityInstruction?: string; payoutFrequency?: string }) => ({
           fdId: created.id,
           renewalNumber: r.renewalNumber,
           startDate: new Date(r.startDate),
