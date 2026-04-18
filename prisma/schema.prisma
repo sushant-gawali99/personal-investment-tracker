@@ -28,13 +28,29 @@ model FixedDeposit {
   notes          String?
   sourceImageUrl     String?
   sourceImageBackUrl String?
-  renewedFromId  String?
-  renewedFrom    FixedDeposit?  @relation("RenewalChain", fields: [renewedFromId], references: [id])
-  renewals       FixedDeposit[] @relation("RenewalChain")
+  renewals       FDRenewal[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   @@index([userId])
+}
+
+model FDRenewal {
+  id             String   @id @default(cuid())
+  fdId           String
+  fd             FixedDeposit @relation(fields: [fdId], references: [id], onDelete: Cascade)
+  renewalNumber  Int
+  startDate      DateTime
+  maturityDate   DateTime
+  principal      Float
+  interestRate   Float
+  tenureMonths   Int
+  maturityAmount Float?
+  maturityInstruction String?
+  payoutFrequency     String?
+  createdAt      DateTime @default(now())
+
+  @@index([fdId])
 }
 
 model KiteConfig {

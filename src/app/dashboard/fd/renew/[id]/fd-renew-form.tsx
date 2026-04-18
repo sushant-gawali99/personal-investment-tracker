@@ -42,27 +42,23 @@ export function FDRenewForm({ fd }: Props) {
     setError("");
     setSaving(true);
     try {
-      const res = await fetch("/api/fd", {
+      const res = await fetch(`/api/fd/${fd.id}/renewals`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          bankName: fd.bankName,
+          startDate,
+          maturityDate,
           principal: parseFloat(principal),
           interestRate: parseFloat(interestRate),
           tenureMonths: parseInt(tenureMonths),
-          startDate,
-          maturityDate,
           maturityAmount: maturityAmount ? parseFloat(maturityAmount) : null,
           maturityInstruction: maturityInstruction || null,
           payoutFrequency: payoutFrequency || null,
-          nomineeName: fd.nomineeName,
-          nomineeRelation: fd.nomineeRelation,
-          renewedFromId: fd.id,
         }),
       });
       const json = await res.json();
       if (!res.ok) { setError(json.error ?? "Failed to save."); return; }
-      router.push(`/dashboard/fd/${json.fd.id}`);
+      router.push(`/dashboard/fd/${fd.id}`);
       router.refresh();
     } catch {
       setError("Failed to save. Please try again.");

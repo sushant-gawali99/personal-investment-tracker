@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, AlertTriangle, FileText, RefreshCw, ArrowRight } from "lucide-react";
+import { ArrowLeft, AlertTriangle, FileText, RefreshCw } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -37,22 +37,32 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
   const userId = await getSessionUserId();
   const fd = await prisma.fixedDeposit.findUnique({
     where: { id },
-    include: { renewedFrom: true, renewals: { orderBy: { startDate: "asc" } } },
+    include: { renewals: { orderBy: { renewalNumber: "asc" } } },
   });
   if (!fd) notFound();
   if (fd.userId && fd.userId !== "" && fd.userId !== userId) notFound();
 
   const now = new Date();
-  const start = new Date(fd.startDate);
-  const maturity = new Date(fd.maturityDate);
-  const isMatured = maturity <= now;
-  const days = daysUntil(maturity);
-  const totalDays = (maturity.getTime() - start.getTime()) / 86400000;
-  const elapsedDays = Math.max(0, (now.getTime() - start.getTime()) / 86400000);
+
+  // Use latest renewal if present, otherwise use original FD dates/amounts
+  const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+  const activePrincipal = latest?.principal ?? fd.principal;
+  const activeRate = latest?.interestRate ?? fd.interestRate;
+  const activeStart = new Date(latest?.startDate ?? fd.startDate);
+  const activeMaturity = new Date(latest?.maturityDate ?? fd.maturityDate);
+  const activeTenure = latest?.tenureMonths ?? fd.tenureMonths;
+  const activeMaturityAmount = latest?.maturityAmount ?? fd.maturityAmount;
+  const activeInstruction = latest?.maturityInstruction ?? fd.maturityInstruction;
+  const activeFrequency = latest?.payoutFrequency ?? fd.payoutFrequency;
+
+  const isMatured = activeMaturity <= now;
+  const days = daysUntil(activeMaturity);
+  const totalDays = (activeMaturity.getTime() - activeStart.getTime()) / 86400000;
+  const elapsedDays = Math.max(0, (now.getTime() - activeStart.getTime()) / 86400000);
   const progress = Math.min(100, Math.max(0, (elapsedDays / totalDays) * 100));
-  const maturityValue = fd.maturityAmount ?? fd.principal;
-  const totalInterest = maturityValue - fd.principal;
-  const accrued = computeAccruedInterest(fd.principal, fd.interestRate, start, now > maturity ? maturity : now, fd.interestType, fd.compoundFreq);
+  const maturityValue = activeMaturityAmount ?? activePrincipal;
+  const totalInterest = maturityValue - activePrincipal;
+  const accrued = computeAccruedInterest(activePrincipal, activeRate, activeStart, now > activeMaturity ? activeMaturity : now, fd.interestType, fd.compoundFreq);
 
   const statusBadge = isMatured ? (
     <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#49454e]/30 text-[#cbc4d0] font-headline font-bold">Matured</span>
@@ -86,6 +96,11 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
               <div className="flex items-center gap-3 mt-1">
                 {fd.fdNumber && <span className="text-[11px] text-[#cbc4d0] mono">FD #{fd.fdNumber}</span>}
                 {fd.accountNumber && <span className="text-[11px] text-[#cbc4d0] mono">A/c {fd.accountNumber}</span>}
+                {fd.renewals.length > 0 && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">
+                    Renewal #{fd.renewals.length}
+                  </span>
+                )}
                 {statusBadge}
               </div>
             </div>
@@ -104,9 +119,9 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
         {/* Progress */}
         <div className="mt-5 space-y-2">
           <div className="flex justify-between text-[11px]">
-            <span className="text-[#cbc4d0]">{formatDate(fd.startDate)}</span>
-            <span className="text-[#e4e1e6] font-headline font-bold">{fd.interestRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
-            <span className="text-[#cbc4d0]">{formatDate(fd.maturityDate)}</span>
+            <span className="text-[#cbc4d0]">{formatDate(activeStart)}</span>
+            <span className="text-[#e4e1e6] font-headline font-bold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
+            <span className="text-[#cbc4d0]">{formatDate(activeMaturity)}</span>
           </div>
           <div className="h-1.5 rounded-full bg-[#2a2a2d] overflow-hidden">
             <div
@@ -115,7 +130,7 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
             />
           </div>
           <p className="text-[11px] text-[#cbc4d0] text-center">
-            {fd.tenureMonths} months tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
+            {activeTenure} months tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
           </p>
         </div>
       </div>
@@ -123,7 +138,7 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
       {/* Amount breakdown */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "Principal", value: formatINR(fd.principal), color: "text-[#e4e1e6]" },
+          { label: "Principal", value: formatINR(activePrincipal), color: "text-[#e4e1e6]" },
           { label: "Accrued Interest", value: formatINR(accrued), color: "text-primary" },
           { label: "Total Interest", value: formatINR(totalInterest), color: "text-primary" },
           { label: "Maturity Value", value: formatINR(maturityValue), color: "text-[#d2bcfa]" },
@@ -147,9 +162,9 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
                 ["Account Number", fd.accountNumber ?? "—"],
                 ["Interest Type", fd.interestType],
                 ["Compound Frequency", fd.interestType === "compound" ? (fd.compoundFreq ?? "—") : "—"],
-                ["Tenure", `${fd.tenureMonths} months`],
-                ["Start Date", formatDate(fd.startDate)],
-                ["Maturity Date", formatDate(fd.maturityDate)],
+                ["Tenure", `${activeTenure} months`],
+                ["Start Date", formatDate(activeStart)],
+                ["Maturity Date", formatDate(activeMaturity)],
                 ["Created", formatDate(fd.createdAt)],
               ].map(([k, v]) => (
                 <div key={k} className="flex items-center justify-between gap-4 py-1 border-b border-[#49454e]/15 last:border-b-0">
@@ -164,8 +179,8 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
             <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal &amp; Nominee</h2>
             <dl className="text-xs space-y-2">
               {[
-                ["Maturity Instruction", formatInstruction(fd.maturityInstruction)],
-                ["Payout Frequency", formatFrequency(fd.payoutFrequency)],
+                ["Maturity Instruction", formatInstruction(activeInstruction)],
+                ["Payout Frequency", formatFrequency(activeFrequency)],
                 ["Nominee", fd.nomineeName ?? "—"],
                 ["Nominee Relation", fd.nomineeRelation ?? "—"],
               ].map(([k, v]) => (
@@ -215,38 +230,33 @@ export default async function FDDetailPage({ params }: { params: Promise<{ id: s
         </div>
       </div>
 
-      {/* Renewal chain */}
-      {(fd.renewedFrom || fd.renewals.length > 0) && (
+      {/* Renewal history */}
+      {fd.renewals.length > 0 && (
         <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3">
           <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal History</h2>
-          <div className="flex flex-wrap items-center gap-2">
-            {fd.renewedFrom && (
-              <>
-                <Link
-                  href={`/dashboard/fd/${fd.renewedFrom.id}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0e0e11] ghost-border text-xs text-[#cbc4d0] hover:text-primary transition-colors"
-                >
-                  <span className="font-headline font-bold">{fd.renewedFrom.bankName}</span>
-                  <span className="mono text-[10px]">{formatDate(fd.renewedFrom.startDate)} → {formatDate(fd.renewedFrom.maturityDate)}</span>
-                </Link>
-                <ArrowRight size={12} className="text-[#49454e] shrink-0" />
-              </>
-            )}
-            <span className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 border border-primary/20 text-xs text-primary font-headline font-bold">
-              Current · {formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}
-            </span>
+          <div className="space-y-2">
+            {/* Original */}
+            <div className="flex items-center justify-between text-xs py-2 border-b border-[#49454e]/15">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#49454e]/30 text-[#cbc4d0] font-headline font-bold">Original</span>
+                <span className="text-[#cbc4d0]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
+              </div>
+              <div className="text-right">
+                <span className="mono text-[#e4e1e6]">{formatINR(fd.principal)}</span>
+                <span className="text-[#cbc4d0] ml-2">@ {fd.interestRate}%</span>
+              </div>
+            </div>
             {fd.renewals.map((r) => (
-              <>
-                <ArrowRight key={`arrow-${r.id}`} size={12} className="text-[#49454e] shrink-0" />
-                <Link
-                  key={r.id}
-                  href={`/dashboard/fd/${r.id}`}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#0e0e11] ghost-border text-xs text-[#cbc4d0] hover:text-primary transition-colors"
-                >
-                  <span className="font-headline font-bold">{r.bankName}</span>
-                  <span className="mono text-[10px]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
-                </Link>
-              </>
+              <div key={r.id} className="flex items-center justify-between text-xs py-2 border-b border-[#49454e]/15 last:border-b-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">R{r.renewalNumber}</span>
+                  <span className="text-[#cbc4d0]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
+                </div>
+                <div className="text-right">
+                  <span className="mono text-[#e4e1e6]">{formatINR(r.principal)}</span>
+                  <span className="text-[#cbc4d0] ml-2">@ {r.interestRate}%</span>
+                </div>
+              </div>
             ))}
           </div>
         </div>

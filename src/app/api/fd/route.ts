@@ -69,7 +69,6 @@ export async function POST(req: NextRequest) {
       notes: notes || null,
       sourceImageUrl: sourceImageUrl || null,
       sourceImageBackUrl: sourceImageBackUrl || null,
-      renewedFromId: renewedFromId || null,
     },
   });
 

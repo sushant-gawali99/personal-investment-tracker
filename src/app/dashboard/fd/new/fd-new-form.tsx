@@ -163,7 +163,7 @@ function ImageDropZone({
 
 type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; nomineeName: string | null; nomineeRelation: string | null } | null;
 
-export function FDNewForm({ renewedFrom }: { renewedFrom?: RenewedFrom }) {
+export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom; linkToId?: string }) {
   const router = useRouter();
   const [form, setForm] = useState<FDForm>(() => renewedFrom ? {
     ...empty,
@@ -277,7 +277,12 @@ export function FDNewForm({ renewedFrom }: { renewedFrom?: RenewedFrom }) {
       });
       const json = await res.json();
       if (!res.ok) { setSaveError(json.error ?? "Failed to save."); return; }
-      router.push("/dashboard/fd");
+      const newId = json.fd.id;
+      if (renewalNumber && renewalNumber > 0 && !renewedFrom) {
+        router.push(`/dashboard/fd/${newId}?addPrevious=1`);
+      } else {
+        router.push("/dashboard/fd");
+      }
       router.refresh();
     } catch {
       setSaveError("Failed to save. Please try again.");
