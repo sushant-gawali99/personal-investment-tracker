@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     tenureMonths, startDate, maturityDate, maturityAmount,
     interestType, compoundFreq,
     maturityInstruction, payoutFrequency, nomineeName, nomineeRelation,
-    notes, sourceImageUrl, sourceImageBackUrl, renewedFromId,
+    notes, sourceImageUrl, sourceImageBackUrl,
+    renewals, // optional: [{ renewalNumber, startDate, maturityDate, principal, interestRate, tenureMonths, maturityAmount, maturityInstruction, payoutFrequency }]
   } = body;
 
   if (!bankName || !principal || !interestRate || !tenureMonths || !startDate || !maturityDate) {
@@ -48,28 +49,49 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const fd = await prisma.fixedDeposit.create({
-    data: {
-      userId,
-      bankName,
-      fdNumber: fdNumber || null,
-      accountNumber: accountNumber || null,
-      principal: Number(principal),
-      interestRate: Number(interestRate),
-      tenureMonths: Number(tenureMonths),
-      startDate: new Date(startDate),
-      maturityDate: new Date(maturityDate),
-      maturityAmount: maturityAmount ? Number(maturityAmount) : null,
-      interestType: interestType || "compound",
-      compoundFreq: compoundFreq || "quarterly",
-      maturityInstruction: maturityInstruction || null,
-      payoutFrequency: payoutFrequency || null,
-      nomineeName: nomineeName || null,
-      nomineeRelation: nomineeRelation || null,
-      notes: notes || null,
-      sourceImageUrl: sourceImageUrl || null,
-      sourceImageBackUrl: sourceImageBackUrl || null,
-    },
+  const [fd] = await prisma.$transaction(async (tx) => {
+    const created = await tx.fixedDeposit.create({
+      data: {
+        userId,
+        bankName,
+        fdNumber: fdNumber || null,
+        accountNumber: accountNumber || null,
+        principal: Number(principal),
+        interestRate: Number(interestRate),
+        tenureMonths: Number(tenureMonths),
+        startDate: new Date(startDate),
+        maturityDate: new Date(maturityDate),
+        maturityAmount: maturityAmount ? Number(maturityAmount) : null,
+        interestType: interestType || "compound",
+        compoundFreq: compoundFreq || "quarterly",
+        maturityInstruction: maturityInstruction || null,
+        payoutFrequency: payoutFrequency || null,
+        nomineeName: nomineeName || null,
+        nomineeRelation: nomineeRelation || null,
+        notes: notes || null,
+        sourceImageUrl: sourceImageUrl || null,
+        sourceImageBackUrl: sourceImageBackUrl || null,
+      },
+    });
+
+    if (Array.isArray(renewals) && renewals.length > 0) {
+      await tx.fDRenewal.createMany({
+        data: renewals.map((r: { renewalNumber: number; startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; maturityAmount?: number; maturityInstruction?: string; payoutFrequency?: string }) => ({
+          fdId: created.id,
+          renewalNumber: r.renewalNumber,
+          startDate: new Date(r.startDate),
+          maturityDate: new Date(r.maturityDate),
+          principal: Number(r.principal),
+          interestRate: Number(r.interestRate),
+          tenureMonths: Number(r.tenureMonths),
+          maturityAmount: r.maturityAmount ? Number(r.maturityAmount) : null,
+          maturityInstruction: r.maturityInstruction || null,
+          payoutFrequency: r.payoutFrequency || null,
+        })),
+      });
+    }
+
+    return [created];
   });
 
   return NextResponse.json({ fd }, { status: 201 });

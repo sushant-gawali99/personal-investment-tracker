@@ -161,6 +161,9 @@ function ImageDropZone({
   );
 }
 
+type PriorRenewal = { startDate: string; maturityDate: string; principal: string; interestRate: string; tenureMonths: string; maturityAmount: string };
+const emptyPrior = (): PriorRenewal => ({ startDate: "", maturityDate: "", principal: "", interestRate: "", tenureMonths: "", maturityAmount: "" });
+
 type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; nomineeName: string | null; nomineeRelation: string | null } | null;
 
 export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom; linkToId?: string }) {
@@ -185,7 +188,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [saveError, setSaveError] = useState("");
   const [showOptional, setShowOptional] = useState(false);
   const [renewalNumber, setRenewalNumber] = useState<number | null>(null);
-  const [dismissedRenewalWarning, setDismissedRenewalWarning] = useState(false);
+  const [priorRenewals, setPriorRenewals] = useState<PriorRenewal[]>([]);
 
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -233,7 +236,9 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         nomineeRelation: e.nomineeRelation ?? "",
         notes: "",
       });
-      setRenewalNumber(e.renewalNumber ?? null);
+      const rn = e.renewalNumber ?? null;
+      setRenewalNumber(rn);
+      if (rn && rn > 0) setPriorRenewals(Array.from({ length: rn }, () => emptyPrior()));
       setExtracted(true);
     } catch {
       setExtractError("Extraction failed. Please fill in manually.");
@@ -272,7 +277,30 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
           sourceImageUrl,
           sourceImageBackUrl,
-          renewedFromId: renewedFrom?.id ?? null,
+          ...(priorRenewals.length > 0 ? {
+            renewals: [
+              ...priorRenewals.map((r, i) => ({
+                renewalNumber: i + 1,
+                startDate: r.startDate,
+                maturityDate: r.maturityDate,
+                principal: parseFloat(r.principal),
+                interestRate: parseFloat(r.interestRate),
+                tenureMonths: parseInt(r.tenureMonths),
+                maturityAmount: r.maturityAmount ? parseFloat(r.maturityAmount) : null,
+              })),
+              {
+                renewalNumber: priorRenewals.length + 1,
+                startDate: form.startDate,
+                maturityDate: form.maturityDate,
+                principal: parseFloat(form.principal),
+                interestRate: parseFloat(form.interestRate),
+                tenureMonths: parseInt(form.tenureMonths),
+                maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
+                maturityInstruction: form.maturityInstruction || null,
+                payoutFrequency: form.payoutFrequency || null,
+              },
+            ],
+          } : {}),
         }),
       });
       const json = await res.json();
@@ -355,22 +383,55 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
         )}
 
-        {extracted && renewalNumber !== null && renewalNumber > 0 && !renewedFrom && !dismissedRenewalWarning && (
-          <div className="bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2.5 space-y-1.5">
-            <p className="text-xs text-amber-400 font-headline font-bold">This appears to be Renewal #{renewalNumber}</p>
-            <p className="text-[11px] text-[#cbc4d0] leading-relaxed">
-              The certificate suggests this FD has been renewed {renewalNumber} time{renewalNumber > 1 ? "s" : ""} before.
-              If the previous {renewalNumber > 1 ? "renewals exist" : "FD exists"} in MyFolio, save this FD first, then link them using the <strong className="text-[#e4e1e6]">Renew</strong> button on each FD&apos;s detail page.
-              If they don&apos;t exist yet, you can add them afterwards and build the chain.
-            </p>
-            <button type="button" onClick={() => setDismissedRenewalWarning(true)} className="text-[11px] text-[#cbc4d0] hover:text-[#e4e1e6] underline">Dismiss</button>
+        {extracted && renewalNumber !== null && renewalNumber > 0 && (
+          <div className="bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2">
+            <p className="text-xs text-amber-400 font-headline font-bold">Renewal #{renewalNumber} detected — fill in previous periods below</p>
           </div>
         )}
       </div>
 
+      {/* Prior renewal sections */}
+      {priorRenewals.map((r, i) => (
+        <div key={i} className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">
+              {i === 0 ? "Original FD" : `Renewal #${i}`}
+            </span>
+            <p className="text-xs text-[#cbc4d0]">Fill in the details for this period</p>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: "Start Date", key: "startDate", type: "date" },
+              { label: "Maturity Date", key: "maturityDate", type: "date" },
+              { label: "Principal (₹)", key: "principal", type: "number" },
+              { label: "Interest Rate (% p.a.)", key: "interestRate", type: "number" },
+              { label: "Tenure (months)", key: "tenureMonths", type: "number" },
+              { label: "Maturity Amount (₹)", key: "maturityAmount", type: "number" },
+            ].map(({ label, key, type }) => (
+              <div key={key}>
+                <label className={labelCls}>{label}</label>
+                <input
+                  type={type}
+                  step={type === "number" ? "0.01" : undefined}
+                  className={inputCls}
+                  value={r[key as keyof PriorRenewal]}
+                  onChange={(e) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, [key]: e.target.value } : p))}
+                  placeholder={key === "maturityAmount" ? "Optional" : undefined}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+
       {/* Main fields */}
       <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
-        <p className="font-headline font-bold text-sm text-[#e4e1e6]">FD Details</p>
+        <div className="flex items-center gap-2">
+          {priorRenewals.length > 0
+            ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">Renewal #{priorRenewals.length + 1} (Current)</span>
+            : null}
+          <p className="font-headline font-bold text-sm text-[#e4e1e6]">FD Details</p>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="col-span-2">
