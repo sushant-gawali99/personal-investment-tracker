@@ -20,7 +20,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Luminous Kinetic",
+  title: "MyFolio",
   description: "Personal investment portfolio tracker",
 };
 
