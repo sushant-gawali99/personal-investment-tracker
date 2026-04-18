@@ -1,12 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
-  const fds = await prisma.fixedDeposit.findMany({ orderBy: { maturityDate: "asc" } });
+  const result = await requireUserId();
+  if (result instanceof NextResponse) return result;
+  const userId = result;
+
+  const fds = await prisma.fixedDeposit.findMany({
+    where: { OR: [{ userId }, { userId: "" }] },
+    orderBy: { maturityDate: "asc" },
+  });
   return NextResponse.json({ fds });
 }
 
 export async function POST(req: NextRequest) {
+  const result = await requireUserId();
+  if (result instanceof NextResponse) return result;
+  const userId = result;
+
   const body = await req.json();
   const {
     bankName, fdNumber, accountNumber, principal, interestRate,
@@ -22,6 +34,7 @@ export async function POST(req: NextRequest) {
 
   const fd = await prisma.fixedDeposit.create({
     data: {
+      userId,
       bankName,
       fdNumber: fdNumber || null,
       accountNumber: accountNumber || null,

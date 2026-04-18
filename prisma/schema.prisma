@@ -9,6 +9,7 @@ datasource db {
 
 model FixedDeposit {
   id             String   @id @default(cuid())
+  userId         String   @default("")
   bankName       String
   fdNumber       String?
   accountNumber  String?
@@ -29,10 +30,12 @@ model FixedDeposit {
   sourceImageBackUrl String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+
+  @@index([userId])
 }
 
 model KiteConfig {
-  id          String    @id @default("singleton")
+  userId      String    @id
   apiKey      String
   apiSecret   String
   accessToken String?

@@ -2,11 +2,15 @@ import { prisma } from "@/lib/prisma";
 import { createKiteClient } from "@/lib/kite";
 import { portfolioSummary, fdAccrualTimeline, type Holding, type MFHolding, type FDRecord } from "@/lib/analytics";
 import { OverviewClient } from "./overview-client";
+import { getSessionUserId } from "@/lib/session";
 
-async function getData() {
+async function getData(userId: string | null) {
   const [fds, kiteConfig] = await Promise.all([
-    prisma.fixedDeposit.findMany({ orderBy: { maturityDate: "asc" } }),
-    prisma.kiteConfig.findUnique({ where: { id: "singleton" } }),
+    prisma.fixedDeposit.findMany({
+      where: { OR: [{ userId: userId ?? "" }, { userId: "" }] },
+      orderBy: { maturityDate: "asc" },
+    }),
+    userId ? prisma.kiteConfig.findUnique({ where: { userId } }) : null,
   ]);
 
   let holdings: Holding[] = [];
@@ -28,16 +32,14 @@ async function getData() {
 
   const summary = portfolioSummary(holdings, fdRecords, mfHoldings);
   const timeline = fdAccrualTimeline(fdRecords, 24);
-
-  const upcomingMaturities = fdRecords
-    .filter((fd) => new Date(fd.maturityDate) > new Date())
-    .slice(0, 5);
+  const upcomingMaturities = fdRecords.filter((fd) => new Date(fd.maturityDate) > new Date()).slice(0, 5);
 
   return { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected: !!kiteConfig?.accessToken };
 }
 
 export default async function OverviewPage() {
-  const { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected } = await getData();
+  const userId = await getSessionUserId();
+  const { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected } = await getData(userId);
 
   return (
     <div className="space-y-4">

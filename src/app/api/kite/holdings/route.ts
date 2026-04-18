@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createKiteClient } from "@/lib/kite";
+import { requireUserId } from "@/lib/session";
 
 export async function GET() {
-  const config = await prisma.kiteConfig.findUnique({ where: { id: "singleton" } });
+  const result = await requireUserId();
+  if (result instanceof NextResponse) return result;
+  const userId = result;
+
+  const config = await prisma.kiteConfig.findUnique({ where: { userId } });
 
   if (!config?.accessToken) {
     return NextResponse.json({ error: "not_connected" }, { status: 401 });

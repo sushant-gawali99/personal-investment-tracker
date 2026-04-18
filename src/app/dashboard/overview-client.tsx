@@ -5,6 +5,7 @@ import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, 
 import { AllocationDonut } from "@/components/charts/allocation-donut";
 import { InterestAccrualChart } from "@/components/charts/interest-accrual-chart";
 import { TopHoldingsChart } from "@/components/charts/top-holdings-chart";
+import { WealthProjectionChart } from "@/components/charts/wealth-projection-chart";
 import { formatINR, formatINRCompact, formatPercent, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Holding, MFHolding, FDRecord } from "@/lib/analytics";
@@ -181,6 +182,14 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Wealth Projection */}
+          {summary.cagr > 0 && (
+            <div className="bg-[#1b1b1e] rounded-xl p-4 ghost-border">
+              <h3 className="font-headline font-bold text-sm text-[#e4e1e6] mb-4">Wealth Projection</h3>
+              <WealthProjectionChart currentValue={summary.totalValue} cagr={summary.cagr} />
             </div>
           )}
 

@@ -1,8 +1,10 @@
 import { KiteSettingsForm } from "./kite-settings-form";
 import { prisma } from "@/lib/prisma";
+import { getSessionUserId } from "@/lib/session";
 
 export default async function SettingsPage() {
-  const config = await prisma.kiteConfig.findUnique({ where: { id: "singleton" } });
+  const userId = await getSessionUserId();
+  const config = userId ? await prisma.kiteConfig.findUnique({ where: { userId } }) : null;
   const isConnected =
     !!config?.accessToken &&
     !!config?.tokenExpiry &&

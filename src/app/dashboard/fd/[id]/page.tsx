@@ -5,6 +5,7 @@ import { prisma } from "@/lib/prisma";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { FDDeleteButton } from "./fd-delete-button";
+import { getSessionUserId } from "@/lib/session";
 
 const INSTRUCTION_LABEL: Record<string, string> = {
   renew_principal_interest: "Auto-renew principal + interest",
@@ -33,8 +34,10 @@ function computeAccruedInterest(principal: number, rate: number, startDate: Date
 
 export default async function FDDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const userId = await getSessionUserId();
   const fd = await prisma.fixedDeposit.findUnique({ where: { id } });
   if (!fd) notFound();
+  if (fd.userId && fd.userId !== "" && fd.userId !== userId) notFound();
 
   const now = new Date();
   const start = new Date(fd.startDate);

@@ -3,9 +3,14 @@ import { Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { FDList } from "./fd-list";
 import { formatINR } from "@/lib/format";
+import { getSessionUserId } from "@/lib/session";
 
 export default async function FDPage() {
-  const fds = await prisma.fixedDeposit.findMany({ orderBy: { maturityDate: "asc" } });
+  const userId = await getSessionUserId();
+  const fds = await prisma.fixedDeposit.findMany({
+    where: { OR: [{ userId: userId ?? "" }, { userId: "" }] },
+    orderBy: { maturityDate: "asc" },
+  });
 
   const totalPrincipal = fds.reduce((s, fd) => s + fd.principal, 0);
   const totalMaturity = fds.reduce((s, fd) => s + (fd.maturityAmount ?? fd.principal), 0);

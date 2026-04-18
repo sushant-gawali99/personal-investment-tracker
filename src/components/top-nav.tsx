@@ -2,15 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { TrendingUp, LayoutDashboard, Landmark, Settings, Menu, X } from "lucide-react";
+import { TrendingUp, Landmark, Settings, Menu, X, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import { signOut } from "next-auth/react";
 
 const TABS = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/zerodha", label: "Zerodha", icon: TrendingUp },
-  { href: "/dashboard/fd", label: "Fixed Deposits", icon: Landmark },
-  { href: "/dashboard/settings", label: "Settings", icon: Settings },
+  { href: "/dashboard", label: "Overview" },
+  { href: "/dashboard/zerodha", label: "Zerodha" },
+  { href: "/dashboard/fd", label: "Fixed Deposits" },
+  { href: "/dashboard/settings", label: "Settings" },
 ];
 
 export function TopNav() {
@@ -19,14 +20,13 @@ export function TopNav() {
 
   return (
     <header className="sticky top-0 z-50 bg-[#0e0e11]/80 backdrop-blur-xl border-b border-[rgba(73,69,78,0.15)]">
-      <div className="max-w-[1600px] mx-auto px-6 h-11 flex items-center justify-between">
-        {/* Brand */}
-        <div className="flex items-center gap-10">
+      <div className="max-w-6xl mx-auto px-4 h-11 flex items-center justify-between">
+        {/* Brand + tabs */}
+        <div className="flex items-center gap-8">
           <span className="font-headline text-sm font-bold tracking-tight text-[#e4e1e6]">
             Personal Investment Tracker
           </span>
 
-          {/* Desktop tabs */}
           <nav className="hidden sm:flex items-center gap-6">
             {TABS.map(({ href, label }) => {
               const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
@@ -48,20 +48,31 @@ export function TopNav() {
           </nav>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-1.5 rounded-lg text-[#cbc4d0] hover:text-primary transition-colors"
-          onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
-        >
-          {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
+        {/* Right side */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[#cbc4d0] hover:text-[#ffafd7] hover:bg-[#ffafd7]/8 text-xs font-headline font-bold transition-colors"
+          >
+            <LogOut size={12} />
+            Sign out
+          </button>
+
+          {/* Mobile hamburger */}
+          <button
+            className="sm:hidden p-1.5 rounded-lg text-[#cbc4d0] hover:text-primary transition-colors"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Toggle menu"
+          >
+            {open ? <X size={18} /> : <Menu size={18} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown */}
       {open && (
         <div className="sm:hidden border-t border-[rgba(73,69,78,0.15)] bg-[#0e0e11] px-4 py-3 space-y-1">
-          {TABS.map(({ href, label, icon: Icon }) => {
+          {TABS.map(({ href, label }) => {
             const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
             return (
               <Link
@@ -73,11 +84,17 @@ export function TopNav() {
                   active ? "text-primary bg-primary/10" : "text-[#cbc4d0] hover:text-primary"
                 )}
               >
-                <Icon size={15} />
                 {label}
               </Link>
             );
           })}
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-headline font-bold tracking-tight text-[#cbc4d0] hover:text-[#ffafd7] w-full transition-colors"
+          >
+            <LogOut size={15} />
+            Sign out
+          </button>
         </div>
       )}
     </header>
