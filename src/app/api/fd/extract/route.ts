@@ -20,7 +20,8 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
   "payoutFrequency": "on_maturity" | "monthly" | "quarterly" | "half_yearly" | "annually" | null,
   "nomineeName": string | null,
   "nomineeRelation": string | null,
-  "renewalNumber": number | null
+  "renewalNumber": number | null,
+  "priorPeriods": Array<{ "startDate": "YYYY-MM-DD" | null, "maturityDate": "YYYY-MM-DD" | null, "principal": number | null, "interestRate": number | null, "tenureMonths": number | null, "maturityAmount": number | null }> | null
 }
 
 Rules:
@@ -32,7 +33,25 @@ Rules:
 - payoutFrequency: how interest is paid out. "on_maturity" for cumulative/reinvest FDs; monthly/quarterly/etc for non-cumulative payouts
 - Renewal details and nominee are usually printed or handwritten on the back side of the receipt — look carefully for handwritten annotations, checkboxes, stamps, or pen-filled fields
 - Even if text is handwritten, faded, or partially legible, make your best effort to extract it
-- renewalNumber: check the back side carefully for handwritten renewal annotations — look for "Renewal No.", "Renewal:", "Renewed", tally marks, or any number written near a date that suggests how many times this FD has been renewed. Even partial or unclear handwriting should be interpreted as a best guess. null only if there is clearly no renewal indication
+
+IMPORTANT — current-period fields:
+- principal, interestRate, tenureMonths, startDate, maturityDate must describe the CURRENT (latest / most recent) active period of this FD
+- If the back side shows a renewal table with entries (handwritten or printed), the LATEST renewal row is the current period — use its date of renewal as startDate, its due date as maturityDate, its period/amount/rate as tenureMonths/principal/interestRate
+- Only if NO renewal has occurred, use the original opening date, original maturity date, and original amount/rate from the front side
+
+renewalNumber — count of COMPLETED renewals only:
+- 0 or null = this FD has never been renewed (only the original period exists)
+- 1 = renewed ONCE (one entry in the renewal table)
+- 2 = renewed twice (two entries in the renewal table)
+- Do NOT count the original opening as a renewal. Count ONLY filled rows in the "Details of Renewal" / renewal table on the back. Tally marks, handwritten rows, or stamped entries each count as one renewal
+
+priorPeriods — historical periods before the current one, in chronological order:
+- If renewalNumber > 0, populate priorPeriods with exactly renewalNumber entries
+- priorPeriods[0] = the ORIGINAL period from the front of the receipt (opening date → original maturity date, original amount/rate/tenure)
+- priorPeriods[1..N-1] = intermediate renewals from the back-side renewal table, EXCLUDING the latest one (the latest is already captured in the top-level current-period fields)
+- Example: if renewalNumber=1, priorPeriods has 1 entry = original. The single renewal row is the current period, captured at the top level.
+- Example: if renewalNumber=2, priorPeriods has 2 entries = [original, first renewal]. The second (latest) renewal row is the current period.
+- If renewalNumber is 0 or null, set priorPeriods to null
 - Return ONLY the JSON, no explanation`;
 
 const PROMPT_SINGLE = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This image shows a Fixed Deposit certificate/receipt.");

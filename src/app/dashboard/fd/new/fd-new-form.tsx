@@ -239,7 +239,23 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       });
       const rn = e.renewalNumber ?? null;
       setRenewalNumber(rn);
-      if (rn && rn > 0) setPriorRenewals(Array.from({ length: rn }, () => emptyPrior()));
+      if (rn && rn > 0) {
+        const aiPriors = Array.isArray(e.priorPeriods) ? e.priorPeriods : [];
+        setPriorRenewals(
+          Array.from({ length: rn }, (_, i) => {
+            const p = aiPriors[i];
+            if (!p) return emptyPrior();
+            return {
+              startDate: toDateInput(p.startDate),
+              maturityDate: toDateInput(p.maturityDate),
+              principal: p.principal != null ? p.principal.toString() : "",
+              interestRate: p.interestRate != null ? p.interestRate.toString() : "",
+              tenureMonths: p.tenureMonths != null ? p.tenureMonths.toString() : "",
+              maturityAmount: p.maturityAmount != null ? p.maturityAmount.toString() : "",
+            };
+          })
+        );
+      }
       setExtracted(true);
     } catch {
       setExtractError("Extraction failed. Please fill in manually.");
@@ -410,7 +426,13 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           <div className="grid grid-cols-2 gap-4">
             {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
               <div key={key}>
-                <label className={labelCls}>{key === "startDate" ? "Start Date" : "Maturity Date"}</label>
+                <label className={labelCls}>
+                  {key === "startDate"
+                    ? "Start Date"
+                    : i === 0
+                      ? "Due Date (original, before renewal)"
+                      : "Due Date (before next renewal)"}
+                </label>
                 <DatePicker
                   value={r[key]}
                   onChange={(v) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, [key]: v } : p))}
@@ -443,7 +465,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
         <div className="flex items-center gap-2">
           {priorRenewals.length > 0
-            ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">Renewal #{priorRenewals.length + 1} (Current)</span>
+            ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">Renewal #{priorRenewals.length} (Current)</span>
             : null}
           <p className="font-headline font-bold text-sm text-[#e4e1e6]">FD Details</p>
         </div>
@@ -475,12 +497,12 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
 
           <div>
-            <label className={labelCls}>Start Date *</label>
+            <label className={labelCls}>{priorRenewals.length > 0 ? "Renewal Start Date *" : "Start Date *"}</label>
             <DatePicker value={form.startDate} onChange={(v) => set("startDate", v)} required />
           </div>
 
           <div>
-            <label className={labelCls}>Maturity Date *</label>
+            <label className={labelCls}>{priorRenewals.length > 0 ? "New Due Date *" : "Maturity Date *"}</label>
             <DatePicker value={form.maturityDate} onChange={(v) => set("maturityDate", v)} required />
           </div>
 
