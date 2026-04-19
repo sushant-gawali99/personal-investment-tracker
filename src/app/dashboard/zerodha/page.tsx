@@ -35,10 +35,10 @@ export default async function ZerodhaPage() {
   const data = await getKiteData(userId);
 
   const header = (
-    <div className="flex items-center justify-between gap-4">
+    <div className="flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <h1 className="font-headline font-semibold text-lg text-[#e4e1e6] tracking-tight">Zerodha</h1>
-        <p className="text-[#cbc4d0] text-xs mt-0.5">Holdings and positions from your Kite account.</p>
+        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Zerodha</h1>
+        <p className="text-[14px] text-[#6a6a6a] mt-1">Holdings and positions from your Kite account.</p>
       </div>
       {data.status === "ok" && (
         <SyncStatus syncedAt={data.syncedAt.toISOString()} sessionExpired={data.sessionExpired} />
@@ -49,7 +49,7 @@ export default async function ZerodhaPage() {
 
   if (data.status === "not_configured" || data.status === "expired") {
     return (
-      <div className="space-y-5">
+      <div className="space-y-6">
         {header}
         <ConnectKiteBanner status={data.status} hasConfig={!!data.config?.apiKey} />
       </div>
@@ -58,18 +58,18 @@ export default async function ZerodhaPage() {
 
   if (data.status === "never_synced") {
     return (
-      <div className="space-y-5">
+      <div className="space-y-6">
         {header}
-        <div className="bg-[#1b1b1e] ghost-border rounded-xl p-8 text-center">
-          <p className="font-headline font-bold text-sm text-[#e4e1e6]">No data yet</p>
-          <p className="text-[#cbc4d0] text-xs mt-1">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
+        <div className="ab-card p-10 text-center">
+          <p className="text-[16px] font-semibold text-[#222222]">No data yet</p>
+          <p className="text-[14px] text-[#6a6a6a] mt-1.5">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
       {header}
       <ZerodhaDashboard holdings={data.holdings} positions={data.positions} mfHoldings={data.mfHoldings} />
     </div>

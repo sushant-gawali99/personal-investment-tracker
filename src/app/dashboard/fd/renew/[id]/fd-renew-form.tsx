@@ -5,9 +5,6 @@ import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 
-const inputCls = "w-full bg-[#0e0e11] ghost-border rounded-lg px-3 py-2.5 text-sm text-[#e4e1e6] placeholder:text-[#cbc4d0] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/40 transition-colors";
-const labelCls = "block text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label mb-1.5";
-
 type Props = {
   fd: {
     id: string;
@@ -69,72 +66,92 @@ export function FDRenewForm({ fd }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="bg-[#1b1b1e] ghost-border rounded-xl p-5 space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+      <section className="ab-card p-6 space-y-5">
         <div>
-          <label className={labelCls}>Renewal Date *</label>
-          <DatePicker value={startDate} onChange={setStartDate} required />
+          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Renewal Details</p>
+          <p className="text-[13px] text-[#6a6a6a] mt-0.5">
+            Record a new renewal period for <span className="font-semibold text-[#222222]">{fd.bankName}</span>.
+          </p>
         </div>
-        <div>
-          <label className={labelCls}>Due Date (Maturity) *</label>
-          <DatePicker value={maturityDate} onChange={setMaturityDate} required />
-        </div>
-        <div>
-          <label className={labelCls}>Deposit Amount (₹) *</label>
-          <input type="number" min="1" step="0.01" className={inputCls} value={principal} onChange={(e) => setPrincipal(e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelCls}>Rate of Interest (% p.a.) *</label>
-          <input type="number" min="0.01" max="30" step="0.01" className={inputCls} value={interestRate} onChange={(e) => setInterestRate(e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelCls}>Period (months) *</label>
-          <input type="number" min="1" className={inputCls} value={tenureMonths} onChange={(e) => setTenureMonths(e.target.value)} required />
-        </div>
-        <div>
-          <label className={labelCls}>Maturity Amount (₹)</label>
-          <input type="number" min="1" step="0.01" className={inputCls} value={maturityAmount} onChange={(e) => setMaturityAmount(e.target.value)} placeholder="Auto-calculated if blank" />
-        </div>
-        <div>
-          <label className={labelCls}>Maturity Instruction</label>
-          <select className={inputCls} value={maturityInstruction} onChange={(e) => setMaturityInstruction(e.target.value)}>
-            <option value="">Not specified</option>
-            <option value="renew_principal_interest">Auto-renew principal + interest</option>
-            <option value="renew_principal">Auto-renew principal, payout interest</option>
-            <option value="payout">Credit to savings on maturity</option>
-          </select>
-        </div>
-        <div>
-          <label className={labelCls}>Interest Payout Frequency</label>
-          <select className={inputCls} value={payoutFrequency} onChange={(e) => setPayoutFrequency(e.target.value)}>
-            <option value="">Not specified</option>
-            <option value="on_maturity">On maturity (cumulative)</option>
-            <option value="monthly">Monthly</option>
-            <option value="quarterly">Quarterly</option>
-            <option value="half_yearly">Half-yearly</option>
-            <option value="annually">Annually</option>
-          </select>
-        </div>
-      </div>
 
-      {error && <p className="text-xs text-[#ffafd7] bg-[#ffafd7]/5 border border-[#ffafd7]/20 rounded-lg px-3 py-2">{error}</p>}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="ab-label">Renewal Date *</label>
+            <DatePicker value={startDate} onChange={setStartDate} required />
+          </div>
+          <div>
+            <label className="ab-label">Due Date (Maturity) *</label>
+            <DatePicker value={maturityDate} onChange={setMaturityDate} required />
+          </div>
+          <div>
+            <label className="ab-label">Deposit Amount (₹) *</label>
+            <input type="number" min="1" step="0.01" className="ab-input mono" value={principal} onChange={(e) => setPrincipal(e.target.value)} required />
+          </div>
+          <div>
+            <label className="ab-label">Rate of Interest (% p.a.) *</label>
+            <input type="number" min="0.01" max="30" step="0.01" className="ab-input mono" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} required />
+          </div>
+          <div>
+            <label className="ab-label">Period (months) *</label>
+            <input type="number" min="1" className="ab-input mono" value={tenureMonths} onChange={(e) => setTenureMonths(e.target.value)} required />
+          </div>
+          <div>
+            <label className="ab-label">Maturity Amount (₹)</label>
+            <input type="number" min="1" step="0.01" className="ab-input mono" value={maturityAmount} onChange={(e) => setMaturityAmount(e.target.value)} placeholder="Auto-calculated if blank" />
+          </div>
+          <div>
+            <label className="ab-label">Maturity Instruction</label>
+            <select className="ab-input" value={maturityInstruction} onChange={(e) => setMaturityInstruction(e.target.value)}>
+              <option value="">Not specified</option>
+              <option value="renew_principal_interest">Auto-renew principal + interest</option>
+              <option value="renew_principal">Auto-renew principal, payout interest</option>
+              <option value="payout">Credit to savings on maturity</option>
+            </select>
+          </div>
+          <div>
+            <label className="ab-label">Interest Payout Frequency</label>
+            <select className="ab-input" value={payoutFrequency} onChange={(e) => setPayoutFrequency(e.target.value)}>
+              <option value="">Not specified</option>
+              <option value="on_maturity">On maturity (cumulative)</option>
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="half_yearly">Half-yearly</option>
+              <option value="annually">Annually</option>
+            </select>
+          </div>
+        </div>
 
-      <div className="flex items-center gap-3 pt-1">
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-primary px-5 py-2.5 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors shadow-[0_0_12px_rgba(0,223,193,0.2)]"
-        >
-          {saving ? <><Loader2 size={12} className="animate-spin inline mr-1.5" />Saving…</> : "Save Renewal"}
-        </button>
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="rounded-lg ghost-border px-5 py-2.5 text-xs font-headline font-bold text-[#cbc4d0] hover:text-[#e4e1e6] hover:bg-[#1b1b1e] transition-colors"
-        >
-          Cancel
-        </button>
-      </div>
+        {error && (
+          <div
+            className="ab-card-flat px-3 py-2 text-[13px]"
+            style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+          >
+            {error}
+          </div>
+        )}
+
+        <div className="flex items-center justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="ab-btn ab-btn-ghost"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="ab-btn ab-btn-accent"
+          >
+            {saving ? (
+              <><Loader2 size={14} className="animate-spin" /> Saving...</>
+            ) : (
+              "Save Renewal"
+            )}
+          </button>
+        </div>
+      </section>
     </form>
   );
 }

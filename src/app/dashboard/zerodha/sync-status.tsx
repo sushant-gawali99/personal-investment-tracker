@@ -42,27 +42,25 @@ export function SyncStatus({ syncedAt, sessionExpired }: { syncedAt: string | nu
   }
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-4">
       <div className="text-right">
-        <p className="text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label">Last synced</p>
-        <p className="text-xs text-[#e4e1e6] font-headline font-bold mt-0.5">
+        <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Last synced</p>
+        <p className="text-[13px] text-[#222222] font-semibold mt-0.5">
           {syncedAt ? formatRelative(syncedAt) : "Never"}
         </p>
-        {error && <p className="text-[10px] text-[#ffafd7] mt-0.5">{error}</p>}
+        {error && <p className="text-[11px] text-[#c13515] mt-0.5 font-medium">{error}</p>}
         {sessionExpired && !error && (
-          <p className="text-[10px] text-amber-400 mt-0.5 flex items-center justify-end gap-1">
-            <AlertTriangle size={10} /> Session expired — reconnect
+          <p className="text-[11px] text-[#b25e00] mt-0.5 flex items-center justify-end gap-1 font-medium">
+            <AlertTriangle size={11} /> Session expired
           </p>
         )}
       </div>
       <button
         onClick={sync}
         disabled={syncing || sessionExpired}
-        className={cn(
-          "inline-flex items-center gap-1.5 rounded-lg bg-primary px-3.5 py-2 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors shadow-[0_0_12px_rgba(0,223,193,0.2)]"
-        )}
+        className={cn("ab-btn ab-btn-primary")}
       >
-        {syncing ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
+        {syncing ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
         {syncing ? "Syncing…" : "Sync Now"}
       </button>
     </div>

@@ -49,23 +49,21 @@ export default async function FDPage() {
   }, 0);
 
   return (
-    <div className="space-y-5">
-      {/* Page header */}
-      <div className="flex items-center justify-between">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="font-headline font-semibold text-lg text-[#e4e1e6] tracking-tight">Fixed Deposits</h1>
-          <p className="text-[#cbc4d0] text-xs mt-0.5">Track and analyse your fixed deposit investments.</p>
+          <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Fixed Deposits</h1>
+          <p className="text-[14px] text-[#6a6a6a] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
         <Link
           href="/dashboard/fd/new"
-          className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] transition-colors shadow-[0_0_15px_rgba(0,223,193,0.25)]"
+          className="ab-btn ab-btn-accent"
         >
-          <Plus size={13} />
+          <Plus size={15} />
           Add FD
         </Link>
       </div>
 
-      {/* Stat cards */}
       {fds.length > 0 && (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -74,24 +72,23 @@ export default async function FDPage() {
             { label: "Active Deposits", value: String(activeFDs) },
             { label: "Interest This Year", value: formatINR(interestThisYear) },
           ].map(({ label, value }) => (
-            <div key={label} className="bg-[#1b1b1e] ghost-border rounded-xl p-3.5">
-              <p className="text-[#cbc4d0] text-[10px] uppercase tracking-widest font-label mb-1">{label}</p>
-              <p className="mono text-xl font-semibold text-[#e4e1e6]">{value}</p>
+            <div key={label} className="ab-card p-4">
+              <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold mb-1">{label}</p>
+              <p className="mono text-[20px] font-semibold text-[#222222]">{value}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Interest summary row */}
       {fds.length > 0 && (
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[#0e0e11] ghost-border rounded-xl p-4 flex items-center justify-between">
-            <p className="text-xs text-[#cbc4d0] uppercase tracking-wider font-label">Total Principal</p>
-            <p className="mono font-bold text-[#e4e1e6]">{formatINR(totalPrincipal)}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="ab-card-flat p-4 flex items-center justify-between">
+            <p className="text-[12px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Total Principal</p>
+            <p className="mono font-semibold text-[#222222]">{formatINR(totalPrincipal)}</p>
           </div>
-          <div className="bg-[#0e0e11] ghost-border rounded-xl p-4 flex items-center justify-between">
-            <p className="text-xs text-[#cbc4d0] uppercase tracking-wider font-label">Total Interest Earned</p>
-            <p className="mono font-bold text-primary">{formatINR(totalInterest)}</p>
+          <div className="ab-card-flat p-4 flex items-center justify-between">
+            <p className="text-[12px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Total Interest Earned</p>
+            <p className="mono font-semibold text-[#00a651]">{formatINR(totalInterest)}</p>
           </div>
         </div>
       )}

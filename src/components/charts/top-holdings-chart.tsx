@@ -26,22 +26,18 @@ export function TopHoldingsChart({ holdings }: { holdings: Holding[] }) {
     }));
 
   if (!top.length) {
-    return <div className="flex items-center justify-center h-48 text-[#cbc4d0] text-sm">No holdings</div>;
+    return <div className="flex items-center justify-center h-48 text-[#6a6a6a] text-sm">No holdings</div>;
   }
 
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={top} layout="vertical" margin={{ top: 0, right: 16, left: 0, bottom: 0 }}>
-        <XAxis type="number" tickFormatter={fmt} tick={{ fontSize: 11, fill: "#cbc4d0" }} tickLine={false} axisLine={false} />
-        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#e4e1e6" }} tickLine={false} axisLine={false} width={70} />
-        <Tooltip
-          formatter={(value) => [fmt(Number(value)), "Value"]}
-          contentStyle={{ background: "#1f1f22", border: "1px solid rgba(73,69,78,0.2)", borderRadius: 8, fontSize: 12 }}
-          cursor={{ fill: "rgba(73,69,78,0.1)" }}
-        />
-        <Bar dataKey="value" radius={[0, 4, 4, 0]} animationDuration={600}>
+        <XAxis type="number" tickFormatter={fmt} tick={{ fontSize: 11, fill: "#6a6a6a" }} tickLine={false} axisLine={false} />
+        <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: "#222222" }} tickLine={false} axisLine={false} width={74} />
+        <Tooltip formatter={(value) => [fmt(Number(value)), "Value"]} cursor={{ fill: "rgba(34,34,34,0.04)" }} />
+        <Bar dataKey="value" radius={[0, 6, 6, 0]} animationDuration={600}>
           {top.map((entry, i) => (
-            <Cell key={i} fill={entry.gain ? "#3f8a7e" : "#8a6571"} />
+            <Cell key={i} fill={entry.gain ? "#00a651" : "#c13515"} />
           ))}
         </Bar>
       </BarChart>

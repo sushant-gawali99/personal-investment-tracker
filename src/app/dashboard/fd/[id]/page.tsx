@@ -45,7 +45,6 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
   const now = new Date();
 
-  // Use latest renewal if present, otherwise use original FD dates/amounts
   const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
   const activePrincipal = latest?.principal ?? fd.principal;
   const activeRate = latest?.interestRate ?? fd.interestRate;
@@ -66,76 +65,75 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
   const accrued = computeAccruedInterest(activePrincipal, activeRate, activeStart, now > activeMaturity ? activeMaturity : now, fd.interestType, fd.compoundFreq);
 
   const statusBadge = isMatured ? (
-    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#49454e]/30 text-[#cbc4d0] font-headline font-bold">Matured</span>
+    <span className="ab-chip">Matured</span>
   ) : days <= 7 ? (
-    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ffafd7]/10 text-[#ffafd7] flex items-center gap-1 font-headline font-bold">
-      <AlertTriangle size={9} />{days}d left
+    <span className="ab-chip ab-chip-error flex items-center gap-1">
+      <AlertTriangle size={10} />{days}d left
     </span>
   ) : days <= 30 ? (
-    <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-headline font-bold">{days}d left</span>
+    <span className="ab-chip ab-chip-warning">{days}d left</span>
   ) : (
-    <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-headline font-bold">{days}d left</span>
+    <span className="ab-chip ab-chip-success">{days}d left</span>
   );
 
   return (
     <div className="space-y-5">
-      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-xs text-[#cbc4d0] hover:text-[#e4e1e6] transition-colors">
-        <ArrowLeft size={12} /> Back to Fixed Deposits
+      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-[13px] text-[#6a6a6a] hover:text-[#222222] transition-colors font-medium">
+        <ArrowLeft size={13} /> Back to Fixed Deposits
       </Link>
 
       {isMatured && (
-        <div className="bg-amber-400/8 border border-amber-400/30 rounded-xl px-4 py-3 flex items-center justify-between gap-4">
+        <div className="ab-card-flat bg-[#fff4e0] border-[#f0d9a8] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={18} className="text-amber-400 shrink-0" />
+            <CheckCircle2 size={20} className="text-[#b25e00] shrink-0" />
             <div>
-              <p className="text-sm text-amber-400 font-headline font-bold">This FD has matured</p>
-              <p className="text-[11px] text-[#cbc4d0] mt-0.5">
+              <p className="text-[14px] text-[#b25e00] font-semibold">This FD has matured</p>
+              <p className="text-[12px] text-[#6a6a6a] mt-0.5">
                 Matured on {formatDate(activeMaturity)} · {Math.floor((now.getTime() - activeMaturity.getTime()) / 86400000)} days ago · {formatINR(maturityValue)} available
               </p>
             </div>
           </div>
           <Link
             href={`/dashboard/fd/renew/${fd.id}`}
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-400/15 hover:bg-amber-400/25 text-amber-400 px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+            className="ab-btn ab-btn-secondary"
           >
-            <RefreshCw size={11} /> Renew Now
+            <RefreshCw size={13} /> Renew Now
           </Link>
         </div>
       )}
 
       {addPrevious && fd.renewals.length === 0 && (
-        <div className="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3 flex items-start justify-between gap-4">
+        <div className="ab-card-flat bg-[#fff4e0] border-[#f0d9a8] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-xs text-amber-400 font-headline font-bold">Complete the renewal history</p>
-            <p className="text-[11px] text-[#cbc4d0] mt-0.5 leading-relaxed">
-              This FD was previously renewed. Use the <strong className="text-[#e4e1e6]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
+            <p className="text-[14px] text-[#b25e00] font-semibold">Complete the renewal history</p>
+            <p className="text-[12px] text-[#6a6a6a] mt-1 leading-relaxed">
+              This FD was previously renewed. Use the <strong className="text-[#222222]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
             </p>
           </div>
           <Link
             href={`/dashboard/fd/renew/${id}`}
-            className="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-amber-400/10 hover:bg-amber-400/20 text-amber-400 px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+            className="ab-btn ab-btn-secondary"
           >
-            <RefreshCw size={11} /> Add Renewal
+            <RefreshCw size={13} /> Add Renewal
           </Link>
         </div>
       )}
 
-      {/* Header */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl p-5">
-        <div className="flex items-start justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-[#ffafd7]/10 flex items-center justify-center">
-              <span className="font-headline font-black text-sm text-[#ffafd7]">
+      <div className="ab-card p-6">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-[#fff5f7] flex items-center justify-center shrink-0">
+              <span className="font-bold text-[14px] text-[#ff385c]">
                 {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
               </span>
             </div>
             <div>
-              <h1 className="font-headline font-bold text-lg text-[#e4e1e6]">{fd.bankName}</h1>
-              <div className="flex items-center gap-3 mt-1">
-                {fd.fdNumber && <span className="text-[11px] text-[#cbc4d0] mono">FD #{fd.fdNumber}</span>}
-                {fd.accountNumber && <span className="text-[11px] text-[#cbc4d0] mono">A/c {fd.accountNumber}</span>}
+              <h1 className="text-[22px] font-semibold text-[#222222] tracking-tight">{fd.bankName}</h1>
+              <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                {fd.fdNumber && <span className="text-[12px] text-[#6a6a6a] mono">FD #{fd.fdNumber}</span>}
+                {fd.accountNumber && <span className="text-[12px] text-[#6a6a6a] mono">A/c {fd.accountNumber}</span>}
                 {fd.renewals.length > 0 && (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">
+                  <span className="ab-chip ab-chip-accent">
                     Renewal #{fd.renewals.length}
                   </span>
                 )}
@@ -146,54 +144,51 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
           <div className="flex items-center gap-2">
             <Link
               href={`/dashboard/fd/renew/${fd.id}`}
-              className="inline-flex items-center gap-1.5 rounded-lg bg-primary/10 hover:bg-primary/20 text-primary px-3 py-1.5 text-xs font-headline font-bold transition-colors"
+              className="ab-btn ab-btn-secondary"
             >
-              <RefreshCw size={11} /> Renew
+              <RefreshCw size={13} /> Renew
             </Link>
             <FDDeleteButton id={fd.id} />
           </div>
         </div>
 
-        {/* Progress */}
-        <div className="mt-5 space-y-2">
-          <div className="flex justify-between text-[11px]">
-            <span className="text-[#cbc4d0]">{formatDate(activeStart)}</span>
-            <span className="text-[#e4e1e6] font-headline font-bold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
-            <span className="text-[#cbc4d0]">{formatDate(activeMaturity)}</span>
+        <div className="mt-6 space-y-2">
+          <div className="flex justify-between text-[12px] flex-wrap gap-2">
+            <span className="text-[#6a6a6a]">{formatDate(activeStart)}</span>
+            <span className="text-[#222222] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
+            <span className="text-[#6a6a6a]">{formatDate(activeMaturity)}</span>
           </div>
-          <div className="h-1.5 rounded-full bg-[#2a2a2d] overflow-hidden">
+          <div className="h-2 rounded-full bg-[#f2f2f2] overflow-hidden">
             <div
-              className={cn("h-full rounded-full", isMatured ? "bg-[#49454e]" : "bg-gradient-to-r from-[#ffafd7]/60 to-[#ffafd7]")}
+              className={cn("h-full rounded-full", isMatured ? "bg-[#c1c1c1]" : "bg-[#ff385c]")}
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[11px] text-[#cbc4d0] text-center">
+          <p className="text-[12px] text-[#6a6a6a] text-center">
             {activeTenure} months tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
           </p>
         </div>
       </div>
 
-      {/* Amount breakdown */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Principal", value: formatINR(activePrincipal), color: "text-[#e4e1e6]" },
-          { label: "Accrued Interest", value: formatINR(accrued), color: "text-primary" },
-          { label: "Total Interest", value: formatINR(totalInterest), color: "text-primary" },
-          { label: "Maturity Value", value: formatINR(maturityValue), color: "text-[#d2bcfa]" },
-        ].map(({ label, value, color }) => (
-          <div key={label} className="bg-[#1b1b1e] ghost-border rounded-xl p-3.5">
-            <p className="text-[#cbc4d0] text-[10px] uppercase tracking-widest font-label mb-1">{label}</p>
-            <p className={cn("mono text-lg font-semibold", color)}>{value}</p>
+          { label: "Principal", value: formatINR(activePrincipal), cls: "text-[#222222]" },
+          { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[#00a651]" },
+          { label: "Total Interest", value: formatINR(totalInterest), cls: "text-[#00a651]" },
+          { label: "Maturity Value", value: formatINR(maturityValue), cls: "text-[#222222]" },
+        ].map(({ label, value, cls }) => (
+          <div key={label} className="ab-card p-4">
+            <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold mb-1">{label}</p>
+            <p className={cn("mono text-[18px] font-semibold", cls)}>{value}</p>
           </div>
         ))}
       </div>
 
-      {/* Details grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-4">
-          <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3">
-            <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Deposit Details</h2>
-            <dl className="text-xs space-y-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="space-y-5">
+          <div className="ab-card p-6 space-y-3">
+            <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Deposit Details</h2>
+            <dl className="text-[13px] space-y-0">
               {[
                 ["Bank", fd.bankName],
                 ["FD Number", fd.fdNumber ?? "—"],
@@ -205,94 +200,92 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
                 ["Maturity Date", formatDate(activeMaturity)],
                 ["Created", formatDate(fd.createdAt)],
               ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-4 py-1 border-b border-[#49454e]/15 last:border-b-0">
-                  <dt className="text-[#cbc4d0]">{k}</dt>
-                  <dd className="text-[#e4e1e6] mono text-right">{v}</dd>
+                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#ebebeb] last:border-b-0">
+                  <dt className="text-[#6a6a6a]">{k}</dt>
+                  <dd className="text-[#222222] mono text-right">{v}</dd>
                 </div>
               ))}
             </dl>
           </div>
 
-          <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3">
-            <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal &amp; Nominee</h2>
-            <dl className="text-xs space-y-2">
+          <div className="ab-card p-6 space-y-3">
+            <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Renewal &amp; Nominee</h2>
+            <dl className="text-[13px] space-y-0">
               {[
                 ["Maturity Instruction", formatInstruction(activeInstruction)],
                 ["Payout Frequency", formatFrequency(activeFrequency)],
                 ["Nominee", fd.nomineeName ?? "—"],
                 ["Nominee Relation", fd.nomineeRelation ?? "—"],
               ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-4 py-1 border-b border-[#49454e]/15 last:border-b-0">
-                  <dt className="text-[#cbc4d0]">{k}</dt>
-                  <dd className="text-[#e4e1e6] mono text-right">{v}</dd>
+                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#ebebeb] last:border-b-0">
+                  <dt className="text-[#6a6a6a]">{k}</dt>
+                  <dd className="text-[#222222] mono text-right">{v}</dd>
                 </div>
               ))}
             </dl>
           </div>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           {fd.notes && (
-            <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4">
-              <h2 className="font-headline font-bold text-sm text-[#e4e1e6] mb-2">Notes</h2>
-              <p className="text-xs text-[#cbc4d0] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
+            <div className="ab-card p-6">
+              <h2 className="text-[16px] font-semibold text-[#222222] mb-2 tracking-tight">Notes</h2>
+              <p className="text-[13px] text-[#6a6a6a] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
             </div>
           )}
 
-          <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4">
-            <h2 className="font-headline font-bold text-sm text-[#e4e1e6] mb-3">Source Document</h2>
+          <div className="ab-card p-6">
+            <h2 className="text-[16px] font-semibold text-[#222222] mb-4 tracking-tight">Source Document</h2>
             {fd.sourceImageUrl || fd.sourceImageBackUrl ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { url: fd.sourceImageUrl, label: "Front" },
                   { url: fd.sourceImageBackUrl, label: "Back" },
                 ].filter((s) => s.url).map(({ url, label }) => (
                   <div key={label} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label">{label}</p>
-                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[10px] text-primary hover:text-[#26fedc] inline-flex items-center gap-1">
-                        <FileText size={10} /> Open
+                      <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{label}</p>
+                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#222222] font-semibold underline underline-offset-4 inline-flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                        <FileText size={11} /> Open
                       </a>
                     </div>
                     <a href={url!} target="_blank" rel="noopener noreferrer" className="block">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-lg w-full h-40 object-contain bg-[#0e0e11] ghost-border" />
+                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-xl w-full h-44 object-contain bg-[#f7f7f7] border border-[#ebebeb]" />
                     </a>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-[#cbc4d0]">No document was attached when this FD was added.</p>
+              <p className="text-[13px] text-[#6a6a6a]">No document was attached when this FD was added.</p>
             )}
           </div>
         </div>
       </div>
 
-      {/* Renewal history */}
       {fd.renewals.length > 0 && (
-        <div className="bg-[#1b1b1e] ghost-border rounded-xl p-4 space-y-3">
-          <h2 className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal History</h2>
-          <div className="space-y-2">
-            {/* Original */}
-            <div className="flex items-center justify-between text-xs py-2 border-b border-[#49454e]/15">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#49454e]/30 text-[#cbc4d0] font-headline font-bold">Original</span>
-                <span className="text-[#cbc4d0]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
+        <div className="ab-card p-6 space-y-4">
+          <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Renewal History</h2>
+          <div>
+            <div className="flex items-center justify-between text-[13px] py-3 border-b border-[#ebebeb]">
+              <div className="flex items-center gap-3">
+                <span className="ab-chip">Original</span>
+                <span className="text-[#6a6a6a]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
               </div>
               <div className="text-right">
-                <span className="mono text-[#e4e1e6]">{formatINR(fd.principal)}</span>
-                <span className="text-[#cbc4d0] ml-2">@ {fd.interestRate}%</span>
+                <span className="mono text-[#222222] font-semibold">{formatINR(fd.principal)}</span>
+                <span className="text-[#6a6a6a] ml-2">@ {fd.interestRate}%</span>
               </div>
             </div>
             {fd.renewals.map((r) => (
-              <div key={r.id} className="flex items-center justify-between text-xs py-2 border-b border-[#49454e]/15 last:border-b-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">R{r.renewalNumber}</span>
-                  <span className="text-[#cbc4d0]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
+              <div key={r.id} className="flex items-center justify-between text-[13px] py-3 border-b border-[#ebebeb] last:border-b-0">
+                <div className="flex items-center gap-3">
+                  <span className="ab-chip ab-chip-accent">R{r.renewalNumber}</span>
+                  <span className="text-[#6a6a6a]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
                 </div>
                 <div className="text-right">
-                  <span className="mono text-[#e4e1e6]">{formatINR(r.principal)}</span>
-                  <span className="text-[#cbc4d0] ml-2">@ {r.interestRate}%</span>
+                  <span className="mono text-[#222222] font-semibold">{formatINR(r.principal)}</span>
+                  <span className="text-[#6a6a6a] ml-2">@ {r.interestRate}%</span>
                 </div>
               </div>
             ))}

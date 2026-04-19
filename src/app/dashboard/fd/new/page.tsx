@@ -24,12 +24,12 @@ export default async function NewFDPage({ searchParams }: { searchParams: Promis
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5">
+    <div className="max-w-3xl mx-auto space-y-6">
       <div>
-        <h1 className="text-lg font-semibold text-slate-100">
+        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">
           {renewedFrom ? "Renew Fixed Deposit" : linkToFd ? "Add Previous FD" : "Add Fixed Deposit"}
         </h1>
-        <p className="text-muted-foreground text-xs mt-0.5">
+        <p className="text-[14px] text-[#6a6a6a] mt-1">
           {renewedFrom
             ? `Creating a renewal for ${renewedFrom.bankName}${renewedFrom.fdNumber ? ` · FD #${renewedFrom.fdNumber}` : ""}`
             : linkToFd

@@ -10,7 +10,7 @@ interface Props {
   centerValue?: string;
 }
 
-const COLORS = ["#8b7fb0", "#6b8ca0", "#b08795"];
+const COLORS = ["#ff385c", "#428bff", "#00a651"];
 
 function fmt(v: number) {
   return `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -24,7 +24,7 @@ export function AllocationDonut({ equityValue, fdValue, mfValue = 0, centerLabel
   ].filter((d) => d.value > 0);
 
   if (data.length === 0) {
-    return <div className="flex items-center justify-center h-full text-[#cbc4d0] text-sm">No data</div>;
+    return <div className="flex items-center justify-center h-full text-[#6a6a6a] text-sm">No data</div>;
   }
 
   return (
@@ -35,26 +35,22 @@ export function AllocationDonut({ equityValue, fdValue, mfValue = 0, centerLabel
             data={data}
             cx="50%"
             cy="50%"
-            innerRadius={48}
-            outerRadius={72}
+            innerRadius={52}
+            outerRadius={78}
             dataKey="value"
             isAnimationActive={false}
           >
             {data.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="#0e0e11" strokeWidth={2} />
+              <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="#ffffff" strokeWidth={3} />
             ))}
           </Pie>
-          <Tooltip
-            formatter={(value) => [fmt(Number(value)), ""]}
-            contentStyle={{ background: "#1f1f22", border: "1px solid rgba(73,69,78,0.4)", borderRadius: 8, fontSize: 12 }}
-            labelStyle={{ color: "#cbc4d0" }}
-          />
+          <Tooltip formatter={(value) => [fmt(Number(value)), ""]} />
         </PieChart>
       </ResponsiveContainer>
       {(centerLabel || centerValue) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          {centerLabel && <p className="text-[9px] text-[#cbc4d0] uppercase tracking-widest font-label">{centerLabel}</p>}
-          {centerValue && <p className="mono text-sm font-bold text-[#e4e1e6] mt-0.5">{centerValue}</p>}
+          {centerLabel && <p className="text-[10px] text-[#6a6a6a] uppercase tracking-widest font-semibold">{centerLabel}</p>}
+          {centerValue && <p className="mono text-[15px] font-bold text-[#222222] mt-0.5">{centerValue}</p>}
         </div>
       )}
     </div>

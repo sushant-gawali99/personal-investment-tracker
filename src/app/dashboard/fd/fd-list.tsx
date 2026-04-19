@@ -50,9 +50,9 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   if (fds.length === 0) {
     return (
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl p-10 text-center">
-        <p className="font-headline font-bold text-[#e4e1e6]">No fixed deposits added yet.</p>
-        <p className="text-[#cbc4d0] text-sm mt-1">Upload an FD certificate to get started.</p>
+      <div className="ab-card p-12 text-center">
+        <p className="text-[18px] font-semibold text-[#222222] tracking-tight">No fixed deposits added yet</p>
+        <p className="text-[14px] text-[#6a6a6a] mt-1.5">Upload an FD certificate to get started.</p>
       </div>
     );
   }
@@ -64,19 +64,18 @@ export function FDList({ fds }: { fds: FD[] }) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Filters */}
+    <div className="space-y-5">
       <div className="flex items-center gap-3 flex-wrap">
-        <div className="flex items-center gap-1 p-1 bg-[#0e0e11] ghost-border rounded-xl w-fit">
+        <div className="inline-flex items-center gap-1 p-1 bg-[#f7f7f7] rounded-full w-fit">
           {(["all", "active", "matured"] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "px-4 py-1.5 rounded-lg text-xs font-headline font-bold transition-colors capitalize",
+                "px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all capitalize",
                 filter === f
-                  ? "bg-primary text-[#00382f] shadow-[0_0_12px_rgba(0,223,193,0.2)]"
-                  : "text-[#cbc4d0] hover:text-[#e4e1e6]"
+                  ? "bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                  : "text-[#6a6a6a] hover:text-[#222222]"
               )}
             >
               {f} ({counts[f]})
@@ -87,7 +86,7 @@ export function FDList({ fds }: { fds: FD[] }) {
         <select
           value={bankFilter}
           onChange={(e) => setBankFilter(e.target.value)}
-          className="bg-[#0e0e11] ghost-border rounded-xl px-3 py-2 text-xs font-headline font-bold text-[#e4e1e6] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/40 transition-colors cursor-pointer"
+          className="bg-white border border-[#c1c1c1] rounded-full px-4 py-2 text-[13px] font-semibold text-[#222222] focus:outline-none focus:border-[#222222] focus:shadow-[0_0_0_1px_#222222] cursor-pointer transition-all"
         >
           <option value="all">All banks ({fds.length})</option>
           {banks.map((b) => (
@@ -100,19 +99,18 @@ export function FDList({ fds }: { fds: FD[] }) {
         {(bankFilter !== "all" || filter !== "all") && (
           <button
             onClick={() => { setFilter("all"); setBankFilter("all"); }}
-            className="text-[11px] text-[#cbc4d0] hover:text-[#e4e1e6] font-headline font-bold underline underline-offset-2"
+            className="text-[13px] text-[#222222] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
           >
             Clear filters
           </button>
         )}
       </div>
 
-      {/* FD table */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl overflow-hidden">
+      <div className="ab-card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[rgba(73,69,78,0.2)] bg-[#0e0e11]/40">
+              <tr className="bg-[#f7f7f7]">
                 {[
                   "Bank",
                   "FD No.",
@@ -128,7 +126,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                   <th
                     key={i}
                     className={cn(
-                      "text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label font-normal px-3 py-2.5",
+                      "text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold px-4 py-3",
                       i === 2 || i === 3 || i === 7 ? "text-right" : "text-left"
                     )}
                   >
@@ -137,7 +135,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                 ))}
               </tr>
             </thead>
-            <tbody>
+            <tbody className="divide-y divide-[#ebebeb]">
               {filtered.map((fd) => {
                 const maturity = new Date(fd.maturityDate);
                 const isMatured = maturity <= now;
@@ -146,18 +144,18 @@ export function FDList({ fds }: { fds: FD[] }) {
                 const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - maturity.getTime()) / 86400000) : 0;
 
                 const statusBadge = isMatured ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-400 font-headline font-bold">
-                    <CheckCircle2 size={9} />
+                  <span className="inline-flex items-center gap-1 ab-chip ab-chip-warning">
+                    <CheckCircle2 size={10} />
                     {maturedDaysAgo === 0 ? "Matured today" : `Matured ${maturedDaysAgo}d ago`}
                   </span>
                 ) : days <= 7 ? (
-                  <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#ffafd7]/10 text-[#ffafd7] font-headline font-bold">
-                    <AlertTriangle size={9} />{days}d left
+                  <span className="inline-flex items-center gap-1 ab-chip ab-chip-error">
+                    <AlertTriangle size={10} />{days}d left
                   </span>
                 ) : days <= 30 ? (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/10 text-amber-400 font-headline font-bold">{days}d left</span>
+                  <span className="ab-chip ab-chip-warning">{days}d left</span>
                 ) : (
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-headline font-bold">{days}d left</span>
+                  <span className="ab-chip ab-chip-success">{days}d left</span>
                 );
 
                 return (
@@ -165,35 +163,35 @@ export function FDList({ fds }: { fds: FD[] }) {
                     key={fd.id}
                     onClick={() => router.push(`/dashboard/fd/${fd.id}`)}
                     className={cn(
-                      "border-b border-[rgba(73,69,78,0.12)] last:border-0 cursor-pointer transition-colors",
-                      isMatured ? "bg-amber-400/[0.03] hover:bg-amber-400/[0.07]" : "hover:bg-[#0e0e11]/50"
+                      "cursor-pointer transition-colors",
+                      isMatured ? "bg-[#fffaf0] hover:bg-[#fff4e0]" : "hover:bg-[#f7f7f7]"
                     )}
                   >
-                    <td className="px-3 py-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className={cn("w-7 h-7 rounded-lg flex items-center justify-center shrink-0", isMatured ? "bg-amber-400/10" : "bg-[#ffafd7]/10")}>
-                          <span className={cn("font-headline font-black text-[10px]", isMatured ? "text-amber-400" : "text-[#ffafd7]")}>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-[#fff5f7] flex items-center justify-center shrink-0">
+                          <span className="font-bold text-[11px] text-[#ff385c]">
                             {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
                           </span>
                         </div>
-                        <span className="font-headline font-bold text-[#e4e1e6] text-xs">{fd.bankName}</span>
+                        <span className="font-semibold text-[#222222] text-[14px]">{fd.bankName}</span>
                       </div>
                     </td>
-                    <td className="px-3 py-3 text-[11px] text-[#cbc4d0] mono">{fd.fdNumber ?? "—"}</td>
-                    <td className="px-3 py-3 text-right mono text-[#e4e1e6]">{formatINR(fd.principal)}</td>
-                    <td className="px-3 py-3 text-right mono text-[#e4e1e6]">{fd.interestRate}%</td>
-                    <td className="px-3 py-3 text-[#cbc4d0]">{fd.tenureMonths}m</td>
-                    <td className="px-3 py-3 text-[#cbc4d0] text-xs">{formatDate(fd.startDate)}</td>
-                    <td className="px-3 py-3 text-[#cbc4d0] text-xs">{formatDate(fd.maturityDate)}</td>
-                    <td className="px-3 py-3 text-right mono text-[#d2bcfa] font-bold">{formatINR(maturityValue)}</td>
-                    <td className="px-3 py-3">{statusBadge}</td>
-                    <td className="px-3 py-3 text-right">
+                    <td className="px-4 py-3 text-[12px] text-[#6a6a6a] mono">{fd.fdNumber ?? "—"}</td>
+                    <td className="px-4 py-3 text-right mono text-[#222222] font-medium">{formatINR(fd.principal)}</td>
+                    <td className="px-4 py-3 text-right mono text-[#222222] font-medium">{fd.interestRate}%</td>
+                    <td className="px-4 py-3 text-[#6a6a6a]">{fd.tenureMonths}m</td>
+                    <td className="px-4 py-3 text-[#6a6a6a] text-[13px]">{formatDate(fd.startDate)}</td>
+                    <td className="px-4 py-3 text-[#6a6a6a] text-[13px]">{formatDate(fd.maturityDate)}</td>
+                    <td className="px-4 py-3 text-right mono text-[#222222] font-semibold">{formatINR(maturityValue)}</td>
+                    <td className="px-4 py-3">{statusBadge}</td>
+                    <td className="px-4 py-3 text-right">
                       <button
                         onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteFD(fd.id); }}
                         disabled={deleting === fd.id}
-                        className="p-1.5 rounded-lg hover:bg-[#ffafd7]/10 text-[#cbc4d0] hover:text-[#ffafd7] transition-colors disabled:opacity-40"
+                        className="p-2 rounded-full hover:bg-[#fdecea] text-[#6a6a6a] hover:text-[#c13515] transition-colors disabled:opacity-40"
                       >
-                        <Trash2 size={13} />
+                        <Trash2 size={14} />
                       </button>
                     </td>
                   </tr>

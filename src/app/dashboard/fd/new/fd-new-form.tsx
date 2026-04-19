@@ -39,15 +39,21 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4">
-      <div className="bg-[#0e0e11] ghost-border rounded-2xl overflow-hidden w-full max-w-lg">
-        <div className="flex items-center justify-between px-5 py-3 border-b border-[rgba(73,69,78,0.15)]">
-          <p className="font-headline font-bold text-sm text-[#e4e1e6]">Take Photo</p>
-          <button onClick={onClose} className="text-[#cbc4d0] hover:text-[#e4e1e6]"><X size={16} /></button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+      <div className="ab-card overflow-hidden w-full max-w-lg">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#ebebeb]">
+          <p className="text-[16px] font-semibold text-[#222222] tracking-tight">Take Photo</p>
+          <button
+            onClick={onClose}
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6a6a6a] hover:bg-[#f7f7f7] transition-colors"
+            aria-label="Close"
+          >
+            <X size={16} />
+          </button>
         </div>
-        <div className="p-4 space-y-4">
+        <div className="p-5 space-y-4">
           {error ? (
-            <p className="text-xs text-[#ffafd7] bg-[#ffafd7]/5 border border-[#ffafd7]/20 rounded-lg px-3 py-2">{error}</p>
+            <p className="ab-card-flat text-[13px] px-3 py-2" style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}>{error}</p>
           ) : (
             <video ref={videoRef} autoPlay playsInline className="w-full rounded-xl aspect-[4/3] bg-black object-cover" />
           )}
@@ -56,11 +62,11 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
               type="button"
               onClick={capture}
               disabled={!!error || capturing}
-              className="flex-1 flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors"
+              className="ab-btn ab-btn-accent flex-1"
             >
-              <Camera size={13} /> Capture
+              <Camera size={14} /> Capture
             </button>
-            <button type="button" onClick={onClose} className="rounded-lg ghost-border px-4 py-2.5 text-xs font-headline font-bold text-[#cbc4d0] hover:text-[#e4e1e6] transition-colors">
+            <button type="button" onClick={onClose} className="ab-btn ab-btn-secondary">
               Cancel
             </button>
           </div>
@@ -95,9 +101,6 @@ function toDateInput(val: string | null | undefined): string {
   try { return new Date(val).toISOString().split("T")[0]; } catch { return ""; }
 }
 
-const inputCls = "w-full bg-[#0e0e11] ghost-border rounded-lg px-3 py-2.5 text-sm text-[#e4e1e6] placeholder:text-[#cbc4d0] focus:outline-none focus:ring-1 focus:ring-primary/50 focus:border-primary/40 transition-colors";
-const labelCls = "block text-[10px] text-[#cbc4d0] uppercase tracking-widest font-label mb-1.5";
-
 function ImageDropZone({
   label, hint, file, preview, onFile, onClear, disabled,
 }: {
@@ -114,14 +117,19 @@ function ImageDropZone({
   });
 
   return (
-    <div className="space-y-1.5">
-      <p className={labelCls}>{label}</p>
+    <div className="space-y-2">
+      <p className="ab-label">{label}</p>
       {preview ? (
-        <div className="relative rounded-xl ghost-border overflow-hidden group">
+        <div className="relative rounded-xl border border-[#ebebeb] overflow-hidden group bg-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview} alt={label} className="w-full h-36 object-cover" />
-          <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-            <button type="button" onClick={onClear} className="flex items-center gap-1.5 text-[#e4e1e6] text-xs font-headline font-bold bg-[#0e0e11]/80 rounded-lg px-3 py-1.5">
+          <img src={preview} alt={label} className="w-full h-40 object-cover" />
+          <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={onClear}
+              className="ab-btn ab-btn-secondary"
+              style={{ padding: "8px 14px", fontSize: "13px" }}
+            >
               <X size={12} /> Remove
             </button>
           </div>
@@ -131,24 +139,25 @@ function ImageDropZone({
           <div
             {...getRootProps()}
             className={cn(
-              "rounded-xl border-2 border-dashed p-5 text-center cursor-pointer transition-colors",
+              "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-white",
               isDragActive
-                ? "border-primary bg-primary/5"
-                : "border-[#49454e]/40 hover:border-primary/40 hover:bg-primary/5",
+                ? "border-[#ff385c] bg-[#fff5f7]"
+                : "border-[#c1c1c1] hover:border-[#ff385c] hover:bg-[#fff5f7]",
               disabled && "pointer-events-none opacity-40"
             )}
           >
             <input {...getInputProps()} />
-            <Upload size={16} className="mx-auto mb-1.5 text-[#cbc4d0]" />
-            <p className="text-xs text-[#cbc4d0]">{isDragActive ? "Drop here" : hint}</p>
+            <Upload size={18} className="mx-auto mb-2 text-[#6a6a6a]" />
+            <p className="text-[13px] text-[#6a6a6a]">{isDragActive ? "Drop here" : hint}</p>
           </div>
           <button
             type="button"
             onClick={() => setShowCamera(true)}
             disabled={disabled}
-            className="w-full flex items-center justify-center gap-1.5 rounded-lg border border-[#49454e]/40 hover:border-primary/40 hover:bg-primary/5 py-2 text-xs text-[#cbc4d0] hover:text-primary font-headline font-bold transition-colors disabled:opacity-40"
+            className="ab-btn ab-btn-ghost w-full border border-[#ebebeb]"
+            style={{ fontSize: "13px" }}
           >
-            <Camera size={12} /> Use Camera
+            <Camera size={14} /> Use Camera
           </button>
         </div>
       )}
@@ -344,30 +353,36 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
       {renewedFrom && (
-        <div className="flex items-center gap-2 text-xs text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2">
-          <RefreshCw size={12} />
-          <span>Renewing <strong>{renewedFrom.bankName}</strong>{renewedFrom.fdNumber ? ` · FD #${renewedFrom.fdNumber}` : ""} — start date pre-filled with previous maturity date</span>
+        <div
+          className="ab-card-flat flex items-center gap-2 px-4 py-3 text-[13px]"
+          style={{ background: "#fff5f7", color: "#e00b41", borderColor: "#ffd4dc" }}
+        >
+          <RefreshCw size={14} />
+          <span>
+            Renewing <strong className="font-semibold">{renewedFrom.bankName}</strong>
+            {renewedFrom.fdNumber ? ` - FD #${renewedFrom.fdNumber}` : ""} - start date pre-filled with previous maturity date
+          </span>
         </div>
       )}
 
       {/* AI Digitize panel */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Sparkles size={15} className="text-primary" />
+      <section className="ab-card p-6 space-y-5">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#fff5f7" }}>
+            <Sparkles size={18} className="text-[#ff385c]" />
           </div>
           <div>
-            <p className="font-headline font-bold text-sm text-[#e4e1e6]">Digitize Receipt with AI</p>
-            <p className="text-xs text-[#cbc4d0] mt-0.5">Upload your FD certificate — AI extracts all details automatically.</p>
+            <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Digitize Receipt with AI</p>
+            <p className="text-[13px] text-[#6a6a6a] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ImageDropZone
             label="Front side *"
-            hint="Click or drag · JPEG, PNG, WebP"
+            hint="Click or drag - JPEG, PNG, WebP"
             file={frontFile} preview={frontPreview}
             onFile={handleFrontFile} onClear={clearFront}
             disabled={extracting}
@@ -382,7 +397,12 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         </div>
 
         {extractError && (
-          <p className="text-xs text-[#ffafd7] bg-[#ffafd7]/5 border border-[#ffafd7]/20 rounded-lg px-3 py-2">{extractError}</p>
+          <div
+            className="ab-card-flat px-3 py-2 text-[13px]"
+            style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+          >
+            {extractError}
+          </div>
         )}
 
         {frontFile && !extracted && (
@@ -390,43 +410,51 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             type="button"
             onClick={handleExtract}
             disabled={extracting}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors shadow-[0_0_12px_rgba(0,223,193,0.2)]"
+            className="ab-btn ab-btn-accent"
           >
             {extracting ? (
-              <><Loader2 size={13} className="animate-spin" /> Extracting…</>
+              <><Loader2 size={14} className="animate-spin" /> Extracting...</>
             ) : (
-              <><Sparkles size={13} /> Extract with AI</>
+              <><Sparkles size={14} /> Extract with AI</>
             )}
           </button>
         )}
 
         {extracted && (
-          <div className="flex items-center gap-2 text-xs text-primary bg-primary/5 border border-primary/20 rounded-lg px-3 py-2">
-            <Sparkles size={12} />
-            <span>Details extracted — review and confirm below</span>
+          <div
+            className="ab-card-flat flex items-center gap-2 px-3 py-2 text-[13px]"
+            style={{ background: "#e8f6ec", color: "#007a33", borderColor: "#c5e9cf" }}
+          >
+            <span className="ab-chip ab-chip-accent">
+              <Sparkles size={12} /> AI Extracted
+            </span>
+            <span>Details extracted - review and confirm below</span>
           </div>
         )}
 
         {extracted && renewalNumber !== null && renewalNumber > 0 && (
-          <div className="bg-amber-400/5 border border-amber-400/20 rounded-lg px-3 py-2">
-            <p className="text-xs text-amber-400 font-headline font-bold">Renewal #{renewalNumber} detected — fill in previous periods below</p>
+          <div
+            className="ab-card-flat px-3 py-2"
+            style={{ background: "#fff4e0", color: "#b25e00", borderColor: "#ffe0b0" }}
+          >
+            <p className="text-[13px] font-semibold">Renewal #{renewalNumber} detected - fill in previous periods below</p>
           </div>
         )}
-      </div>
+      </section>
 
       {/* Prior renewal sections */}
       {priorRenewals.map((r, i) => (
-        <div key={i} className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">
+        <section key={i} className="ab-card-flat p-4 sm:p-6 space-y-4">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className={i === 0 ? "ab-chip ab-chip-info" : "ab-chip ab-chip-accent"}>
               {i === 0 ? "Original FD" : `Renewal #${i}`}
             </span>
-            <p className="text-xs text-[#cbc4d0]">Fill in the details for this period</p>
+            <p className="text-[13px] text-[#6a6a6a]">Fill in the details for this period</p>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
               <div key={key}>
-                <label className={labelCls}>
+                <label className="ab-label">
                   {key === "startDate"
                     ? "Start Date"
                     : i === 0
@@ -446,11 +474,11 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               { label: "Maturity Amount (₹)", key: "maturityAmount" },
             ].map(({ label, key }) => (
               <div key={key}>
-                <label className={labelCls}>{label}</label>
+                <label className="ab-label">{label}</label>
                 <input
                   type="number"
                   step="0.01"
-                  className={inputCls}
+                  className="ab-input mono"
                   value={r[key as keyof PriorRenewal]}
                   onChange={(e) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, [key]: e.target.value } : p))}
                   placeholder={key === "maturityAmount" ? "Optional" : undefined}
@@ -458,57 +486,57 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               </div>
             ))}
           </div>
-        </div>
+        </section>
       ))}
 
       {/* Main fields */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          {priorRenewals.length > 0
-            ? <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#d2bcfa]/10 text-[#d2bcfa] font-headline font-bold">Renewal #{priorRenewals.length} (Current)</span>
-            : null}
-          <p className="font-headline font-bold text-sm text-[#e4e1e6]">FD Details</p>
+      <section className="ab-card p-6 space-y-5">
+        <div className="flex items-center gap-2 flex-wrap">
+          {priorRenewals.length > 0 ? (
+            <span className="ab-chip ab-chip-accent">Renewal #{priorRenewals.length} (Current)</span>
+          ) : null}
+          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">FD Details</p>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="col-span-2">
-            <label htmlFor="bankName" className={labelCls}>Bank Name *</label>
-            <input id="bankName" className={inputCls} value={form.bankName} onChange={(e) => set("bankName", e.target.value)} placeholder="State Bank of India" required />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="sm:col-span-2">
+            <label htmlFor="bankName" className="ab-label">Bank Name *</label>
+            <input id="bankName" className="ab-input" value={form.bankName} onChange={(e) => set("bankName", e.target.value)} placeholder="State Bank of India" required />
           </div>
 
           <div>
-            <label htmlFor="principal" className={labelCls}>Principal Amount (₹) *</label>
-            <input id="principal" type="number" min="1" step="0.01" className={inputCls} value={form.principal} onChange={(e) => set("principal", e.target.value)} placeholder="100000" required />
+            <label htmlFor="principal" className="ab-label">Principal Amount (₹) *</label>
+            <input id="principal" type="number" min="1" step="0.01" className="ab-input mono" value={form.principal} onChange={(e) => set("principal", e.target.value)} placeholder="100000" required />
           </div>
 
           <div>
-            <label htmlFor="interestRate" className={labelCls}>Interest Rate (% p.a.) *</label>
-            <input id="interestRate" type="number" min="0.01" max="30" step="0.01" className={inputCls} value={form.interestRate} onChange={(e) => set("interestRate", e.target.value)} placeholder="7.50" required />
+            <label htmlFor="interestRate" className="ab-label">Interest Rate (% p.a.) *</label>
+            <input id="interestRate" type="number" min="0.01" max="30" step="0.01" className="ab-input mono" value={form.interestRate} onChange={(e) => set("interestRate", e.target.value)} placeholder="7.50" required />
           </div>
 
           <div>
-            <label htmlFor="tenureMonths" className={labelCls}>Tenure (months) *</label>
-            <input id="tenureMonths" type="number" min="1" className={inputCls} value={form.tenureMonths} onChange={(e) => set("tenureMonths", e.target.value)} placeholder="24" required />
+            <label htmlFor="tenureMonths" className="ab-label">Tenure (months) *</label>
+            <input id="tenureMonths" type="number" min="1" className="ab-input mono" value={form.tenureMonths} onChange={(e) => set("tenureMonths", e.target.value)} placeholder="24" required />
           </div>
 
           <div>
-            <label htmlFor="maturityAmount" className={labelCls}>Maturity Amount (₹)</label>
-            <input id="maturityAmount" type="number" min="1" step="0.01" className={inputCls} value={form.maturityAmount} onChange={(e) => set("maturityAmount", e.target.value)} placeholder="Auto-calculated if blank" />
+            <label htmlFor="maturityAmount" className="ab-label">Maturity Amount (₹)</label>
+            <input id="maturityAmount" type="number" min="1" step="0.01" className="ab-input mono" value={form.maturityAmount} onChange={(e) => set("maturityAmount", e.target.value)} placeholder="Auto-calculated if blank" />
           </div>
 
           <div>
-            <label className={labelCls}>{priorRenewals.length > 0 ? "Renewal Start Date *" : "Start Date *"}</label>
+            <label className="ab-label">{priorRenewals.length > 0 ? "Renewal Start Date *" : "Start Date *"}</label>
             <DatePicker value={form.startDate} onChange={(v) => set("startDate", v)} required />
           </div>
 
           <div>
-            <label className={labelCls}>{priorRenewals.length > 0 ? "New Due Date *" : "Maturity Date *"}</label>
+            <label className="ab-label">{priorRenewals.length > 0 ? "New Due Date *" : "Maturity Date *"}</label>
             <DatePicker value={form.maturityDate} onChange={(v) => set("maturityDate", v)} required />
           </div>
 
           <div>
-            <label className={labelCls}>Interest Type *</label>
-            <select className={inputCls} value={form.interestType} onChange={(e) => set("interestType", e.target.value)}>
+            <label className="ab-label">Interest Type *</label>
+            <select className="ab-input" value={form.interestType} onChange={(e) => set("interestType", e.target.value)}>
               <option value="compound">Compound</option>
               <option value="simple">Simple</option>
             </select>
@@ -516,8 +544,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
 
           {form.interestType === "compound" && (
             <div>
-              <label className={labelCls}>Compounding Frequency</label>
-              <select className={inputCls} value={form.compoundFreq} onChange={(e) => set("compoundFreq", e.target.value)}>
+              <label className="ab-label">Compounding Frequency</label>
+              <select className="ab-input" value={form.compoundFreq} onChange={(e) => set("compoundFreq", e.target.value)}>
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="annually">Annually</option>
@@ -525,18 +553,18 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Renewal & nominee (from back of certificate) */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl p-6 space-y-5">
+      <section className="ab-card p-6 space-y-5">
         <div>
-          <p className="font-headline font-bold text-sm text-[#e4e1e6]">Renewal &amp; Nominee</p>
-          <p className="text-[11px] text-[#cbc4d0] mt-0.5">Usually printed on the back of the FD receipt.</p>
+          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Renewal &amp; Nominee</p>
+          <p className="text-[13px] text-[#6a6a6a] mt-0.5">Usually printed on the back of the FD receipt.</p>
         </div>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelCls}>Maturity Instruction</label>
-            <select className={inputCls} value={form.maturityInstruction} onChange={(e) => set("maturityInstruction", e.target.value)}>
+            <label className="ab-label">Maturity Instruction</label>
+            <select className="ab-input" value={form.maturityInstruction} onChange={(e) => set("maturityInstruction", e.target.value)}>
               <option value="">Not specified</option>
               <option value="renew_principal_interest">Auto-renew principal + interest</option>
               <option value="renew_principal">Auto-renew principal, payout interest</option>
@@ -544,8 +572,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             </select>
           </div>
           <div>
-            <label className={labelCls}>Interest Payout Frequency</label>
-            <select className={inputCls} value={form.payoutFrequency} onChange={(e) => set("payoutFrequency", e.target.value)}>
+            <label className="ab-label">Interest Payout Frequency</label>
+            <select className="ab-input" value={form.payoutFrequency} onChange={(e) => set("payoutFrequency", e.target.value)}>
               <option value="">Not specified</option>
               <option value="on_maturity">On maturity (cumulative)</option>
               <option value="monthly">Monthly</option>
@@ -555,62 +583,71 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             </select>
           </div>
           <div>
-            <label htmlFor="nomineeName" className={labelCls}>Nominee Name</label>
-            <input id="nomineeName" className={inputCls} value={form.nomineeName} onChange={(e) => set("nomineeName", e.target.value)} placeholder="Full name" />
+            <label htmlFor="nomineeName" className="ab-label">Nominee Name</label>
+            <input id="nomineeName" className="ab-input" value={form.nomineeName} onChange={(e) => set("nomineeName", e.target.value)} placeholder="Full name" />
           </div>
           <div>
-            <label htmlFor="nomineeRelation" className={labelCls}>Nominee Relation</label>
-            <input id="nomineeRelation" className={inputCls} value={form.nomineeRelation} onChange={(e) => set("nomineeRelation", e.target.value)} placeholder="Spouse, Son, Daughter…" />
+            <label htmlFor="nomineeRelation" className="ab-label">Nominee Relation</label>
+            <input id="nomineeRelation" className="ab-input" value={form.nomineeRelation} onChange={(e) => set("nomineeRelation", e.target.value)} placeholder="Spouse, Son, Daughter..." />
           </div>
         </div>
-      </div>
+      </section>
 
       {/* Optional fields */}
-      <div className="bg-[#1b1b1e] ghost-border rounded-xl overflow-hidden">
+      <section className="ab-card-flat overflow-hidden">
         <button
           type="button"
           onClick={() => setShowOptional((s) => !s)}
-          className="flex items-center justify-between w-full px-6 py-4 font-headline font-bold text-sm text-[#cbc4d0] hover:text-[#e4e1e6] hover:bg-[#0e0e11]/40 transition-colors"
+          className="flex items-center justify-between w-full px-6 py-4 text-[16px] font-semibold text-[#222222] tracking-tight hover:bg-[#f7f7f7] transition-colors"
         >
           <span>Optional Details</span>
-          {showOptional ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+          {showOptional ? <ChevronUp size={16} className="text-[#6a6a6a]" /> : <ChevronDown size={16} className="text-[#6a6a6a]" />}
         </button>
         {showOptional && (
-          <div className="px-6 pb-6 grid grid-cols-2 gap-4 border-t border-[rgba(73,69,78,0.15)] pt-5">
+          <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#ebebeb] pt-5">
             <div>
-              <label htmlFor="fdNumber" className={labelCls}>FD Number / Certificate No.</label>
-              <input id="fdNumber" className={inputCls} value={form.fdNumber} onChange={(e) => set("fdNumber", e.target.value)} placeholder="FD123456" />
+              <label htmlFor="fdNumber" className="ab-label">FD Number / Certificate No.</label>
+              <input id="fdNumber" className="ab-input" value={form.fdNumber} onChange={(e) => set("fdNumber", e.target.value)} placeholder="FD123456" />
             </div>
             <div>
-              <label htmlFor="accountNumber" className={labelCls}>Account Number</label>
-              <input id="accountNumber" className={inputCls} value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
+              <label htmlFor="accountNumber" className="ab-label">Account Number</label>
+              <input id="accountNumber" className="ab-input" value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
             </div>
-            <div className="col-span-2">
-              <label htmlFor="notes" className={labelCls}>Notes</label>
-              <textarea id="notes" rows={3} className={inputCls + " resize-none"} value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any additional notes…" />
+            <div className="sm:col-span-2">
+              <label htmlFor="notes" className="ab-label">Notes</label>
+              <textarea id="notes" rows={3} className="ab-input resize-none" value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any additional notes..." />
             </div>
           </div>
         )}
-      </div>
+      </section>
 
       {saveError && (
-        <p className="text-xs text-[#ffafd7] bg-[#ffafd7]/5 border border-[#ffafd7]/20 rounded-lg px-3 py-2">{saveError}</p>
+        <div
+          className="ab-card-flat px-3 py-2 text-[13px]"
+          style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+        >
+          {saveError}
+        </div>
       )}
 
-      <div className="flex items-center gap-3">
-        <button
-          type="submit"
-          disabled={saving}
-          className="rounded-lg bg-primary px-5 py-2.5 text-xs font-headline font-bold text-[#00382f] hover:bg-[#26fedc] disabled:opacity-60 transition-colors shadow-[0_0_12px_rgba(0,223,193,0.2)]"
-        >
-          {saving ? "Saving…" : "Save Fixed Deposit"}
-        </button>
+      <div className="flex items-center justify-end gap-3 pt-2">
         <button
           type="button"
           onClick={() => router.back()}
-          className="rounded-lg ghost-border px-5 py-2.5 text-xs font-headline font-bold text-[#cbc4d0] hover:text-[#e4e1e6] hover:bg-[#1b1b1e] transition-colors"
+          className="ab-btn ab-btn-ghost"
         >
           Cancel
+        </button>
+        <button
+          type="submit"
+          disabled={saving}
+          className="ab-btn ab-btn-accent"
+        >
+          {saving ? (
+            <><Loader2 size={14} className="animate-spin" /> Saving...</>
+          ) : (
+            "Save Fixed Deposit"
+          )}
         </button>
       </div>
     </form>

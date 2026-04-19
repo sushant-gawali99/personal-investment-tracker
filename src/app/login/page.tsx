@@ -17,6 +17,18 @@ function GoogleIcon() {
   );
 }
 
+function LogoMark() {
+  return (
+    <span
+      aria-hidden
+      className="inline-flex items-center justify-center w-8 h-8 rounded-full text-white text-[14px] font-bold"
+      style={{ background: "linear-gradient(135deg, #ff385c 0%, #e00b41 100%)" }}
+    >
+      M
+    </span>
+  );
+}
+
 function LoginPageInner() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -29,78 +41,71 @@ function LoginPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0d] flex">
-      {/* Left panel — branding */}
-      <div className="hidden lg:flex lg:w-[45%] flex-col justify-between p-12 bg-[#0e0e11] border-r border-[rgba(73,69,78,0.2)]">
+    <div className="min-h-screen bg-white flex">
+      <div className="hidden lg:flex lg:w-[48%] flex-col justify-between p-12 bg-[#fafafa] border-r border-[#ebebeb]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center">
-            <TrendingUp size={15} className="text-primary" />
-          </div>
-          <span className="font-headline font-bold text-sm text-[#e4e1e6]">Personal Investment Tracker</span>
+          <LogoMark />
+          <span className="text-[18px] font-semibold text-[#222222] tracking-tight">MyFolio</span>
         </div>
 
-        <div className="space-y-8">
+        <div className="space-y-10">
           <div>
-            <h1 className="font-headline font-bold text-4xl text-[#e4e1e6] leading-tight tracking-tight">
+            <h1 className="text-[44px] font-bold text-[#222222] leading-[1.05] tracking-tight">
               Your wealth,<br />at a glance.
             </h1>
-            <p className="text-[#cbc4d0] text-sm mt-4 leading-relaxed max-w-xs">
+            <p className="text-[#6a6a6a] text-[15px] mt-5 leading-relaxed max-w-sm">
               Track equities, mutual funds, and fixed deposits in one unified dashboard. Live P&amp;L, AI-powered FD extraction, and more.
             </p>
           </div>
 
-          <div className="space-y-4">
+          <div className="space-y-5">
             {[
               { icon: BarChart3, label: "Live portfolio from Zerodha", sub: "Equity & MF holdings in real time" },
               { icon: ShieldCheck, label: "AI-powered FD tracking", sub: "Extract details from certificates instantly" },
               { icon: TrendingUp, label: "Portfolio analytics", sub: "CAGR, allocation drift, accrual timeline" },
             ].map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1b1b1e] ghost-border flex items-center justify-center shrink-0 mt-0.5">
-                  <Icon size={13} className="text-primary" />
+                <div className="w-10 h-10 rounded-full bg-[#fff5f7] flex items-center justify-center shrink-0">
+                  <Icon size={16} className="text-[#ff385c]" />
                 </div>
                 <div>
-                  <p className="text-xs font-headline font-semibold text-[#e4e1e6]">{label}</p>
-                  <p className="text-[11px] text-[#cbc4d0] mt-0.5">{sub}</p>
+                  <p className="text-[14px] font-semibold text-[#222222]">{label}</p>
+                  <p className="text-[13px] text-[#6a6a6a] mt-0.5">{sub}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-[11px] text-[#49454e]">Personal use only · Data stays in your account</p>
+        <p className="text-[12px] text-[#929292]">Personal use only · Data stays in your account</p>
       </div>
 
-      {/* Right panel — login form */}
       <div className="flex-1 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-sm space-y-6">
-          {/* Mobile logo */}
+        <div className="w-full max-w-sm space-y-7">
           <div className="lg:hidden flex items-center gap-2 mb-2">
-            <div className="w-7 h-7 rounded-lg bg-primary/15 flex items-center justify-center">
-              <TrendingUp size={13} className="text-primary" />
-            </div>
-            <span className="font-headline font-bold text-sm text-[#e4e1e6]">Personal Investment Tracker</span>
+            <LogoMark />
+            <span className="text-[16px] font-semibold text-[#222222] tracking-tight">MyFolio</span>
           </div>
 
           <div>
-            <h2 className="font-headline font-bold text-2xl text-[#e4e1e6] tracking-tight">Welcome back</h2>
-            <p className="text-[#cbc4d0] text-sm mt-1">Sign in to access your portfolio</p>
+            <h2 className="text-[28px] font-bold text-[#222222] tracking-tight">Welcome back</h2>
+            <p className="text-[#6a6a6a] text-[14px] mt-1.5">Sign in to access your portfolio</p>
           </div>
 
           <button
             onClick={handleGoogle}
             disabled={loadingGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 text-gray-800 font-semibold text-sm py-2.5 px-4 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f7f7f7] text-[#222222] font-medium text-[15px] py-3 px-4 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed border border-[#222222]"
           >
             {loadingGoogle ? (
-              <Loader2 size={16} className="animate-spin text-gray-500" />
+              <Loader2 size={17} className="animate-spin text-[#6a6a6a]" />
             ) : (
               <GoogleIcon />
             )}
             {loadingGoogle ? "Redirecting…" : "Continue with Google"}
           </button>
 
-          <p className="text-center text-[11px] text-[#49454e]">
+          <p className="text-center text-[12px] text-[#929292]">
             Private app · Only authorised accounts can sign in
           </p>
         </div>

@@ -45,10 +45,10 @@ export default async function OverviewPage() {
   const { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected } = await getData(userId);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div>
-        <h1 className="font-headline font-bold text-base text-[#e4e1e6]">Overview</h1>
-        <p className="text-[#cbc4d0] text-xs mt-0.5">Your complete investment portfolio at a glance.</p>
+        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Overview</h1>
+        <p className="text-[14px] text-[#6a6a6a] mt-1">Your complete investment portfolio at a glance.</p>
       </div>
       <OverviewClient
         summary={summary}
