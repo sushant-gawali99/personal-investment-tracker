@@ -89,11 +89,6 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Overview</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">A snapshot of your wealth across every account.</p>
-      </div>
-
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
           label="Total Portfolio"
