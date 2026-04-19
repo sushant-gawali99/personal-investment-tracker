@@ -44,13 +44,13 @@ export function SyncStatus({ syncedAt, sessionExpired }: { syncedAt: string | nu
   return (
     <div className="flex items-center gap-4">
       <div className="text-right">
-        <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Last synced</p>
-        <p className="text-[13px] text-[#222222] font-semibold mt-0.5">
+        <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Last synced</p>
+        <p className="text-[13px] text-[#ededed] font-semibold mt-0.5">
           {syncedAt ? formatRelative(syncedAt) : "Never"}
         </p>
-        {error && <p className="text-[11px] text-[#c13515] mt-0.5 font-medium">{error}</p>}
+        {error && <p className="text-[11px] text-[#ff7a6e] mt-0.5 font-medium">{error}</p>}
         {sessionExpired && !error && (
-          <p className="text-[11px] text-[#b25e00] mt-0.5 flex items-center justify-end gap-1 font-medium">
+          <p className="text-[11px] text-[#f5a524] mt-0.5 flex items-center justify-end gap-1 font-medium">
             <AlertTriangle size={11} /> Session expired
           </p>
         )}

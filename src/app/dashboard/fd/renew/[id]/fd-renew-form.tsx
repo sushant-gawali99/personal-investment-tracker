@@ -69,9 +69,9 @@ export function FDRenewForm({ fd }: Props) {
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
       <section className="ab-card p-6 space-y-5">
         <div>
-          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Renewal Details</p>
-          <p className="text-[13px] text-[#6a6a6a] mt-0.5">
-            Record a new renewal period for <span className="font-semibold text-[#222222]">{fd.bankName}</span>.
+          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal Details</p>
+          <p className="text-[13px] text-[#a0a0a5] mt-0.5">
+            Record a new renewal period for <span className="font-semibold text-[#ededed]">{fd.bankName}</span>.
           </p>
         </div>
 
@@ -125,7 +125,7 @@ export function FDRenewForm({ fd }: Props) {
         {error && (
           <div
             className="ab-card-flat px-3 py-2 text-[13px]"
-            style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+            style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
           >
             {error}
           </div>

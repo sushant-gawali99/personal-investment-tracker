@@ -19,7 +19,7 @@ export function TopNav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-[#ebebeb]">
+    <header className="sticky top-0 z-50 bg-[#17171a] border-b border-[#2a2a2e]">
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <Link href="/dashboard" className="flex items-center gap-2">
@@ -30,7 +30,7 @@ export function TopNav() {
             >
               M
             </span>
-            <span className="text-[18px] font-semibold tracking-tight text-[#222222]">MyFolio</span>
+            <span className="text-[18px] font-semibold tracking-tight text-[#ededed]">MyFolio</span>
           </Link>
 
           <nav className="hidden sm:flex items-center gap-1">
@@ -43,8 +43,8 @@ export function TopNav() {
                   className={cn(
                     "px-3 py-2 rounded-full text-sm font-medium transition-colors",
                     active
-                      ? "bg-[#f7f7f7] text-[#222222]"
-                      : "text-[#6a6a6a] hover:text-[#222222] hover:bg-[#f7f7f7]"
+                      ? "bg-[#1c1c20] text-[#ededed]"
+                      : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
                   )}
                 >
                   {label}
@@ -57,14 +57,14 @@ export function TopNav() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-[#6a6a6a] hover:text-[#222222] hover:bg-[#f7f7f7] transition-colors"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
           >
             <LogOut size={14} />
             Sign out
           </button>
 
           <button
-            className="sm:hidden p-2 rounded-full text-[#222222] hover:bg-[#f7f7f7] transition-colors"
+            className="sm:hidden p-2 rounded-full text-[#ededed] hover:bg-[#1c1c20] transition-colors"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
           >
@@ -74,7 +74,7 @@ export function TopNav() {
       </div>
 
       {open && (
-        <div className="sm:hidden border-t border-[#ebebeb] bg-white px-4 py-3 space-y-1">
+        <div className="sm:hidden border-t border-[#2a2a2e] bg-[#17171a] px-4 py-3 space-y-1">
           {TABS.map(({ href, label }) => {
             const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
             return (
@@ -84,7 +84,7 @@ export function TopNav() {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full",
-                  active ? "bg-[#f7f7f7] text-[#222222]" : "text-[#6a6a6a] hover:text-[#222222] hover:bg-[#f7f7f7]"
+                  active ? "bg-[#1c1c20] text-[#ededed]" : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
                 )}
               >
                 {label}
@@ -93,7 +93,7 @@ export function TopNav() {
           })}
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#6a6a6a] hover:text-[#222222] hover:bg-[#f7f7f7] w-full transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20] w-full transition-colors"
           >
             <LogOut size={15} />
             Sign out

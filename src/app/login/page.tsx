@@ -41,19 +41,19 @@ function LoginPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-white flex">
-      <div className="hidden lg:flex lg:w-[48%] flex-col justify-between p-12 bg-[#fafafa] border-r border-[#ebebeb]">
+    <div className="min-h-screen bg-[#17171a] flex">
+      <div className="hidden lg:flex lg:w-[48%] flex-col justify-between p-12 bg-[#0e0e11] border-r border-[#2a2a2e]">
         <div className="flex items-center gap-2.5">
           <LogoMark />
-          <span className="text-[18px] font-semibold text-[#222222] tracking-tight">MyFolio</span>
+          <span className="text-[18px] font-semibold text-[#ededed] tracking-tight">MyFolio</span>
         </div>
 
         <div className="space-y-10">
           <div>
-            <h1 className="text-[44px] font-bold text-[#222222] leading-[1.05] tracking-tight">
+            <h1 className="text-[44px] font-bold text-[#ededed] leading-[1.05] tracking-tight">
               Your wealth,<br />at a glance.
             </h1>
-            <p className="text-[#6a6a6a] text-[15px] mt-5 leading-relaxed max-w-sm">
+            <p className="text-[#a0a0a5] text-[15px] mt-5 leading-relaxed max-w-sm">
               Track equities, mutual funds, and fixed deposits in one unified dashboard. Live P&amp;L, AI-powered FD extraction, and more.
             </p>
           </div>
@@ -65,47 +65,47 @@ function LoginPageInner() {
               { icon: TrendingUp, label: "Portfolio analytics", sub: "CAGR, allocation drift, accrual timeline" },
             ].map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#fff5f7] flex items-center justify-center shrink-0">
+                <div className="w-10 h-10 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
                   <Icon size={16} className="text-[#ff385c]" />
                 </div>
                 <div>
-                  <p className="text-[14px] font-semibold text-[#222222]">{label}</p>
-                  <p className="text-[13px] text-[#6a6a6a] mt-0.5">{sub}</p>
+                  <p className="text-[14px] font-semibold text-[#ededed]">{label}</p>
+                  <p className="text-[13px] text-[#a0a0a5] mt-0.5">{sub}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-[12px] text-[#929292]">Personal use only · Data stays in your account</p>
+        <p className="text-[12px] text-[#6e6e73]">Personal use only · Data stays in your account</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm space-y-7">
           <div className="lg:hidden flex items-center gap-2 mb-2">
             <LogoMark />
-            <span className="text-[16px] font-semibold text-[#222222] tracking-tight">MyFolio</span>
+            <span className="text-[16px] font-semibold text-[#ededed] tracking-tight">MyFolio</span>
           </div>
 
           <div>
-            <h2 className="text-[28px] font-bold text-[#222222] tracking-tight">Welcome back</h2>
-            <p className="text-[#6a6a6a] text-[14px] mt-1.5">Sign in to access your portfolio</p>
+            <h2 className="text-[28px] font-bold text-[#ededed] tracking-tight">Welcome back</h2>
+            <p className="text-[#a0a0a5] text-[14px] mt-1.5">Sign in to access your portfolio</p>
           </div>
 
           <button
             onClick={handleGoogle}
             disabled={loadingGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-[#f7f7f7] text-[#222222] font-medium text-[15px] py-3 px-4 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed border border-[#222222]"
+            className="w-full flex items-center justify-center gap-3 bg-[#17171a] hover:bg-[#1c1c20] text-[#ededed] font-medium text-[15px] py-3 px-4 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed border border-[#ededed]"
           >
             {loadingGoogle ? (
-              <Loader2 size={17} className="animate-spin text-[#6a6a6a]" />
+              <Loader2 size={17} className="animate-spin text-[#a0a0a5]" />
             ) : (
               <GoogleIcon />
             )}
             {loadingGoogle ? "Redirecting…" : "Continue with Google"}
           </button>
 
-          <p className="text-center text-[12px] text-[#929292]">
+          <p className="text-center text-[12px] text-[#6e6e73]">
             Private app · Only authorised accounts can sign in
           </p>
         </div>

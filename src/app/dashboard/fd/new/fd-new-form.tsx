@@ -41,11 +41,11 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="ab-card overflow-hidden w-full max-w-lg">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#ebebeb]">
-          <p className="text-[16px] font-semibold text-[#222222] tracking-tight">Take Photo</p>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2e]">
+          <p className="text-[16px] font-semibold text-[#ededed] tracking-tight">Take Photo</p>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#6a6a6a] hover:bg-[#f7f7f7] transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[#a0a0a5] hover:bg-[#1c1c20] transition-colors"
             aria-label="Close"
           >
             <X size={16} />
@@ -53,7 +53,7 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
         </div>
         <div className="p-5 space-y-4">
           {error ? (
-            <p className="ab-card-flat text-[13px] px-3 py-2" style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}>{error}</p>
+            <p className="ab-card-flat text-[13px] px-3 py-2" style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}>{error}</p>
           ) : (
             <video ref={videoRef} autoPlay playsInline className="w-full rounded-xl aspect-[4/3] bg-black object-cover" />
           )}
@@ -120,7 +120,7 @@ function ImageDropZone({
     <div className="space-y-2">
       <p className="ab-label">{label}</p>
       {preview ? (
-        <div className="relative rounded-xl border border-[#ebebeb] overflow-hidden group bg-white">
+        <div className="relative rounded-xl border border-[#2a2a2e] overflow-hidden group bg-[#17171a]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt={label} className="w-full h-40 object-cover" />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -139,22 +139,22 @@ function ImageDropZone({
           <div
             {...getRootProps()}
             className={cn(
-              "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-white",
+              "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[#17171a]",
               isDragActive
-                ? "border-[#ff385c] bg-[#fff5f7]"
-                : "border-[#c1c1c1] hover:border-[#ff385c] hover:bg-[#fff5f7]",
+                ? "border-[#ff385c] bg-[#2a1218]"
+                : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",
               disabled && "pointer-events-none opacity-40"
             )}
           >
             <input {...getInputProps()} />
-            <Upload size={18} className="mx-auto mb-2 text-[#6a6a6a]" />
-            <p className="text-[13px] text-[#6a6a6a]">{isDragActive ? "Drop here" : hint}</p>
+            <Upload size={18} className="mx-auto mb-2 text-[#a0a0a5]" />
+            <p className="text-[13px] text-[#a0a0a5]">{isDragActive ? "Drop here" : hint}</p>
           </div>
           <button
             type="button"
             onClick={() => setShowCamera(true)}
             disabled={disabled}
-            className="ab-btn ab-btn-ghost w-full border border-[#ebebeb]"
+            className="ab-btn ab-btn-ghost w-full border border-[#2a2a2e]"
             style={{ fontSize: "13px" }}
           >
             <Camera size={14} /> Use Camera
@@ -357,7 +357,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {renewedFrom && (
         <div
           className="ab-card-flat flex items-center gap-2 px-4 py-3 text-[13px]"
-          style={{ background: "#fff5f7", color: "#e00b41", borderColor: "#ffd4dc" }}
+          style={{ background: "#2a1218", color: "#e00b41", borderColor: "#3a1820" }}
         >
           <RefreshCw size={14} />
           <span>
@@ -370,12 +370,12 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {/* AI Digitize panel */}
       <section className="ab-card p-6 space-y-5">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#fff5f7" }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2a1218" }}>
             <Sparkles size={18} className="text-[#ff385c]" />
           </div>
           <div>
-            <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Digitize Receipt with AI</p>
-            <p className="text-[13px] text-[#6a6a6a] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
+            <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Digitize Receipt with AI</p>
+            <p className="text-[13px] text-[#a0a0a5] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
           </div>
         </div>
 
@@ -399,7 +399,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         {extractError && (
           <div
             className="ab-card-flat px-3 py-2 text-[13px]"
-            style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+            style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
           >
             {extractError}
           </div>
@@ -423,7 +423,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         {extracted && (
           <div
             className="ab-card-flat flex items-center gap-2 px-3 py-2 text-[13px]"
-            style={{ background: "#e8f6ec", color: "#007a33", borderColor: "#c5e9cf" }}
+            style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
           >
             <span className="ab-chip ab-chip-accent">
               <Sparkles size={12} /> AI Extracted
@@ -435,7 +435,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         {extracted && renewalNumber !== null && renewalNumber > 0 && (
           <div
             className="ab-card-flat px-3 py-2"
-            style={{ background: "#fff4e0", color: "#b25e00", borderColor: "#ffe0b0" }}
+            style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
           >
             <p className="text-[13px] font-semibold">Renewal #{renewalNumber} detected - fill in previous periods below</p>
           </div>
@@ -449,7 +449,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             <span className={i === 0 ? "ab-chip ab-chip-info" : "ab-chip ab-chip-accent"}>
               {i === 0 ? "Original FD" : `Renewal #${i}`}
             </span>
-            <p className="text-[13px] text-[#6a6a6a]">Fill in the details for this period</p>
+            <p className="text-[13px] text-[#a0a0a5]">Fill in the details for this period</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
@@ -495,7 +495,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           {priorRenewals.length > 0 ? (
             <span className="ab-chip ab-chip-accent">Renewal #{priorRenewals.length} (Current)</span>
           ) : null}
-          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">FD Details</p>
+          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">FD Details</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -558,8 +558,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {/* Renewal & nominee (from back of certificate) */}
       <section className="ab-card p-6 space-y-5">
         <div>
-          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Renewal &amp; Nominee</p>
-          <p className="text-[13px] text-[#6a6a6a] mt-0.5">Usually printed on the back of the FD receipt.</p>
+          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</p>
+          <p className="text-[13px] text-[#a0a0a5] mt-0.5">Usually printed on the back of the FD receipt.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -598,13 +598,13 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         <button
           type="button"
           onClick={() => setShowOptional((s) => !s)}
-          className="flex items-center justify-between w-full px-6 py-4 text-[16px] font-semibold text-[#222222] tracking-tight hover:bg-[#f7f7f7] transition-colors"
+          className="flex items-center justify-between w-full px-6 py-4 text-[16px] font-semibold text-[#ededed] tracking-tight hover:bg-[#1c1c20] transition-colors"
         >
           <span>Optional Details</span>
-          {showOptional ? <ChevronUp size={16} className="text-[#6a6a6a]" /> : <ChevronDown size={16} className="text-[#6a6a6a]" />}
+          {showOptional ? <ChevronUp size={16} className="text-[#a0a0a5]" /> : <ChevronDown size={16} className="text-[#a0a0a5]" />}
         </button>
         {showOptional && (
-          <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#ebebeb] pt-5">
+          <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#2a2a2e] pt-5">
             <div>
               <label htmlFor="fdNumber" className="ab-label">FD Number / Certificate No.</label>
               <input id="fdNumber" className="ab-input" value={form.fdNumber} onChange={(e) => set("fdNumber", e.target.value)} placeholder="FD123456" />
@@ -624,7 +624,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {saveError && (
         <div
           className="ab-card-flat px-3 py-2 text-[13px]"
-          style={{ background: "#fdecea", color: "#c13515", borderColor: "#f5c6c2" }}
+          style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
         >
           {saveError}
         </div>

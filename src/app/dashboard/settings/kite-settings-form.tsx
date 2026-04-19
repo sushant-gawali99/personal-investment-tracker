@@ -54,12 +54,12 @@ export function KiteSettingsForm({ savedApiKey, isConnected }: Props) {
       <div className="flex items-center gap-2">
         {isConnected ? (
           <>
-            <CheckCircle2 size={16} className="text-[#00a651]" />
+            <CheckCircle2 size={16} className="text-[#5ee0a4]" />
             <span className="ab-chip ab-chip-success">Connected</span>
           </>
         ) : (
           <>
-            <XCircle size={16} className="text-[#6a6a6a]" />
+            <XCircle size={16} className="text-[#a0a0a5]" />
             <span className="ab-chip">Not connected</span>
           </>
         )}
@@ -91,16 +91,16 @@ export function KiteSettingsForm({ savedApiKey, isConnected }: Props) {
             <button
               type="button"
               onClick={() => setShowSecret((s) => !s)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#6a6a6a] hover:text-[#222222] transition-colors"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a0a0a5] hover:text-[#ededed] transition-colors"
             >
               {showSecret ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
-          <p className="text-[12px] text-[#6a6a6a] mt-1.5">Secret is never shown after saving.</p>
+          <p className="text-[12px] text-[#a0a0a5] mt-1.5">Secret is never shown after saving.</p>
         </div>
 
-        {error && <p className="text-[13px] text-[#c13515] bg-[#fdecea] rounded-lg px-3 py-2.5 font-medium">{error}</p>}
-        {saved && <p className="text-[13px] text-[#007a33] bg-[#e8f6ec] rounded-lg px-3 py-2.5 font-medium">Credentials saved successfully.</p>}
+        {error && <p className="text-[13px] text-[#ff7a6e] bg-[#2a1613] rounded-lg px-3 py-2.5 font-medium">{error}</p>}
+        {saved && <p className="text-[13px] text-[#5ee0a4] bg-[#0f2a19] rounded-lg px-3 py-2.5 font-medium">Credentials saved successfully.</p>}
 
         <div className="flex items-center gap-3 pt-1 flex-wrap">
           <button
@@ -125,7 +125,7 @@ export function KiteSettingsForm({ savedApiKey, isConnected }: Props) {
             <button
               type="button"
               onClick={handleDisconnect}
-              className="ab-btn ab-btn-ghost text-[#c13515] hover:bg-[#fdecea]"
+              className="ab-btn ab-btn-ghost text-[#ff7a6e] hover:bg-[#2a1613]"
             >
               Disconnect
             </button>

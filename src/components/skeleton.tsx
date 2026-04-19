@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 
 export function Skeleton({ className }: { className?: string }) {
-  return <div className={cn("animate-pulse rounded-lg bg-[#f2f2f2]", className)} />;
+  return <div className={cn("animate-pulse rounded-lg bg-[#222226]", className)} />;
 }
 
 export function StatCardSkeleton() {
@@ -17,10 +17,10 @@ export function StatCardSkeleton() {
 export function TableSkeleton({ rows = 6, cols = 5 }: { rows?: number; cols?: number }) {
   return (
     <div className="ab-card overflow-hidden">
-      <div className="px-4 py-3 border-b border-[#ebebeb] bg-[#f7f7f7]">
+      <div className="px-4 py-3 border-b border-[#2a2a2e] bg-[#1c1c20]">
         <Skeleton className="h-2.5 w-32" />
       </div>
-      <div className="divide-y divide-[#ebebeb]">
+      <div className="divide-y divide-[#2a2a2e]">
         {Array.from({ length: rows }).map((_, i) => (
           <div key={i} className="px-4 py-3 flex items-center gap-4">
             <Skeleton className="h-4 w-20" />

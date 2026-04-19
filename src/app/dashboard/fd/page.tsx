@@ -52,8 +52,8 @@ export default async function FDPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Fixed Deposits</h1>
-          <p className="text-[14px] text-[#6a6a6a] mt-1">Track and analyse your fixed deposit investments.</p>
+          <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Fixed Deposits</h1>
+          <p className="text-[14px] text-[#a0a0a5] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
         <Link
           href="/dashboard/fd/new"
@@ -73,8 +73,8 @@ export default async function FDPage() {
             { label: "Interest This Year", value: formatINR(interestThisYear) },
           ].map(({ label, value }) => (
             <div key={label} className="ab-card p-4">
-              <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold mb-1">{label}</p>
-              <p className="mono text-[20px] font-semibold text-[#222222]">{value}</p>
+              <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
+              <p className="mono text-[20px] font-semibold text-[#ededed]">{value}</p>
             </div>
           ))}
         </div>
@@ -83,12 +83,12 @@ export default async function FDPage() {
       {fds.length > 0 && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="ab-card-flat p-4 flex items-center justify-between">
-            <p className="text-[12px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Total Principal</p>
-            <p className="mono font-semibold text-[#222222]">{formatINR(totalPrincipal)}</p>
+            <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Principal</p>
+            <p className="mono font-semibold text-[#ededed]">{formatINR(totalPrincipal)}</p>
           </div>
           <div className="ab-card-flat p-4 flex items-center justify-between">
-            <p className="text-[12px] text-[#6a6a6a] uppercase tracking-wider font-semibold">Total Interest Earned</p>
-            <p className="mono font-semibold text-[#00a651]">{formatINR(totalInterest)}</p>
+            <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Interest Earned</p>
+            <p className="mono font-semibold text-[#5ee0a4]">{formatINR(totalInterest)}</p>
           </div>
         </div>
       )}

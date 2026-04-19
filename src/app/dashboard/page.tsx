@@ -47,8 +47,8 @@ export default async function OverviewPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Overview</h1>
-        <p className="text-[14px] text-[#6a6a6a] mt-1">Your complete investment portfolio at a glance.</p>
+        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Overview</h1>
+        <p className="text-[14px] text-[#a0a0a5] mt-1">Your complete investment portfolio at a glance.</p>
       </div>
       <OverviewClient
         summary={summary}

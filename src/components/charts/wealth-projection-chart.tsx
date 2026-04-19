@@ -28,7 +28,7 @@ interface CustomDotProps {
 
 function MilestoneDot({ cx, cy, payload }: CustomDotProps) {
   if (!payload?.isMilestone) return null;
-  return <circle cx={cx} cy={cy} r={4} fill="#ff385c" stroke="#ffffff" strokeWidth={2} />;
+  return <circle cx={cx} cy={cy} r={4} fill="#ff385c" stroke="#17171a" strokeWidth={2} />;
 }
 
 export function WealthProjectionChart({
@@ -46,8 +46,8 @@ export function WealthProjectionChart({
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
         {milestoneData.map((d) => (
           <div key={d.year} className="ab-card-flat p-2.5 text-center">
-            <p className="text-[10px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{d.year}</p>
-            <p className="mono text-xs font-bold text-[#222222] mt-1">{formatINRCompact(d.value)}</p>
+            <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{d.year}</p>
+            <p className="mono text-xs font-bold text-[#ededed] mt-1">{formatINRCompact(d.value)}</p>
           </div>
         ))}
       </div>
@@ -60,11 +60,11 @@ export function WealthProjectionChart({
               <stop offset="95%" stopColor="#ff385c" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#ebebeb" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#6a6a6a" }} tickLine={false} axisLine={false} />
-          <YAxis tickFormatter={(v) => formatINRCompact(v)} tick={{ fontSize: 11, fill: "#6a6a6a" }} tickLine={false} axisLine={false} width={56} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
+          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={(v) => formatINRCompact(v)} tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} width={56} />
           <Tooltip formatter={(value) => [formatINRCompact(Number(value)), "Projected Wealth"]} />
-          <ReferenceLine x="Now" stroke="#c1c1c1" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#6a6a6a", position: "top" }} />
+          <ReferenceLine x="Now" stroke="#3a3a3f" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#a0a0a5", position: "top" }} />
           <Area
             type="monotone"
             dataKey="value"
@@ -78,7 +78,7 @@ export function WealthProjectionChart({
         </AreaChart>
       </ResponsiveContainer>
 
-      <p className="text-[11px] text-[#929292] text-center">
+      <p className="text-[11px] text-[#6e6e73] text-center">
         Assumes {cagr.toFixed(2)}% CAGR maintained — actual returns may vary
       </p>
     </div>

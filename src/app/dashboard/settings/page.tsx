@@ -20,20 +20,20 @@ export default async function SettingsPage() {
   return (
     <div className="max-w-2xl space-y-8">
       <div>
-        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Settings</h1>
-        <p className="text-[14px] text-[#6a6a6a] mt-1">Manage your API credentials and app configuration.</p>
+        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Settings</h1>
+        <p className="text-[14px] text-[#a0a0a5] mt-1">Manage your API credentials and app configuration.</p>
       </div>
 
       <section className="ab-card p-6 space-y-5">
         <div>
-          <p className="text-[18px] font-semibold text-[#222222] tracking-tight">Zerodha / Kite Connect</p>
-          <p className="text-[13px] text-[#6a6a6a] mt-2 leading-relaxed">
+          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Zerodha / Kite Connect</p>
+          <p className="text-[13px] text-[#a0a0a5] mt-2 leading-relaxed">
             Enter your Kite Connect API credentials from{" "}
             <a
               href="https://developers.kite.trade"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[#222222] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
+              className="text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
             >
               developers.kite.trade
             </a>

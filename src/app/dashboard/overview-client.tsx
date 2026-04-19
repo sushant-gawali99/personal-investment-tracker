@@ -38,18 +38,18 @@ function StatCard({
   return (
     <div className="ab-card p-5">
       <div className="flex items-center justify-between mb-3">
-        <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{label}</p>
+        <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
         {Icon && (
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f7f7f7] text-[#222222]">
+          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1c1c20] text-[#ededed]">
             <Icon size={15} strokeWidth={2} />
           </span>
         )}
       </div>
-      <p className="mono text-[22px] font-bold text-[#222222] leading-tight">{value}</p>
+      <p className="mono text-[22px] font-bold text-[#ededed] leading-tight">{value}</p>
       {sub && (
         <p className={cn(
           "text-[12px] flex items-center gap-1 mt-1.5 font-medium",
-          positive === true ? "text-[#00a651]" : positive === false ? "text-[#c13515]" : "text-[#6a6a6a]"
+          positive === true ? "text-[#5ee0a4]" : positive === false ? "text-[#ff7a6e]" : "text-[#a0a0a5]"
         )}>
           {positive === true && <TrendingUp size={12} />}
           {positive === false && <TrendingDown size={12} />}
@@ -70,11 +70,11 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
   if (!hasAny) {
     return (
       <div className="ab-card p-10 text-center max-w-md mx-auto">
-        <div className="w-14 h-14 rounded-full bg-[#fff5f7] flex items-center justify-center mx-auto mb-5">
+        <div className="w-14 h-14 rounded-full bg-[#2a1218] flex items-center justify-center mx-auto mb-5">
           <Landmark size={22} className="text-[#ff385c]" />
         </div>
-        <p className="text-[20px] font-semibold text-[#222222] tracking-tight">No investments tracked yet</p>
-        <p className="text-[14px] text-[#6a6a6a] mt-2 mb-6">Connect Zerodha or add a Fixed Deposit to get started.</p>
+        <p className="text-[20px] font-semibold text-[#ededed] tracking-tight">No investments tracked yet</p>
+        <p className="text-[14px] text-[#a0a0a5] mt-2 mb-6">Connect Zerodha or add a Fixed Deposit to get started.</p>
         <div className="flex gap-3 justify-center flex-wrap">
           <Link href="/dashboard/settings" className="ab-btn ab-btn-accent">
             Connect Zerodha
@@ -90,8 +90,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Overview</h1>
-        <p className="text-[14px] text-[#6a6a6a] mt-1">A snapshot of your wealth across every account.</p>
+        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Overview</h1>
+        <p className="text-[14px] text-[#a0a0a5] mt-1">A snapshot of your wealth across every account.</p>
       </div>
 
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -127,7 +127,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
         <div className="lg:col-span-8 space-y-5">
 
           <div className="ab-card p-6">
-            <h2 className="text-[18px] font-semibold text-[#222222] mb-5 tracking-tight">Asset Allocation</h2>
+            <h2 className="text-[18px] font-semibold text-[#ededed] mb-5 tracking-tight">Asset Allocation</h2>
             <div className="flex items-center gap-6 flex-wrap">
               <div className="shrink-0 w-[168px] h-[168px]">
                 <AllocationDonut
@@ -141,22 +141,22 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
               <div className="flex-1 min-w-[260px] space-y-4">
                 {[
                   { label: "Equity", sub: "Zerodha stocks", value: formatINR(equity.currentValue), pct: summary.equityPct, color: "#ff385c" },
-                  { label: "Mutual Funds", sub: "Direct MF", value: formatINR(mf.currentValue), pct: summary.mfPct, color: "#428bff" },
-                  { label: "Fixed Deposits", sub: "FDs + SGBs", value: formatINR(fd.totalMaturity), pct: summary.fdPct, color: "#00a651" },
+                  { label: "Mutual Funds", sub: "Direct MF", value: formatINR(mf.currentValue), pct: summary.mfPct, color: "#5aa9ff" },
+                  { label: "Fixed Deposits", sub: "FDs + SGBs", value: formatINR(fd.totalMaturity), pct: summary.fdPct, color: "#5ee0a4" },
                 ].filter((r) => r.pct > 0).map(({ label, sub, value, pct, color }) => (
                   <div key={label} className="space-y-1.5">
                     <div className="flex items-center gap-3">
                       <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
                       <div className="flex-1 min-w-0">
-                        <p className="text-[14px] font-semibold text-[#222222]">{label}</p>
-                        <p className="text-[12px] text-[#6a6a6a]">{sub}</p>
+                        <p className="text-[14px] font-semibold text-[#ededed]">{label}</p>
+                        <p className="text-[12px] text-[#a0a0a5]">{sub}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="mono text-[14px] font-semibold text-[#222222]">{pct.toFixed(1)}%</p>
-                        <p className="mono text-[12px] text-[#6a6a6a]">{value}</p>
+                        <p className="mono text-[14px] font-semibold text-[#ededed]">{pct.toFixed(1)}%</p>
+                        <p className="mono text-[12px] text-[#a0a0a5]">{value}</p>
                       </div>
                     </div>
-                    <div className="h-1 rounded-full bg-[#f2f2f2] overflow-hidden ml-5">
+                    <div className="h-1 rounded-full bg-[#222226] overflow-hidden ml-5">
                       <div className="h-full rounded-full" style={{ width: `${Math.min(100, pct)}%`, background: color }} />
                     </div>
                   </div>
@@ -167,15 +167,15 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
           {hasMF && (
             <div className="ab-card p-6">
-              <h3 className="text-[16px] font-semibold text-[#222222] mb-4 tracking-tight">Mutual Funds</h3>
+              <h3 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Mutual Funds</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
-                  { label: "Invested", value: formatINR(mf.totalInvested), cls: "text-[#222222]" },
-                  { label: "Current Value", value: formatINR(mf.currentValue), cls: "text-[#222222]" },
-                  { label: "Total P&L", value: (mf.totalPnL >= 0 ? "+" : "") + formatINR(mf.totalPnL), cls: mf.totalPnL >= 0 ? "text-[#00a651]" : "text-[#c13515]" },
+                  { label: "Invested", value: formatINR(mf.totalInvested), cls: "text-[#ededed]" },
+                  { label: "Current Value", value: formatINR(mf.currentValue), cls: "text-[#ededed]" },
+                  { label: "Total P&L", value: (mf.totalPnL >= 0 ? "+" : "") + formatINR(mf.totalPnL), cls: mf.totalPnL >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]" },
                 ].map(({ label, value, cls }) => (
                   <div key={label}>
-                    <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{label}</p>
+                    <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
                     <p className={cn("mono text-[20px] font-semibold mt-1", cls)}>{value}</p>
                   </div>
                 ))}
@@ -185,7 +185,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
           {summary.cagr > 0 && (
             <div className="ab-card p-6">
-              <h3 className="text-[18px] font-semibold text-[#222222] mb-4 tracking-tight">Wealth Projection</h3>
+              <h3 className="text-[18px] font-semibold text-[#ededed] mb-4 tracking-tight">Wealth Projection</h3>
               <WealthProjectionChart currentValue={summary.totalValue} cagr={summary.cagr} />
             </div>
           )}
@@ -193,8 +193,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           {hasFD && (
             <div className="ab-card p-6">
               <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
-                <h3 className="text-[18px] font-semibold text-[#222222] tracking-tight">FD Interest Accrual</h3>
-                <div className="flex items-center gap-4 text-[12px] text-[#6a6a6a]">
+                <h3 className="text-[18px] font-semibold text-[#ededed] tracking-tight">FD Interest Accrual</h3>
+                <div className="flex items-center gap-4 text-[12px] text-[#a0a0a5]">
                   <span className="flex items-center gap-1.5"><span className="w-3 h-[2px] bg-[#ff385c] inline-block" /> Accrued</span>
                   <span className="flex items-center gap-1.5"><span className="w-3 h-[2px] border-t border-dashed border-[#ff385c] inline-block" /> Projected</span>
                 </div>
@@ -206,8 +206,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           {hasEquity && (
             <div className="ab-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[18px] font-semibold text-[#222222] tracking-tight">Top Holdings</h3>
-                <Link href="/dashboard/zerodha" className="text-[13px] text-[#222222] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                <h3 className="text-[18px] font-semibold text-[#ededed] tracking-tight">Top Holdings</h3>
+                <Link href="/dashboard/zerodha" className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
                   View all <ArrowRight size={12} />
                 </Link>
               </div>
@@ -220,12 +220,12 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           {hasFD && (
             <div className="space-y-3">
               {[
-                { label: "Interest This Year", value: formatINR(fd.interestThisYear), cls: "text-[#222222]" },
-                { label: "Total FD Interest", value: formatINR(fd.totalInterest), cls: "text-[#222222]" },
-                { label: "Equity P&L", value: (equity.totalPnL >= 0 ? "+" : "") + formatINR(equity.totalPnL), cls: equity.totalPnL >= 0 ? "text-[#00a651]" : "text-[#c13515]" },
+                { label: "Interest This Year", value: formatINR(fd.interestThisYear), cls: "text-[#ededed]" },
+                { label: "Total FD Interest", value: formatINR(fd.totalInterest), cls: "text-[#ededed]" },
+                { label: "Equity P&L", value: (equity.totalPnL >= 0 ? "+" : "") + formatINR(equity.totalPnL), cls: equity.totalPnL >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]" },
               ].map(({ label, value, cls }) => (
                 <div key={label} className="ab-card-flat p-4 flex items-center justify-between">
-                  <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{label}</p>
+                  <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
                   <p className={cn("mono font-semibold text-[15px]", cls)}>{value}</p>
                 </div>
               ))}
@@ -235,25 +235,25 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           {hasFD && upcomingMaturities.length > 0 && (
             <div className="ab-card p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[16px] font-semibold text-[#222222] tracking-tight">Upcoming Maturities</h3>
-                <Link href="/dashboard/fd" className="text-[12px] text-[#222222] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Upcoming Maturities</h3>
+                <Link href="/dashboard/fd" className="text-[12px] text-[#ededed] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
                   View all <ArrowRight size={11} />
                 </Link>
               </div>
-              <div className="divide-y divide-[#ebebeb]">
+              <div className="divide-y divide-[#2a2a2e]">
                 {upcomingMaturities.map((fd) => {
                   const days = daysUntil(fd.maturityDate);
                   return (
                     <div key={fd.id} className="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                       <div>
-                        <p className="text-[14px] font-semibold text-[#222222]">{fd.bankName}</p>
-                        <p className="text-[12px] text-[#6a6a6a] mt-0.5">{formatDate(fd.maturityDate)}</p>
+                        <p className="text-[14px] font-semibold text-[#ededed]">{fd.bankName}</p>
+                        <p className="text-[12px] text-[#a0a0a5] mt-0.5">{formatDate(fd.maturityDate)}</p>
                       </div>
                       <div className="text-right">
-                        <p className="mono text-[14px] font-semibold text-[#222222]">{formatINR(fd.maturityAmount ?? fd.principal)}</p>
+                        <p className="mono text-[14px] font-semibold text-[#ededed]">{formatINR(fd.maturityAmount ?? fd.principal)}</p>
                         <p className={cn(
                           "text-[11px] font-semibold flex items-center gap-0.5 justify-end mt-0.5",
-                          days <= 7 ? "text-[#c13515]" : days <= 30 ? "text-[#b25e00]" : "text-[#6a6a6a]"
+                          days <= 7 ? "text-[#ff7a6e]" : days <= 30 ? "text-[#f5a524]" : "text-[#a0a0a5]"
                         )}>
                           {days <= 30 && <AlertTriangle size={10} />}
                           {days}d remaining
@@ -268,11 +268,11 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
           {!hasEquity && !kiteConnected && (
             <div className="ab-card p-6 text-center">
-              <div className="w-12 h-12 rounded-full bg-[#fff5f7] flex items-center justify-center mx-auto mb-3">
+              <div className="w-12 h-12 rounded-full bg-[#2a1218] flex items-center justify-center mx-auto mb-3">
                 <TrendingUp size={20} className="text-[#ff385c]" />
               </div>
-              <p className="text-[16px] font-semibold text-[#222222] tracking-tight">Connect Zerodha</p>
-              <p className="text-[13px] text-[#6a6a6a] mt-1 mb-4">Link your Kite account to see equity holdings.</p>
+              <p className="text-[16px] font-semibold text-[#ededed] tracking-tight">Connect Zerodha</p>
+              <p className="text-[13px] text-[#a0a0a5] mt-1 mb-4">Link your Kite account to see equity holdings.</p>
               <Link href="/dashboard/settings" className="ab-btn ab-btn-accent inline-flex">
                 Go to Settings
               </Link>

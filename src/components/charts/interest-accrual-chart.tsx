@@ -35,11 +35,11 @@ export function InterestAccrualChart({ data }: { data: DataPoint[] }) {
             <stop offset="95%" stopColor="#ff385c" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#ebebeb" />
-        <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#6a6a6a" }} tickLine={false} axisLine={false} interval={3} />
-        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: "#6a6a6a" }} tickLine={false} axisLine={false} width={52} />
+        <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
+        <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} interval={3} />
+        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} width={52} />
         <Tooltip formatter={(value, name) => [fmt(Number(value)), name === "accrued" ? "Accrued" : "Projected"]} />
-        {todayLabel && <ReferenceLine x={todayLabel} stroke="#c1c1c1" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#6a6a6a", position: "top" }} />}
+        {todayLabel && <ReferenceLine x={todayLabel} stroke="#3a3a3f" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#a0a0a5", position: "top" }} />}
         <Area type="monotone" dataKey="accrued" stroke="#ff385c" strokeWidth={2} fill="url(#accrued)" dot={false} animationDuration={600} />
         <Area type="monotone" dataKey="projected" stroke="#ff385c" strokeWidth={1.5} fill="url(#projected)" dot={false} strokeDasharray="5 5" animationDuration={600} />
       </AreaChart>

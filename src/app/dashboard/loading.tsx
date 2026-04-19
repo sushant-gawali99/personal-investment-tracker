@@ -26,7 +26,7 @@ export default function OverviewLoading() {
         <div className="ab-card p-6 space-y-3">
           <Skeleton className="h-4 w-36" />
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="flex items-center justify-between py-3 border-b border-[#ebebeb] last:border-0">
+            <div key={i} className="flex items-center justify-between py-3 border-b border-[#2a2a2e] last:border-0">
               <div className="space-y-1.5">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-3 w-20" />

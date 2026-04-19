@@ -37,8 +37,8 @@ export default async function ZerodhaPage() {
   const header = (
     <div className="flex items-center justify-between gap-4 flex-wrap">
       <div>
-        <h1 className="text-[28px] font-bold text-[#222222] tracking-tight">Zerodha</h1>
-        <p className="text-[14px] text-[#6a6a6a] mt-1">Holdings and positions from your Kite account.</p>
+        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Zerodha</h1>
+        <p className="text-[14px] text-[#a0a0a5] mt-1">Holdings and positions from your Kite account.</p>
       </div>
       {data.status === "ok" && (
         <SyncStatus syncedAt={data.syncedAt.toISOString()} sessionExpired={data.sessionExpired} />
@@ -61,8 +61,8 @@ export default async function ZerodhaPage() {
       <div className="space-y-6">
         {header}
         <div className="ab-card p-10 text-center">
-          <p className="text-[16px] font-semibold text-[#222222]">No data yet</p>
-          <p className="text-[14px] text-[#6a6a6a] mt-1.5">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
+          <p className="text-[16px] font-semibold text-[#ededed]">No data yet</p>
+          <p className="text-[14px] text-[#a0a0a5] mt-1.5">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
         </div>
       </div>
     );

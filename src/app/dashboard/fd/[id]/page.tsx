@@ -78,17 +78,17 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
   return (
     <div className="space-y-5">
-      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-[13px] text-[#6a6a6a] hover:text-[#222222] transition-colors font-medium">
+      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-[13px] text-[#a0a0a5] hover:text-[#ededed] transition-colors font-medium">
         <ArrowLeft size={13} /> Back to Fixed Deposits
       </Link>
 
       {isMatured && (
-        <div className="ab-card-flat bg-[#fff4e0] border-[#f0d9a8] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="ab-card-flat bg-[#2a1f0d] border-[#3a2d0f] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={20} className="text-[#b25e00] shrink-0" />
+            <CheckCircle2 size={20} className="text-[#f5a524] shrink-0" />
             <div>
-              <p className="text-[14px] text-[#b25e00] font-semibold">This FD has matured</p>
-              <p className="text-[12px] text-[#6a6a6a] mt-0.5">
+              <p className="text-[14px] text-[#f5a524] font-semibold">This FD has matured</p>
+              <p className="text-[12px] text-[#a0a0a5] mt-0.5">
                 Matured on {formatDate(activeMaturity)} · {Math.floor((now.getTime() - activeMaturity.getTime()) / 86400000)} days ago · {formatINR(maturityValue)} available
               </p>
             </div>
@@ -103,11 +103,11 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       )}
 
       {addPrevious && fd.renewals.length === 0 && (
-        <div className="ab-card-flat bg-[#fff4e0] border-[#f0d9a8] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+        <div className="ab-card-flat bg-[#2a1f0d] border-[#3a2d0f] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[14px] text-[#b25e00] font-semibold">Complete the renewal history</p>
-            <p className="text-[12px] text-[#6a6a6a] mt-1 leading-relaxed">
-              This FD was previously renewed. Use the <strong className="text-[#222222]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
+            <p className="text-[14px] text-[#f5a524] font-semibold">Complete the renewal history</p>
+            <p className="text-[12px] text-[#a0a0a5] mt-1 leading-relaxed">
+              This FD was previously renewed. Use the <strong className="text-[#ededed]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
             </p>
           </div>
           <Link
@@ -122,16 +122,16 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       <div className="ab-card p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#fff5f7] flex items-center justify-center shrink-0">
+            <div className="w-12 h-12 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
               <span className="font-bold text-[14px] text-[#ff385c]">
                 {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
               </span>
             </div>
             <div>
-              <h1 className="text-[22px] font-semibold text-[#222222] tracking-tight">{fd.bankName}</h1>
+              <h1 className="text-[22px] font-semibold text-[#ededed] tracking-tight">{fd.bankName}</h1>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                {fd.fdNumber && <span className="text-[12px] text-[#6a6a6a] mono">FD #{fd.fdNumber}</span>}
-                {fd.accountNumber && <span className="text-[12px] text-[#6a6a6a] mono">A/c {fd.accountNumber}</span>}
+                {fd.fdNumber && <span className="text-[12px] text-[#a0a0a5] mono">FD #{fd.fdNumber}</span>}
+                {fd.accountNumber && <span className="text-[12px] text-[#a0a0a5] mono">A/c {fd.accountNumber}</span>}
                 {fd.renewals.length > 0 && (
                   <span className="ab-chip ab-chip-accent">
                     Renewal #{fd.renewals.length}
@@ -154,17 +154,17 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
         <div className="mt-6 space-y-2">
           <div className="flex justify-between text-[12px] flex-wrap gap-2">
-            <span className="text-[#6a6a6a]">{formatDate(activeStart)}</span>
-            <span className="text-[#222222] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
-            <span className="text-[#6a6a6a]">{formatDate(activeMaturity)}</span>
+            <span className="text-[#a0a0a5]">{formatDate(activeStart)}</span>
+            <span className="text-[#ededed] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
+            <span className="text-[#a0a0a5]">{formatDate(activeMaturity)}</span>
           </div>
-          <div className="h-2 rounded-full bg-[#f2f2f2] overflow-hidden">
+          <div className="h-2 rounded-full bg-[#222226] overflow-hidden">
             <div
-              className={cn("h-full rounded-full", isMatured ? "bg-[#c1c1c1]" : "bg-[#ff385c]")}
+              className={cn("h-full rounded-full", isMatured ? "bg-[#3a3a3f]" : "bg-[#ff385c]")}
               style={{ width: `${progress}%` }}
             />
           </div>
-          <p className="text-[12px] text-[#6a6a6a] text-center">
+          <p className="text-[12px] text-[#a0a0a5] text-center">
             {activeTenure} months tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
           </p>
         </div>
@@ -172,13 +172,13 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Principal", value: formatINR(activePrincipal), cls: "text-[#222222]" },
-          { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[#00a651]" },
-          { label: "Total Interest", value: formatINR(totalInterest), cls: "text-[#00a651]" },
-          { label: "Maturity Value", value: formatINR(maturityValue), cls: "text-[#222222]" },
+          { label: "Principal", value: formatINR(activePrincipal), cls: "text-[#ededed]" },
+          { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[#5ee0a4]" },
+          { label: "Total Interest", value: formatINR(totalInterest), cls: "text-[#5ee0a4]" },
+          { label: "Maturity Value", value: formatINR(maturityValue), cls: "text-[#ededed]" },
         ].map(({ label, value, cls }) => (
           <div key={label} className="ab-card p-4">
-            <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold mb-1">{label}</p>
+            <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
             <p className={cn("mono text-[18px] font-semibold", cls)}>{value}</p>
           </div>
         ))}
@@ -187,7 +187,7 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="space-y-5">
           <div className="ab-card p-6 space-y-3">
-            <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Deposit Details</h2>
+            <h2 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Deposit Details</h2>
             <dl className="text-[13px] space-y-0">
               {[
                 ["Bank", fd.bankName],
@@ -200,16 +200,16 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
                 ["Maturity Date", formatDate(activeMaturity)],
                 ["Created", formatDate(fd.createdAt)],
               ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#ebebeb] last:border-b-0">
-                  <dt className="text-[#6a6a6a]">{k}</dt>
-                  <dd className="text-[#222222] mono text-right">{v}</dd>
+                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#2a2a2e] last:border-b-0">
+                  <dt className="text-[#a0a0a5]">{k}</dt>
+                  <dd className="text-[#ededed] mono text-right">{v}</dd>
                 </div>
               ))}
             </dl>
           </div>
 
           <div className="ab-card p-6 space-y-3">
-            <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Renewal &amp; Nominee</h2>
+            <h2 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</h2>
             <dl className="text-[13px] space-y-0">
               {[
                 ["Maturity Instruction", formatInstruction(activeInstruction)],
@@ -217,9 +217,9 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
                 ["Nominee", fd.nomineeName ?? "—"],
                 ["Nominee Relation", fd.nomineeRelation ?? "—"],
               ].map(([k, v]) => (
-                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#ebebeb] last:border-b-0">
-                  <dt className="text-[#6a6a6a]">{k}</dt>
-                  <dd className="text-[#222222] mono text-right">{v}</dd>
+                <div key={k} className="flex items-center justify-between gap-4 py-2.5 border-b border-[#2a2a2e] last:border-b-0">
+                  <dt className="text-[#a0a0a5]">{k}</dt>
+                  <dd className="text-[#ededed] mono text-right">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -229,13 +229,13 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
         <div className="space-y-5">
           {fd.notes && (
             <div className="ab-card p-6">
-              <h2 className="text-[16px] font-semibold text-[#222222] mb-2 tracking-tight">Notes</h2>
-              <p className="text-[13px] text-[#6a6a6a] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
+              <h2 className="text-[16px] font-semibold text-[#ededed] mb-2 tracking-tight">Notes</h2>
+              <p className="text-[13px] text-[#a0a0a5] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
             </div>
           )}
 
           <div className="ab-card p-6">
-            <h2 className="text-[16px] font-semibold text-[#222222] mb-4 tracking-tight">Source Document</h2>
+            <h2 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Source Document</h2>
             {fd.sourceImageUrl || fd.sourceImageBackUrl ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
@@ -244,20 +244,20 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
                 ].filter((s) => s.url).map(({ url, label }) => (
                   <div key={label} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] text-[#6a6a6a] uppercase tracking-wider font-semibold">{label}</p>
-                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#222222] font-semibold underline underline-offset-4 inline-flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                      <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
+                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#ededed] font-semibold underline underline-offset-4 inline-flex items-center gap-1 hover:text-[#ff385c] transition-colors">
                         <FileText size={11} /> Open
                       </a>
                     </div>
                     <a href={url!} target="_blank" rel="noopener noreferrer" className="block">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-xl w-full h-44 object-contain bg-[#f7f7f7] border border-[#ebebeb]" />
+                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-xl w-full h-44 object-contain bg-[#1c1c20] border border-[#2a2a2e]" />
                     </a>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[13px] text-[#6a6a6a]">No document was attached when this FD was added.</p>
+              <p className="text-[13px] text-[#a0a0a5]">No document was attached when this FD was added.</p>
             )}
           </div>
         </div>
@@ -265,27 +265,27 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
       {fd.renewals.length > 0 && (
         <div className="ab-card p-6 space-y-4">
-          <h2 className="text-[16px] font-semibold text-[#222222] tracking-tight">Renewal History</h2>
+          <h2 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Renewal History</h2>
           <div>
-            <div className="flex items-center justify-between text-[13px] py-3 border-b border-[#ebebeb]">
+            <div className="flex items-center justify-between text-[13px] py-3 border-b border-[#2a2a2e]">
               <div className="flex items-center gap-3">
                 <span className="ab-chip">Original</span>
-                <span className="text-[#6a6a6a]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
+                <span className="text-[#a0a0a5]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
               </div>
               <div className="text-right">
-                <span className="mono text-[#222222] font-semibold">{formatINR(fd.principal)}</span>
-                <span className="text-[#6a6a6a] ml-2">@ {fd.interestRate}%</span>
+                <span className="mono text-[#ededed] font-semibold">{formatINR(fd.principal)}</span>
+                <span className="text-[#a0a0a5] ml-2">@ {fd.interestRate}%</span>
               </div>
             </div>
             {fd.renewals.map((r) => (
-              <div key={r.id} className="flex items-center justify-between text-[13px] py-3 border-b border-[#ebebeb] last:border-b-0">
+              <div key={r.id} className="flex items-center justify-between text-[13px] py-3 border-b border-[#2a2a2e] last:border-b-0">
                 <div className="flex items-center gap-3">
                   <span className="ab-chip ab-chip-accent">R{r.renewalNumber}</span>
-                  <span className="text-[#6a6a6a]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
+                  <span className="text-[#a0a0a5]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
                 </div>
                 <div className="text-right">
-                  <span className="mono text-[#222222] font-semibold">{formatINR(r.principal)}</span>
-                  <span className="text-[#6a6a6a] ml-2">@ {r.interestRate}%</span>
+                  <span className="mono text-[#ededed] font-semibold">{formatINR(r.principal)}</span>
+                  <span className="text-[#a0a0a5] ml-2">@ {r.interestRate}%</span>
                 </div>
               </div>
             ))}
