@@ -117,8 +117,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                   "Principal",
                   "Rate",
                   "Tenure",
-                  "Start",
-                  "Maturity",
+                  "Duration",
                   "At Maturity",
                   "Status",
                   "",
@@ -127,7 +126,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                     key={i}
                     className={cn(
                       "text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold px-4 py-3",
-                      i === 2 || i === 3 || i === 7 ? "text-right" : "text-left"
+                      i === 2 || i === 3 || i === 6 ? "text-right" : "text-left"
                     )}
                   >
                     {h}
@@ -181,8 +180,9 @@ export function FDList({ fds }: { fds: FD[] }) {
                     <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{formatINR(fd.principal)}</td>
                     <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{fd.interestRate}%</td>
                     <td className="px-4 py-3 text-[#a0a0a5]">{fd.tenureMonths}m</td>
-                    <td className="px-4 py-3 text-[#a0a0a5] text-[13px]">{formatDate(fd.startDate)}</td>
-                    <td className="px-4 py-3 text-[#a0a0a5] text-[13px]">{formatDate(fd.maturityDate)}</td>
+                    <td className="px-4 py-3 text-[#a0a0a5] text-[13px] whitespace-nowrap">
+                      {formatDate(fd.startDate)} <span className="text-[#6e6e73]">→</span> {formatDate(fd.maturityDate)}
+                    </td>
                     <td className="px-4 py-3 text-right mono text-[#ededed] font-semibold">{formatINR(maturityValue)}</td>
                     <td className="px-4 py-3">{statusBadge}</td>
                     <td className="px-4 py-3 text-right">
