@@ -48,3 +48,4 @@ next-env.d.ts
 
 # User uploaded FD documents
 /public/uploads/
+.superpowers/
