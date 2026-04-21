@@ -37,6 +37,9 @@ interface MFHolding {
   last_price_date: string | null;
 }
 
+type HoldingSortKey = keyof Holding | "invested";
+type MFSortKey = keyof MFHolding | "invested" | "value";
+
 interface Props {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   holdings: any[];
@@ -82,10 +85,15 @@ function SymbolAvatar({ symbol }: { symbol: string }) {
   );
 }
 
+function SortIcon({ col, activeKey, dir }: { col: string; activeKey: string; dir: "asc" | "desc" }) {
+  if (col !== activeKey) return <span className="text-[#a0a0a5] ml-1 text-[10px]">⇅</span>;
+  return <span className="text-[#ededed] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
+}
+
 export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPositions, mfHoldings: rawMFHoldings }: Props) {
   const [search, setSearch] = useState("");
-  const [sortKey, setSortKey] = useState<keyof Holding>("pnl");
-  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+  const [sortKey, setSortKey] = useState<HoldingSortKey>("tradingsymbol");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const holdings: Holding[] = rawHoldings ?? [];
   const netPositions: Position[] = rawPositions?.net?.filter((p: Position) => p.quantity !== 0) ?? [];
@@ -97,17 +105,22 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
   const totalPnLPct = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
   const dayPnL = holdings.reduce((s, h) => s + (h.day_change ?? 0) * h.quantity, 0);
 
-  function toggleSort(key: keyof Holding) {
+  function toggleSort(key: HoldingSortKey) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    else { setSortKey(key); setSortDir("desc"); }
+    else { setSortKey(key); setSortDir("asc"); }
   }
 
   const filtered = useMemo(() =>
     holdings
       .filter((h) => h.tradingsymbol.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
-        const av = a[sortKey] as number;
-        const bv = b[sortKey] as number;
+        if (sortKey === "tradingsymbol") {
+          return sortDir === "asc"
+            ? a.tradingsymbol.localeCompare(b.tradingsymbol)
+            : b.tradingsymbol.localeCompare(a.tradingsymbol);
+        }
+        const av = sortKey === "invested" ? a.average_price * a.quantity : a[sortKey as keyof Holding] as number;
+        const bv = sortKey === "invested" ? b.average_price * b.quantity : b[sortKey as keyof Holding] as number;
         return sortDir === "asc" ? av - bv : bv - av;
       }),
     [holdings, search, sortKey, sortDir]
@@ -154,17 +167,18 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
             <table className="w-full text-[14px]">
               <thead className="bg-[#1c1c20]">
                 <tr>
-                  <th className={thL}>Symbol</th>
-                  <th className={thR} onClick={() => toggleSort("quantity")}>Qty</th>
-                  <th className={thR} onClick={() => toggleSort("average_price")}>Avg Cost</th>
-                  <th className={thR} onClick={() => toggleSort("last_price")}>LTP</th>
+                  <th className={thL} onClick={() => toggleSort("tradingsymbol")}>Symbol <SortIcon col="tradingsymbol" activeKey={sortKey} dir={sortDir} /></th>
+                  <th className={thR} onClick={() => toggleSort("quantity")}>Qty <SortIcon col="quantity" activeKey={sortKey} dir={sortDir} /></th>
+                  <th className={thR} onClick={() => toggleSort("average_price")}>Avg Cost <SortIcon col="average_price" activeKey={sortKey} dir={sortDir} /></th>
+                  <th className={thR} onClick={() => toggleSort("invested")}>Invested <SortIcon col="invested" activeKey={sortKey} dir={sortDir} /></th>
+                  <th className={thR} onClick={() => toggleSort("last_price")}>LTP <SortIcon col="last_price" activeKey={sortKey} dir={sortDir} /></th>
                   <th className={thR}>Value</th>
-                  <th className={thR} onClick={() => toggleSort("pnl")}>P&amp;L</th>
+                  <th className={thR} onClick={() => toggleSort("pnl")}>P&amp;L <SortIcon col="pnl" activeKey={sortKey} dir={sortDir} /></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#2a2a2e]">
                 {filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No holdings found.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No holdings found.</td></tr>
                 )}
                 {filtered.map((h) => {
                   const gain = h.pnl >= 0;
@@ -182,6 +196,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                       </td>
                       <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{h.quantity}</td>
                       <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price)}</td>
+                      <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price * h.quantity)}</td>
                       <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price)}</td>
                       <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price * h.quantity)}</td>
                       <td className="px-4 py-3 text-right">
