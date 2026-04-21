@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, RefreshCw } from "lucide-react";
+import { Upload, Loader2, Sparkles, ChevronDown, X, Camera, RefreshCw } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 
@@ -343,7 +343,6 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [extractError, setExtractError] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
-  const [showOptional, setShowOptional] = useState(false);
   const [renewalNumber, setRenewalNumber] = useState<number | null>(null);
   const [priorRenewals, setPriorRenewals] = useState<PriorRenewal[]>([]);
   const [uploadMode, setUploadMode] = useState<"image" | "pdf">("image");
@@ -976,24 +975,24 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         </div>
       </section>
 
-      {/* Optional fields */}
-      <section id="notes" ref={(el) => { sectionRefs.current.notes = el; }} className="ab-card-flat overflow-hidden">
-        <button
-          type="button"
-          onClick={() => setShowOptional((s) => !s)}
-          className="flex items-center justify-between w-full px-6 py-4 text-[16px] font-semibold text-[#ededed] tracking-tight hover:bg-[#1c1c20] transition-colors"
-        >
-          <span>Optional Details</span>
-          {showOptional ? <ChevronUp size={16} className="text-[#a0a0a5]" /> : <ChevronDown size={16} className="text-[#a0a0a5]" />}
-        </button>
-        {showOptional && (
-          <div className="px-6 pb-6 border-t border-[#2a2a2e] pt-5">
-            <div>
-              <label htmlFor="notes" className="ab-label">Notes</label>
-              <textarea id="notes" rows={3} className="ab-input resize-none" value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any additional notes..." />
-            </div>
-          </div>
-        )}
+      {/* Notes section */}
+      <section
+        id="notes"
+        ref={(el) => { sectionRefs.current.notes = el; }}
+        className="ab-card p-6 space-y-4"
+      >
+        <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Notes</p>
+        <div>
+          <label htmlFor="notes" className="ab-label">Notes</label>
+          <textarea
+            id="notes"
+            rows={3}
+            className="ab-input resize-none"
+            value={form.notes}
+            onChange={(e) => set("notes", e.target.value)}
+            placeholder="Any additional notes..."
+          />
+        </div>
       </section>
 
       {saveError && (
