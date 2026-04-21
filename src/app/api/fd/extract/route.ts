@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { anthropic } from "@/lib/anthropic";
 import type { ImageBlockParam, TextBlockParam } from "@anthropic-ai/sdk/resources/messages";
 
+type DocumentBlockParam = {
+  type: "document";
+  source: { type: "base64"; media_type: "application/pdf"; data: string };
+};
+
 const PROMPT = `These images show the front and back of a Fixed Deposit certificate/receipt. Extract all FD details and return a single JSON object with exactly these fields (use null for any field not found):
 
 {
@@ -56,6 +61,8 @@ priorPeriods — historical periods before the current one, in chronological ord
 
 const PROMPT_SINGLE = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This image shows a Fixed Deposit certificate/receipt.");
 
+const PROMPT_PDF = PROMPT.replace("These images show the front and back of a Fixed Deposit certificate/receipt.", "This PDF is a Fixed Deposit certificate/receipt.");
+
 async function fileToImageBlock(file: File): Promise<ImageBlockParam> {
   const bytes = await file.arrayBuffer();
   const base64 = Buffer.from(bytes).toString("base64");
@@ -69,27 +76,54 @@ async function fileToImageBlock(file: File): Promise<ImageBlockParam> {
   };
 }
 
+async function fileToPdfBlock(file: File): Promise<DocumentBlockParam> {
+  const bytes = await file.arrayBuffer();
+  const base64 = Buffer.from(bytes).toString("base64");
+  return {
+    type: "document",
+    source: {
+      type: "base64",
+      media_type: "application/pdf",
+      data: base64,
+    },
+  };
+}
+
 export async function POST(req: NextRequest) {
   const formData = await req.formData();
+  const pdfFile = formData.get("pdfFile") as File | null;
   const front = formData.get("front") as File | null;
   const back = formData.get("back") as File | null;
 
-  if (!front) {
+  if (!pdfFile && !front) {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
-  const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
-  for (const file of [front, back].filter(Boolean) as File[]) {
-    if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: `${file.name} exceeds 5 MB limit.` }, { status: 400 });
-    if (!validTypes.includes(file.type)) return NextResponse.json({ error: "Unsupported file type. Use JPEG, PNG, or WebP." }, { status: 400 });
-  }
-
   try {
-    const contentBlocks: (ImageBlockParam | TextBlockParam)[] = [];
+    let contentBlocks: (ImageBlockParam | TextBlockParam | DocumentBlockParam)[];
 
-    contentBlocks.push(await fileToImageBlock(front));
-    if (back) contentBlocks.push(await fileToImageBlock(back));
-    contentBlocks.push({ type: "text", text: back ? PROMPT : PROMPT_SINGLE });
+    if (pdfFile) {
+      if (pdfFile.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: `${pdfFile.name} exceeds 5 MB limit.` }, { status: 400 });
+      }
+      if (pdfFile.type !== "application/pdf") {
+        return NextResponse.json({ error: "Expected a PDF file." }, { status: 400 });
+      }
+      contentBlocks = [
+        await fileToPdfBlock(pdfFile),
+        { type: "text", text: PROMPT_PDF },
+      ];
+    } else {
+      const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+      for (const file of [front, back].filter(Boolean) as File[]) {
+        if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: `${file.name} exceeds 5 MB limit.` }, { status: 400 });
+        if (!validTypes.includes(file.type)) return NextResponse.json({ error: "Unsupported file type. Use JPEG, PNG, or WebP." }, { status: 400 });
+      }
+      contentBlocks = [];
+      contentBlocks.push(await fileToImageBlock(front!));
+      if (back) contentBlocks.push(await fileToImageBlock(back));
+      contentBlocks.push({ type: "text", text: back ? PROMPT : PROMPT_SINGLE });
+    }
 
     const message = await anthropic.messages.create({
       model: "claude-sonnet-4-6",
@@ -100,7 +134,7 @@ export async function POST(req: NextRequest) {
     const text = message.content[0].type === "text" ? message.content[0].text : "";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      return NextResponse.json({ error: "Could not extract details from image." }, { status: 422 });
+      return NextResponse.json({ error: "Could not extract details from document." }, { status: 422 });
     }
 
     const extracted = JSON.parse(jsonMatch[0]);
