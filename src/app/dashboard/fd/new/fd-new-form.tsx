@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { Upload, Loader2, Sparkles, ChevronDown, ChevronUp, X, Camera, RefreshCw } from "lucide-react";
@@ -267,6 +267,48 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     renewal: null,
     notes: null,
   });
+
+  const [invalidSections, setInvalidSections] = useState<Set<SectionId>>(new Set());
+
+  type SectionStatus = "empty" | "partial" | "complete" | "error";
+
+  const sectionStatus = useMemo<Record<SectionId, SectionStatus>>(() => {
+    const detailsRequired = [
+      form.bankName,
+      form.principal,
+      form.interestRate,
+      form.tenureMonths,
+      form.startDate,
+      form.maturityDate,
+      form.interestType,
+    ];
+    const detailsFilled = detailsRequired.filter((v) => v && v.trim() !== "").length;
+
+    const priorAllComplete = priorRenewals.every((r) =>
+      r.startDate && r.maturityDate && r.principal && r.interestRate && r.tenureMonths
+    );
+    const priorAnyFilled = priorRenewals.some((r) =>
+      r.startDate || r.maturityDate || r.principal || r.interestRate || r.tenureMonths
+    );
+
+    const receiptHasFile = !!frontFile || !!pdfFile;
+    const renewalAnyFilled = !!(form.maturityInstruction || form.payoutFrequency || form.nomineeName || form.nomineeRelation);
+    const notesAnyFilled = !!form.notes;
+
+    const statusFor = (id: SectionId, raw: SectionStatus): SectionStatus =>
+      invalidSections.has(id) ? "error" : raw;
+
+    return {
+      receipt: statusFor("receipt", receiptHasFile ? (extracted ? "complete" : "partial") : "empty"),
+      prior: statusFor("prior", priorRenewals.length === 0 ? "empty" : priorAllComplete ? "complete" : priorAnyFilled ? "partial" : "empty"),
+      details: statusFor(
+        "details",
+        detailsFilled === detailsRequired.length ? "complete" : detailsFilled === 0 ? "empty" : "partial"
+      ),
+      renewal: statusFor("renewal", renewalAnyFilled ? "complete" : "empty"),
+      notes: statusFor("notes", notesAnyFilled ? "complete" : "empty"),
+    };
+  }, [form, priorRenewals, frontFile, pdfFile, extracted, invalidSections]);
 
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
