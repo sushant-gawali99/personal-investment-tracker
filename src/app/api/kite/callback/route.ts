@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { createKiteClient } from "@/lib/kite";
 import { getSessionUserId } from "@/lib/session";
+import { syncKiteData } from "@/lib/kite-sync";
 
 function publicBaseUrl(req: NextRequest): string {
   if (process.env.NEXTAUTH_URL) return process.env.NEXTAUTH_URL;
@@ -40,7 +41,13 @@ export async function GET(req: NextRequest) {
       where: { userId },
       data: { accessToken: session.access_token, tokenExpiry: expiry, updatedAt: new Date() },
     });
-    return NextResponse.redirect(new URL("/dashboard/zerodha?kite=connected", base));
+
+    try {
+      await syncKiteData(userId);
+      return NextResponse.redirect(new URL("/dashboard/zerodha?kite=synced", base));
+    } catch {
+      return NextResponse.redirect(new URL("/dashboard/zerodha?kite=connected", base));
+    }
   } catch {
     return NextResponse.redirect(new URL("/dashboard/settings?kite=error", base));
   }

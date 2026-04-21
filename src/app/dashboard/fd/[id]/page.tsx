@@ -60,8 +60,9 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
   const totalDays = (activeMaturity.getTime() - activeStart.getTime()) / 86400000;
   const elapsedDays = Math.max(0, (now.getTime() - activeStart.getTime()) / 86400000);
   const progress = Math.min(100, Math.max(0, (elapsedDays / totalDays) * 100));
-  const maturityValue = activeMaturityAmount ?? activePrincipal;
-  const totalInterest = maturityValue - activePrincipal;
+  const computedTotalInterest = computeAccruedInterest(activePrincipal, activeRate, activeStart, activeMaturity, fd.interestType, fd.compoundFreq);
+  const totalInterest = activeMaturityAmount != null ? activeMaturityAmount - activePrincipal : computedTotalInterest;
+  const maturityValue = activePrincipal + totalInterest;
   const accrued = computeAccruedInterest(activePrincipal, activeRate, activeStart, now > activeMaturity ? activeMaturity : now, fd.interestType, fd.compoundFreq);
 
   const statusBadge = isMatured ? (
