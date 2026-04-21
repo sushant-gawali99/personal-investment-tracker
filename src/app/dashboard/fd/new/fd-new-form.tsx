@@ -938,27 +938,25 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           {saveError}
         </div>
       )}
-
-      <div className="flex items-center justify-end gap-3 pt-2">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="ab-btn ab-btn-ghost"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={saving}
-          className="ab-btn ab-btn-accent"
-        >
-          {saving ? (
-            <><Loader2 size={14} className="animate-spin" /> Saving...</>
-          ) : (
-            "Save Fixed Deposit"
-          )}
-        </button>
       </div>
+
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-[#0e0e10]/95 backdrop-blur border-t border-[#2a2a2e]">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-end gap-3">
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="ab-btn ab-btn-ghost"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="ab-btn ab-btn-accent"
+          >
+            {saving ? (<><Loader2 size={14} className="animate-spin" /> Saving...</>) : "Save Fixed Deposit"}
+          </button>
+        </div>
       </div>
     </form>
   );
