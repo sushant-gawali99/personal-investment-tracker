@@ -29,19 +29,3 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   });
   return NextResponse.json({ fd });
 }
-
-export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const result = await requireUserId();
-  if (result instanceof NextResponse) return result;
-  const userId = result;
-  const { id } = await params;
-
-  const existing = await prisma.fixedDeposit.findUnique({ where: { id } });
-  if (!existing) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (existing.userId && existing.userId !== "" && existing.userId !== userId) {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  await prisma.fixedDeposit.delete({ where: { id } });
-  return NextResponse.json({ success: true });
-}
