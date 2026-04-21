@@ -669,6 +669,15 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               </select>
             </div>
           )}
+
+          <div>
+            <label htmlFor="fdNumber" className="ab-label">FD Number / Certificate No.</label>
+            <input id="fdNumber" className="ab-input" value={form.fdNumber} onChange={(e) => set("fdNumber", e.target.value)} placeholder="FD123456" />
+          </div>
+          <div>
+            <label htmlFor="accountNumber" className="ab-label">Account Number</label>
+            <input id="accountNumber" className="ab-input" value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
+          </div>
         </div>
       </section>
 
@@ -721,16 +730,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           {showOptional ? <ChevronUp size={16} className="text-[#a0a0a5]" /> : <ChevronDown size={16} className="text-[#a0a0a5]" />}
         </button>
         {showOptional && (
-          <div className="px-6 pb-6 grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-[#2a2a2e] pt-5">
+          <div className="px-6 pb-6 border-t border-[#2a2a2e] pt-5">
             <div>
-              <label htmlFor="fdNumber" className="ab-label">FD Number / Certificate No.</label>
-              <input id="fdNumber" className="ab-input" value={form.fdNumber} onChange={(e) => set("fdNumber", e.target.value)} placeholder="FD123456" />
-            </div>
-            <div>
-              <label htmlFor="accountNumber" className="ab-label">Account Number</label>
-              <input id="accountNumber" className="ab-input" value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
-            </div>
-            <div className="sm:col-span-2">
               <label htmlFor="notes" className="ab-label">Notes</label>
               <textarea id="notes" rows={3} className="ab-input resize-none" value={form.notes} onChange={(e) => set("notes", e.target.value)} placeholder="Any additional notes..." />
             </div>
