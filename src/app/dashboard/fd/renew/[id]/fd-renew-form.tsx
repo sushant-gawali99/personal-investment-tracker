@@ -24,11 +24,30 @@ export function FDRenewForm({ fd }: Props) {
   const router = useRouter();
   const prevMaturity = fd.maturityDate.split("T")[0];
 
+  function calcMonths(start: string, end: string): string {
+    if (!start || !end) return "";
+    const s = new Date(start), e = new Date(end);
+    const months = (e.getFullYear() - s.getFullYear()) * 12 + (e.getMonth() - s.getMonth());
+    return months > 0 ? months.toString() : "";
+  }
+
   const [startDate, setStartDate] = useState(prevMaturity);
   const [principal, setPrincipal] = useState(fd.principal.toString());
   const [interestRate, setInterestRate] = useState(fd.interestRate.toString());
   const [tenureMonths, setTenureMonths] = useState(fd.tenureMonths.toString());
   const [maturityDate, setMaturityDate] = useState("");
+
+  function handleStartDate(val: string) {
+    setStartDate(val);
+    const m = calcMonths(val, maturityDate);
+    if (m) setTenureMonths(m);
+  }
+
+  function handleMaturityDate(val: string) {
+    setMaturityDate(val);
+    const m = calcMonths(startDate, val);
+    if (m) setTenureMonths(m);
+  }
   const [maturityAmount, setMaturityAmount] = useState("");
   const [maturityInstruction, setMaturityInstruction] = useState(fd.maturityInstruction ?? "");
   const [payoutFrequency, setPayoutFrequency] = useState(fd.payoutFrequency ?? "");
@@ -78,11 +97,11 @@ export function FDRenewForm({ fd }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="ab-label">Renewal Date *</label>
-            <DatePicker value={startDate} onChange={setStartDate} required />
+            <DatePicker value={startDate} onChange={handleStartDate} required />
           </div>
           <div>
             <label className="ab-label">Due Date (Maturity) *</label>
-            <DatePicker value={maturityDate} onChange={setMaturityDate} required />
+            <DatePicker value={maturityDate} onChange={handleMaturityDate} required />
           </div>
           <div>
             <label className="ab-label">Deposit Amount (₹) *</label>
