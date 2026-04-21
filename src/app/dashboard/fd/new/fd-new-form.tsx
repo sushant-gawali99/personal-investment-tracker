@@ -348,6 +348,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [priorRenewals, setPriorRenewals] = useState<PriorRenewal[]>([]);
   const [uploadMode, setUploadMode] = useState<"image" | "pdf">("image");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [receiptCollapsed, setReceiptCollapsed] = useState(false);
 
   const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
     receipt: null,
@@ -406,6 +407,10 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   useEffect(() => {
+    if (extracted) setReceiptCollapsed(true);
+  }, [extracted]);
+
+  useEffect(() => {
     const entries = (Object.keys(sectionRefs.current) as SectionId[])
       .map((id) => ({ id, el: sectionRefs.current[id] }))
       .filter((e): e is { id: SectionId; el: HTMLElement } => !!e.el);
@@ -441,7 +446,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     setBackFile(file);
     setBackPreview(URL.createObjectURL(file));
   }
-  function clearFront() { setFrontFile(null); setFrontPreview(null); setExtracted(false); }
+  function clearFront() { setFrontFile(null); setFrontPreview(null); setExtracted(false); setReceiptCollapsed(false); }
   function clearBack() { setBackFile(null); setBackPreview(null); }
 
   function handlePdfFile(file: File) {
@@ -449,7 +454,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     setExtracted(false);
     setExtractError("");
   }
-  function clearPdf() { setPdfFile(null); setExtracted(false); }
+  function clearPdf() { setPdfFile(null); setExtracted(false); setReceiptCollapsed(false); }
 
   async function handleExtract() {
     if (uploadMode === "pdf" && !pdfFile) return;
@@ -630,115 +635,143 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       )}
 
       {/* AI Digitize panel */}
-      <section id="receipt" ref={(el) => { sectionRefs.current.receipt = el; }} className="ab-card p-6 space-y-5">
-        <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2a1218" }}>
-            <Sparkles size={18} className="text-[#ff385c]" />
-          </div>
-          <div>
-            <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Digitize Receipt with AI</p>
-            <p className="text-[13px] text-[#a0a0a5] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
-          </div>
-        </div>
-
-        {/* Image / PDF mode toggle */}
-        <div className="flex gap-1 p-1 rounded-lg bg-[#17171a] w-fit">
-          {(["image", "pdf"] as const).map((mode) => (
+      <section
+        id="receipt"
+        ref={(el) => { sectionRefs.current.receipt = el; }}
+        className={cn(receiptCollapsed ? "ab-card-flat" : "ab-card p-6 space-y-5")}
+      >
+        {receiptCollapsed ? (
+          <div className="flex items-center justify-between gap-3 px-4 py-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="ab-chip ab-chip-accent shrink-0">
+                <Sparkles size={12} /> AI Extracted
+              </span>
+              <span className="text-[13px] text-[#a0a0a5] truncate">
+                from {uploadMode === "pdf" ? (pdfFile?.name ?? "receipt.pdf") : (frontFile?.name ?? "receipt")}
+              </span>
+            </div>
             <button
-              key={mode}
               type="button"
-              onClick={() => {
-                if (mode === uploadMode) return;
-                setUploadMode(mode);
-                if (mode === "pdf") { setFrontFile(null); setFrontPreview(null); setBackFile(null); setBackPreview(null); }
-                else { setPdfFile(null); }
-                setExtracted(false);
-                setExtractError("");
-              }}
-              className={cn(
-                "px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors",
-                uploadMode === mode
-                  ? "bg-[#2a2a2e] text-[#ededed]"
-                  : "text-[#a0a0a5] hover:text-[#ededed]"
-              )}
+              onClick={() => setReceiptCollapsed(false)}
+              className="ab-btn ab-btn-ghost shrink-0"
+              style={{ fontSize: "13px" }}
             >
-              {mode === "image" ? "Image" : "PDF"}
+              <ChevronDown size={14} /> Expand
             </button>
-          ))}
-        </div>
-
-        {uploadMode === "image" ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <ImageDropZone
-              label="Front side *"
-              hint="Click or drag - JPEG, PNG, WebP"
-              file={frontFile} preview={frontPreview}
-              onFile={handleFrontFile} onClear={clearFront}
-              disabled={extracting}
-            />
-            <ImageDropZone
-              label="Back side (optional)"
-              hint="Upload for more details"
-              file={backFile} preview={backPreview}
-              onFile={handleBackFile} onClear={clearBack}
-              disabled={extracting || !frontFile}
-            />
           </div>
         ) : (
-          <div>
-            <p className="ab-label mb-2">FD Certificate PDF *</p>
-            <PdfDropZone
-              file={pdfFile}
-              onFile={handlePdfFile}
-              onClear={clearPdf}
-              disabled={extracting}
-            />
-          </div>
-        )}
+          <>
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2a1218" }}>
+                <Sparkles size={18} className="text-[#ff385c]" />
+              </div>
+              <div>
+                <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Digitize Receipt with AI</p>
+                <p className="text-[13px] text-[#a0a0a5] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
+              </div>
+            </div>
 
-        {extractError && (
-          <div
-            className="ab-card-flat px-3 py-2 text-[13px]"
-            style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
-          >
-            {extractError}
-          </div>
-        )}
+            {/* Image / PDF mode toggle */}
+            <div className="flex gap-1 p-1 rounded-lg bg-[#17171a] w-fit">
+              {(["image", "pdf"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => {
+                    if (mode === uploadMode) return;
+                    setUploadMode(mode);
+                    if (mode === "pdf") { setFrontFile(null); setFrontPreview(null); setBackFile(null); setBackPreview(null); }
+                    else { setPdfFile(null); }
+                    setExtracted(false);
+                    setExtractError("");
+                    setReceiptCollapsed(false);
+                  }}
+                  className={cn(
+                    "px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors",
+                    uploadMode === mode
+                      ? "bg-[#2a2a2e] text-[#ededed]"
+                      : "text-[#a0a0a5] hover:text-[#ededed]"
+                  )}
+                >
+                  {mode === "image" ? "Image" : "PDF"}
+                </button>
+              ))}
+            </div>
 
-        {((uploadMode === "image" && frontFile) || (uploadMode === "pdf" && pdfFile)) && !extracted && (
-          <button
-            type="button"
-            onClick={handleExtract}
-            disabled={extracting}
-            className="ab-btn ab-btn-accent"
-          >
-            {extracting ? (
-              <><Loader2 size={14} className="animate-spin" /> Extracting...</>
+            {uploadMode === "image" ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <ImageDropZone
+                  label="Front side *"
+                  hint="Click or drag - JPEG, PNG, WebP"
+                  file={frontFile} preview={frontPreview}
+                  onFile={handleFrontFile} onClear={clearFront}
+                  disabled={extracting}
+                />
+                <ImageDropZone
+                  label="Back side (optional)"
+                  hint="Upload for more details"
+                  file={backFile} preview={backPreview}
+                  onFile={handleBackFile} onClear={clearBack}
+                  disabled={extracting || !frontFile}
+                />
+              </div>
             ) : (
-              <><Sparkles size={14} /> Extract with AI</>
+              <div>
+                <p className="ab-label mb-2">FD Certificate PDF *</p>
+                <PdfDropZone
+                  file={pdfFile}
+                  onFile={handlePdfFile}
+                  onClear={clearPdf}
+                  disabled={extracting}
+                />
+              </div>
             )}
-          </button>
-        )}
 
-        {extracted && (
-          <div
-            className="ab-card-flat flex items-center gap-2 px-3 py-2 text-[13px]"
-            style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
-          >
-            <span className="ab-chip ab-chip-accent">
-              <Sparkles size={12} /> AI Extracted
-            </span>
-            <span>Details extracted - review and confirm below</span>
-          </div>
-        )}
+            {extractError && (
+              <div
+                className="ab-card-flat px-3 py-2 text-[13px]"
+                style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
+              >
+                {extractError}
+              </div>
+            )}
 
-        {extracted && renewalNumber !== null && renewalNumber > 0 && (
-          <div
-            className="ab-card-flat px-3 py-2"
-            style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
-          >
-            <p className="text-[13px] font-semibold">Renewal #{renewalNumber} detected - fill in previous periods below</p>
-          </div>
+            {((uploadMode === "image" && frontFile) || (uploadMode === "pdf" && pdfFile)) && !extracted && (
+              <button
+                type="button"
+                onClick={handleExtract}
+                disabled={extracting}
+                className="ab-btn ab-btn-accent"
+              >
+                {extracting ? (
+                  <><Loader2 size={14} className="animate-spin" /> Extracting...</>
+                ) : (
+                  <><Sparkles size={14} /> Extract with AI</>
+                )}
+              </button>
+            )}
+
+            {extracted && (
+              <div
+                className="ab-card-flat flex items-center gap-2 px-3 py-2 text-[13px]"
+                style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
+              >
+                <span className="ab-chip ab-chip-accent">
+                  <Sparkles size={12} /> AI Extracted
+                </span>
+                <span>Details extracted - review and confirm below</span>
+              </div>
+            )}
+
+            {extracted && renewalNumber !== null && renewalNumber > 0 && (
+              <div
+                className="ab-card-flat px-3 py-2"
+                style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
+              >
+                <p className="text-[13px] font-semibold">Renewal #{renewalNumber} detected - fill in previous periods below</p>
+              </div>
+            )}
+          </>
         )}
       </section>
 
