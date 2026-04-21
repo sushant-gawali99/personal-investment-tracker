@@ -171,6 +171,62 @@ function ImageDropZone({
   );
 }
 
+function PdfDropZone({
+  file, onFile, onClear, disabled,
+}: {
+  file: File | null;
+  onFile: (f: File) => void;
+  onClear: () => void;
+  disabled: boolean;
+}) {
+  const onDrop = useCallback((files: File[]) => { if (files[0]) onFile(files[0]); }, [onFile]);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: { "application/pdf": [] },
+    maxFiles: 1,
+    disabled,
+  });
+
+  if (file) {
+    return (
+      <div className="rounded-xl border border-[#2a2a2e] px-4 py-3 flex items-center justify-between bg-[#17171a]">
+        <div className="flex items-center gap-2 text-[13px] text-[#ededed] truncate">
+          <Upload size={14} className="text-[#a0a0a5] shrink-0" />
+          <span className="truncate">{file.name}</span>
+          <span className="text-[#a0a0a5] shrink-0">({(file.size / 1024).toFixed(0)} KB)</span>
+        </div>
+        <button
+          type="button"
+          onClick={onClear}
+          className="ml-3 w-7 h-7 rounded-full flex items-center justify-center text-[#a0a0a5] hover:bg-[#2a2a2e] transition-colors shrink-0"
+          aria-label="Remove PDF"
+        >
+          <X size={14} />
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      {...getRootProps()}
+      className={cn(
+        "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[#17171a]",
+        isDragActive
+          ? "border-[#ff385c] bg-[#2a1218]"
+          : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",
+        disabled && "pointer-events-none opacity-40"
+      )}
+    >
+      <input {...getInputProps()} />
+      <Upload size={18} className="mx-auto mb-2 text-[#a0a0a5]" />
+      <p className="text-[13px] text-[#a0a0a5]">
+        {isDragActive ? "Drop PDF here" : "Click or drag — PDF only, max 5 MB"}
+      </p>
+    </div>
+  );
+}
+
 type PriorRenewal = { startDate: string; maturityDate: string; principal: string; interestRate: string; tenureMonths: string; maturityAmount: string };
 const emptyPrior = (): PriorRenewal => ({ startDate: "", maturityDate: "", principal: "", interestRate: "", tenureMonths: "", maturityAmount: "" });
 
@@ -199,6 +255,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [showOptional, setShowOptional] = useState(false);
   const [renewalNumber, setRenewalNumber] = useState<number | null>(null);
   const [priorRenewals, setPriorRenewals] = useState<PriorRenewal[]>([]);
+  const [uploadMode, setUploadMode] = useState<"image" | "pdf">("image");
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
 
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -215,13 +273,25 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   function clearFront() { setFrontFile(null); setFrontPreview(null); setExtracted(false); }
   function clearBack() { setBackFile(null); setBackPreview(null); }
 
+  function handlePdfFile(file: File) {
+    setPdfFile(file);
+    setExtracted(false);
+    setExtractError("");
+  }
+  function clearPdf() { setPdfFile(null); setExtracted(false); }
+
   async function handleExtract() {
-    if (!frontFile) return;
+    if (uploadMode === "pdf" && !pdfFile) return;
+    if (uploadMode === "image" && !frontFile) return;
     setExtracting(true);
     setExtractError("");
     const data = new FormData();
-    data.append("front", frontFile);
-    if (backFile) data.append("back", backFile);
+    if (uploadMode === "pdf") {
+      data.append("pdfFile", pdfFile!);
+    } else {
+      data.append("front", frontFile!);
+      if (backFile) data.append("back", backFile);
+    }
 
     try {
       const res = await fetch("/api/fd/extract", { method: "POST", body: data });
@@ -287,10 +357,18 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     setSaveError("");
     setSaving(true);
     try {
-      const [sourceImageUrl, sourceImageBackUrl] = await Promise.all([
-        frontFile ? uploadFile(frontFile) : Promise.resolve(null),
-        backFile ? uploadFile(backFile) : Promise.resolve(null),
-      ]);
+      let sourceImageUrl: string | null = null;
+      let sourceImageBackUrl: string | null = null;
+      let sourcePdfUrl: string | null = null;
+
+      if (uploadMode === "pdf" && pdfFile) {
+        sourcePdfUrl = await uploadFile(pdfFile);
+      } else {
+        [sourceImageUrl, sourceImageBackUrl] = await Promise.all([
+          frontFile ? uploadFile(frontFile) : Promise.resolve(null),
+          backFile ? uploadFile(backFile) : Promise.resolve(null),
+        ]);
+      }
 
       const res = await fetch("/api/fd", {
         method: "POST",
@@ -309,6 +387,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             : (form.maturityAmount ? parseFloat(form.maturityAmount) : null),
           sourceImageUrl,
           sourceImageBackUrl,
+          sourcePdfUrl,
           // Renewals: intermediate priors (R1..Rn-1) + current AI data as last renewal
           ...(priorRenewals.length > 0 ? {
             renewals: [
@@ -379,22 +458,60 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ImageDropZone
-            label="Front side *"
-            hint="Click or drag - JPEG, PNG, WebP"
-            file={frontFile} preview={frontPreview}
-            onFile={handleFrontFile} onClear={clearFront}
-            disabled={extracting}
-          />
-          <ImageDropZone
-            label="Back side (optional)"
-            hint="Upload for more details"
-            file={backFile} preview={backPreview}
-            onFile={handleBackFile} onClear={clearBack}
-            disabled={extracting || !frontFile}
-          />
+        {/* Image / PDF mode toggle */}
+        <div className="flex gap-1 p-1 rounded-lg bg-[#17171a] w-fit">
+          {(["image", "pdf"] as const).map((mode) => (
+            <button
+              key={mode}
+              type="button"
+              onClick={() => {
+                if (mode === uploadMode) return;
+                setUploadMode(mode);
+                if (mode === "pdf") { setFrontFile(null); setFrontPreview(null); setBackFile(null); setBackPreview(null); }
+                else { setPdfFile(null); }
+                setExtracted(false);
+                setExtractError("");
+              }}
+              className={cn(
+                "px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors",
+                uploadMode === mode
+                  ? "bg-[#2a2a2e] text-[#ededed]"
+                  : "text-[#a0a0a5] hover:text-[#ededed]"
+              )}
+            >
+              {mode === "image" ? "Image" : "PDF"}
+            </button>
+          ))}
         </div>
+
+        {uploadMode === "image" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <ImageDropZone
+              label="Front side *"
+              hint="Click or drag - JPEG, PNG, WebP"
+              file={frontFile} preview={frontPreview}
+              onFile={handleFrontFile} onClear={clearFront}
+              disabled={extracting}
+            />
+            <ImageDropZone
+              label="Back side (optional)"
+              hint="Upload for more details"
+              file={backFile} preview={backPreview}
+              onFile={handleBackFile} onClear={clearBack}
+              disabled={extracting || !frontFile}
+            />
+          </div>
+        ) : (
+          <div>
+            <p className="ab-label mb-2">FD Certificate PDF *</p>
+            <PdfDropZone
+              file={pdfFile}
+              onFile={handlePdfFile}
+              onClear={clearPdf}
+              disabled={extracting}
+            />
+          </div>
+        )}
 
         {extractError && (
           <div
@@ -405,7 +522,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
         )}
 
-        {frontFile && !extracted && (
+        {((uploadMode === "image" && frontFile) || (uploadMode === "pdf" && pdfFile)) && !extracted && (
           <button
             type="button"
             onClick={handleExtract}
