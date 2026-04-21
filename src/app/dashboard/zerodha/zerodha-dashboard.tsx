@@ -105,9 +105,17 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
   const totalPnLPct = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0;
   const dayPnL = holdings.reduce((s, h) => s + (h.day_change ?? 0) * h.quantity, 0);
 
+  const [mfSortKey, setMfSortKey] = useState<MFSortKey>("fund");
+  const [mfSortDir, setMfSortDir] = useState<"asc" | "desc">("asc");
+
   function toggleSort(key: HoldingSortKey) {
     if (sortKey === key) setSortDir((d) => (d === "asc" ? "desc" : "asc"));
     else { setSortKey(key); setSortDir("asc"); }
+  }
+
+  function toggleMfSort(key: MFSortKey) {
+    if (mfSortKey === key) setMfSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    else { setMfSortKey(key); setMfSortDir("asc"); }
   }
 
   const filtered = useMemo(() =>
@@ -125,6 +133,31 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
       }),
     [holdings, search, sortKey, sortDir]
   );
+
+  const sortedMfHoldings = useMemo(() => {
+    return [...mfHoldings].sort((a, b) => {
+      if (mfSortKey === "invested") {
+        const av = a.average_price * a.quantity;
+        const bv = b.average_price * b.quantity;
+        return mfSortDir === "asc" ? av - bv : bv - av;
+      }
+      if (mfSortKey === "value") {
+        const av = a.last_price * a.quantity;
+        const bv = b.last_price * b.quantity;
+        return mfSortDir === "asc" ? av - bv : bv - av;
+      }
+      const aRaw = a[mfSortKey as keyof MFHolding];
+      const bRaw = b[mfSortKey as keyof MFHolding];
+      if (typeof aRaw === "string" || aRaw === null) {
+        const av = (aRaw ?? "") as string;
+        const bv = ((bRaw ?? "") as string);
+        return mfSortDir === "asc" ? av.localeCompare(bv) : bv.localeCompare(av);
+      }
+      const av = (aRaw ?? 0) as number;
+      const bv = (bRaw ?? 0) as number;
+      return mfSortDir === "asc" ? av - bv : bv - av;
+    });
+  }, [mfHoldings, mfSortKey, mfSortDir]);
 
   const thBase = "px-4 py-3 text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold cursor-pointer hover:text-[#ededed] transition-colors select-none";
   const thL = cn(thBase, "text-left");
@@ -279,16 +312,17 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                 <table className="w-full text-[14px]">
                   <thead className="bg-[#1c1c20]">
                     <tr>
-                      <th className={thL}>Fund</th>
-                      <th className={thR}>Units</th>
-                      <th className={thR}>Avg NAV</th>
-                      <th className={thR}>Current NAV</th>
-                      <th className={thR}>Value</th>
-                      <th className={thR}>P&amp;L</th>
+                      <th className={thL} onClick={() => toggleMfSort("fund")}>Fund <SortIcon col="fund" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("quantity")}>Units <SortIcon col="quantity" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("average_price")}>Avg NAV <SortIcon col="average_price" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("invested")}>Invested <SortIcon col="invested" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("last_price")}>Current NAV <SortIcon col="last_price" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("value")}>Value <SortIcon col="value" activeKey={mfSortKey} dir={mfSortDir} /></th>
+                      <th className={thR} onClick={() => toggleMfSort("pnl")}>P&amp;L <SortIcon col="pnl" activeKey={mfSortKey} dir={mfSortDir} /></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#2a2a2e]">
-                    {mfHoldings.map((h) => {
+                    {sortedMfHoldings.map((h) => {
                       const invested = h.average_price * h.quantity;
                       const pnl = h.last_price * h.quantity - invested;
                       const gain = pnl >= 0;
@@ -309,6 +343,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                           </td>
                           <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{h.quantity.toFixed(3)}</td>
                           <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price)}</td>
+                          <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price * h.quantity)}</td>
                           <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price)}</td>
                           <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price * h.quantity)}</td>
                           <td className="px-4 py-3 text-right">
