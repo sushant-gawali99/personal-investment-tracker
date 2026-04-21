@@ -131,7 +131,28 @@ All MF table headers become clickable. The "Invested" column is inserted between
 
 Column order: **Fund | Units | Avg NAV | Invested | Current NAV | Value | P&L**
 
-The sort indicator (▲/▼) uses the same `sortIndicator` helper pattern — a small `mfSortIndicator` variant keyed to `mfSortKey`/`mfSortDir`.
+The sort indicator uses the same `sortIndicator` helper pattern — a small `mfSortIndicator` variant keyed to `mfSortKey`/`mfSortDir`.
+
+---
+
+## Sort Indicators
+
+Every sortable column header shows a visual indicator:
+
+- **Active sorted column (asc):** `▲` in `#ededed` (bright)
+- **Active sorted column (desc):** `▼` in `#ededed` (bright)
+- **Inactive sortable column:** `▲▼` stacked (or `⇅`) in `#a0a0a5` (muted) — signals the column is sortable but not currently active
+
+Implemented as a helper function used by both tables:
+
+```tsx
+function SortIcon({ col, activeKey, dir }: { col: string; activeKey: string; dir: "asc" | "desc" }) {
+  if (col !== activeKey) return <span className="text-[#a0a0a5] ml-1 text-[10px]">⇅</span>;
+  return <span className="text-[#ededed] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
+}
+```
+
+Used in headers as: `<SortIcon col="tradingsymbol" activeKey={sortKey} dir={sortDir} />`
 
 ---
 
