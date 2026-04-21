@@ -397,6 +397,38 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     };
   }, [form, priorRenewals, frontFile, pdfFile, extracted, invalidSections]);
 
+  const [activeId, setActiveId] = useState<SectionId | null>("receipt");
+
+  function scrollToSection(id: SectionId) {
+    const el = sectionRefs.current[id];
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  useEffect(() => {
+    const entries = (Object.keys(sectionRefs.current) as SectionId[])
+      .map((id) => ({ id, el: sectionRefs.current[id] }))
+      .filter((e): e is { id: SectionId; el: HTMLElement } => !!e.el);
+
+    if (entries.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (obs) => {
+        const visible = obs
+          .filter((o) => o.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        if (visible[0]) {
+          const match = entries.find((e) => e.el === visible[0].target);
+          if (match) setActiveId(match.id);
+        }
+      },
+      { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
+    );
+
+    entries.forEach((e) => observer.observe(e.el));
+    return () => observer.disconnect();
+  }, [priorRenewals.length]);
+
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   function handleFrontFile(file: File) {
@@ -571,7 +603,19 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-3xl mx-auto space-y-6">
+    <form onSubmit={handleSubmit} className="max-w-6xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
+      <FormStepper
+        items={[
+          { id: "receipt", label: "Receipt", status: sectionStatus.receipt },
+          ...(priorRenewals.length > 0 ? [{ id: "prior" as SectionId, label: "Prior Periods", status: sectionStatus.prior }] : []),
+          { id: "details", label: "FD Details", status: sectionStatus.details },
+          { id: "renewal", label: "Renewal & Nominee", status: sectionStatus.renewal },
+          { id: "notes", label: "Notes", status: sectionStatus.notes },
+        ]}
+        activeId={activeId}
+        onSelect={scrollToSection}
+      />
+      <div className="flex-1 min-w-0 space-y-6">
       {renewedFrom && (
         <div
           className="ab-card-flat flex items-center gap-2 px-4 py-3 text-[13px]"
@@ -914,6 +958,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             "Save Fixed Deposit"
           )}
         </button>
+      </div>
       </div>
     </form>
   );
