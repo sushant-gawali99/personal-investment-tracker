@@ -2,27 +2,41 @@
 
 import Link from "next/link";
 import { useState, Fragment } from "react";
-import { useRouter } from "next/navigation";
-import { AlertTriangle, Trash2, CheckCircle2, ChevronRight, RefreshCw, ArrowUpRight } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronRight, RefreshCw, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
+import { FDDisableButton } from "./fd-disable-button";
 
-type FD = FDDetailData;
+type FD = FDDetailData & { disabled: boolean };
 
-type Filter = "all" | "active" | "matured";
+type Filter = "all" | "active" | "matured" | "disabled";
 
 export function FDList({ fds }: { fds: FD[] }) {
-  const router = useRouter();
   const [filter, setFilter] = useState<Filter>("all");
   const [bankFilter, setBankFilter] = useState<string>("all");
-  const [deleting, setDeleting] = useState<string | null>(null);
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const now = new Date();
 
-  const banks = Array.from(new Set(fds.map((fd) => fd.bankName))).sort();
+  function normalizeBankName(name: string) {
+    return name.trim().toLowerCase().replace(/\s+/g, " ");
+  }
 
-  // Compute the "current" (latest-renewal-resolved) values used for row cells.
+  // Group variations by normalized name; pick the first-seen variant as canonical display name.
+  const bankMap = new Map<string, { label: string; count: number }>();
+  for (const fd of fds) {
+    const key = normalizeBankName(fd.bankName);
+    const entry = bankMap.get(key);
+    if (!entry) {
+      bankMap.set(key, { label: fd.bankName.trim(), count: 1 });
+    } else {
+      entry.count += 1;
+    }
+  }
+  const banks = Array.from(bankMap.entries())
+    .map(([key, { label, count }]) => ({ key, label, count }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+
   function resolveCurrent(fd: FD) {
     const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
     return {
@@ -36,23 +50,17 @@ export function FDList({ fds }: { fds: FD[] }) {
   }
 
   const filtered = fds.filter((fd) => {
-    const current = resolveCurrent(fd);
-    const matured = current.maturityDate <= now;
-    if (filter === "active" && matured) return false;
-    if (filter === "matured" && !matured) return false;
-    if (bankFilter !== "all" && fd.bankName !== bankFilter) return false;
+    if (filter === "disabled") {
+      if (!fd.disabled) return false;
+    } else {
+      if (fd.disabled) return false;
+      const matured = resolveCurrent(fd).maturityDate <= now;
+      if (filter === "active" && matured) return false;
+      if (filter === "matured" && !matured) return false;
+    }
+    if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
     return true;
   });
-
-  async function deleteFD(id: string) {
-    setDeleting(id);
-    try {
-      await fetch(`/api/fd/${id}`, { method: "DELETE" });
-      router.refresh();
-    } finally {
-      setDeleting(null);
-    }
-  }
 
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {
@@ -73,9 +81,10 @@ export function FDList({ fds }: { fds: FD[] }) {
   }
 
   const counts = {
-    all: fds.length,
-    active: fds.filter((fd) => resolveCurrent(fd).maturityDate > now).length,
-    matured: fds.filter((fd) => resolveCurrent(fd).maturityDate <= now).length,
+    all: fds.filter((fd) => !fd.disabled).length,
+    active: fds.filter((fd) => !fd.disabled && resolveCurrent(fd).maturityDate > now).length,
+    matured: fds.filter((fd) => !fd.disabled && resolveCurrent(fd).maturityDate <= now).length,
+    disabled: fds.filter((fd) => fd.disabled).length,
   };
 
   const HEADERS = ["Bank", "FD No.", "Principal", "Rate", "Tenure", "Duration", "At Maturity", "Status", ""];
@@ -85,7 +94,7 @@ export function FDList({ fds }: { fds: FD[] }) {
     <div className="space-y-5">
       <div className="flex items-center gap-3 flex-wrap">
         <div className="inline-flex items-center gap-1 p-1 bg-[#1c1c20] rounded-full w-fit">
-          {(["all", "active", "matured"] as Filter[]).map((f) => (
+          {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
@@ -107,9 +116,9 @@ export function FDList({ fds }: { fds: FD[] }) {
           className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] cursor-pointer transition-all"
         >
           <option value="all">All banks ({fds.length})</option>
-          {banks.map((b) => (
-            <option key={b} value={b}>
-              {b} ({fds.filter((fd) => fd.bankName === b).length})
+          {banks.map(({ key, label, count }) => (
+            <option key={key} value={key}>
+              {label} ({count})
             </option>
           ))}
         </select>
@@ -151,7 +160,9 @@ export function FDList({ fds }: { fds: FD[] }) {
                 const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - current.maturityDate.getTime()) / 86400000) : 0;
                 const isExpanded = expandedIds.has(fd.id);
 
-                const statusBadge = isMatured ? (
+                const statusBadge = fd.disabled ? (
+                  <span className="ab-chip">Disabled</span>
+                ) : isMatured ? (
                   <span className="inline-flex items-center gap-1 ab-chip ab-chip-warning">
                     <CheckCircle2 size={10} />
                     {maturedDaysAgo === 0 ? "Matured today" : `Matured ${maturedDaysAgo}d ago`}
@@ -172,7 +183,8 @@ export function FDList({ fds }: { fds: FD[] }) {
                       onClick={() => toggleExpanded(fd.id)}
                       className={cn(
                         "cursor-pointer transition-colors",
-                        isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]",
+                        fd.disabled ? "opacity-50 hover:opacity-70 hover:bg-[#1c1c20]" :
+                          isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]",
                         isExpanded && "bg-[#17171a]"
                       )}
                     >
@@ -222,21 +234,15 @@ export function FDList({ fds }: { fds: FD[] }) {
                               Open full page <ArrowUpRight size={12} />
                             </Link>
                             <div className="flex items-center gap-2">
-                              <Link
-                                href={`/dashboard/fd/renew/${fd.id}`}
-                                className="ab-btn ab-btn-secondary"
-                              >
-                                <RefreshCw size={13} /> Renew
-                              </Link>
-                              <button
-                                type="button"
-                                onClick={() => deleteFD(fd.id)}
-                                disabled={deleting === fd.id}
-                                className="ab-btn ab-btn-secondary"
-                                style={{ color: "#ff7a6e", borderColor: "rgba(255, 122, 110, 0.3)" }}
-                              >
-                                <Trash2 size={13} /> {deleting === fd.id ? "Deleting…" : "Delete"}
-                              </button>
+                              {!fd.disabled && (
+                                <Link
+                                  href={`/dashboard/fd/renew/${fd.id}`}
+                                  className="ab-btn ab-btn-secondary"
+                                >
+                                  <RefreshCw size={13} /> Renew
+                                </Link>
+                              )}
+                              <FDDisableButton id={fd.id} disabled={fd.disabled} />
                             </div>
                           </div>
                         </td>

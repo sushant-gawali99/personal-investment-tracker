@@ -14,7 +14,8 @@ export default async function FDPage() {
   });
 
   // Summary stats resolve each FD to its latest-renewal values for totals.
-  const resolved = fds.map((fd) => {
+  // Disabled FDs never contribute to totals.
+  const resolved = fds.filter((fd) => !fd.disabled).map((fd) => {
     const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
     return {
       principal: latest?.principal ?? fd.principal,
