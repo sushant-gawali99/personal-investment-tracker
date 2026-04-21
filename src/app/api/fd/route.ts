@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
     tenureMonths, startDate, maturityDate, maturityAmount,
     interestType, compoundFreq,
     maturityInstruction, payoutFrequency, nomineeName, nomineeRelation,
-    notes, sourceImageUrl, sourceImageBackUrl,
+    notes, sourceImageUrl, sourceImageBackUrl, sourcePdfUrl,
     renewals, // optional: [{ renewalNumber, startDate, maturityDate, principal, interestRate, tenureMonths, maturityAmount, maturityInstruction, payoutFrequency }]
   } = body;
 
@@ -71,6 +71,7 @@ export async function POST(req: NextRequest) {
         notes: notes || null,
         sourceImageUrl: sourceImageUrl || null,
         sourceImageBackUrl: sourceImageBackUrl || null,
+        sourcePdfUrl: sourcePdfUrl || null,
       },
     });
 
