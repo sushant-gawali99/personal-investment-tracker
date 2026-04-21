@@ -4,7 +4,7 @@ import { ArrowLeft, AlertTriangle, RefreshCw, CheckCircle2 } from "lucide-react"
 import { prisma } from "@/lib/prisma";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { FDDeleteButton } from "./fd-delete-button";
+import { FDDisableButton } from "../fd-disable-button";
 import { FDDetailContent } from "../fd-detail-content";
 import { getSessionUserId } from "@/lib/session";
 
@@ -72,12 +72,14 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
               </p>
             </div>
           </div>
-          <Link
-            href={`/dashboard/fd/renew/${fd.id}`}
-            className="ab-btn ab-btn-secondary"
-          >
-            <RefreshCw size={13} /> Renew Now
-          </Link>
+          {!fd.disabled && (
+            <Link
+              href={`/dashboard/fd/renew/${fd.id}`}
+              className="ab-btn ab-btn-secondary"
+            >
+              <RefreshCw size={13} /> Renew Now
+            </Link>
+          )}
         </div>
       )}
 
@@ -116,18 +118,21 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
                     Renewal #{fd.renewals.length}
                   </span>
                 )}
+                {fd.disabled && <span className="ab-chip">Disabled</span>}
                 {statusBadge}
               </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <Link
-              href={`/dashboard/fd/renew/${fd.id}`}
-              className="ab-btn ab-btn-secondary"
-            >
-              <RefreshCw size={13} /> Renew
-            </Link>
-            <FDDeleteButton id={fd.id} />
+            {!fd.disabled && (
+              <Link
+                href={`/dashboard/fd/renew/${fd.id}`}
+                className="ab-btn ab-btn-secondary"
+              >
+                <RefreshCw size={13} /> Renew
+              </Link>
+            )}
+            <FDDisableButton id={fd.id} disabled={fd.disabled} />
           </div>
         </div>
       </div>
