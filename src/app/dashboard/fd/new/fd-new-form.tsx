@@ -258,6 +258,16 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [uploadMode, setUploadMode] = useState<"image" | "pdf">("image");
   const [pdfFile, setPdfFile] = useState<File | null>(null);
 
+  type SectionId = "receipt" | "prior" | "details" | "renewal" | "notes";
+
+  const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
+    receipt: null,
+    prior: null,
+    details: null,
+    renewal: null,
+    notes: null,
+  });
+
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
   function handleFrontFile(file: File) {
@@ -447,7 +457,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       )}
 
       {/* AI Digitize panel */}
-      <section className="ab-card p-6 space-y-5">
+      <section id="receipt" ref={(el) => { sectionRefs.current.receipt = el; }} className="ab-card p-6 space-y-5">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2a1218" }}>
             <Sparkles size={18} className="text-[#ff385c]" />
@@ -560,8 +570,14 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       </section>
 
       {/* Prior renewal sections */}
-      {priorRenewals.map((r, i) => (
-        <section key={i} className="ab-card-flat p-4 sm:p-6 space-y-4">
+      {priorRenewals.length > 0 && (
+        <section
+          id="prior"
+          ref={(el) => { sectionRefs.current.prior = el; }}
+          className="space-y-6"
+        >
+          {priorRenewals.map((r, i) => (
+            <section key={i} className="ab-card-flat p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 flex-wrap">
             <span className={i === 0 ? "ab-chip ab-chip-info" : "ab-chip ab-chip-accent"}>
               {i === 0 ? "Original FD" : `Renewal #${i}`}
@@ -603,11 +619,13 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               </div>
             ))}
           </div>
+            </section>
+          ))}
         </section>
-      ))}
+      )}
 
       {/* Main fields */}
-      <section className="ab-card p-6 space-y-5">
+      <section id="details" ref={(el) => { sectionRefs.current.details = el; }} className="ab-card p-6 space-y-5">
         <div className="flex items-center gap-2 flex-wrap">
           {priorRenewals.length > 0 ? (
             <span className="ab-chip ab-chip-accent">Renewal #{priorRenewals.length} (Current)</span>
@@ -682,7 +700,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       </section>
 
       {/* Renewal & nominee (from back of certificate) */}
-      <section className="ab-card p-6 space-y-5">
+      <section id="renewal" ref={(el) => { sectionRefs.current.renewal = el; }} className="ab-card p-6 space-y-5">
         <div>
           <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</p>
           <p className="text-[13px] text-[#a0a0a5] mt-0.5">Usually printed on the back of the FD receipt.</p>
@@ -720,7 +738,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       </section>
 
       {/* Optional fields */}
-      <section className="ab-card-flat overflow-hidden">
+      <section id="notes" ref={(el) => { sectionRefs.current.notes = el; }} className="ab-card-flat overflow-hidden">
         <button
           type="button"
           onClick={() => setShowOptional((s) => !s)}
