@@ -530,6 +530,39 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    const missing = new Set<SectionId>();
+
+    const detailsMissing =
+      !form.bankName || !form.principal || !form.interestRate ||
+      !form.tenureMonths || !form.startDate || !form.maturityDate || !form.interestType;
+    if (detailsMissing) missing.add("details");
+
+    const priorMissing = priorRenewals.some(
+      (r) => !r.startDate || !r.maturityDate || !r.principal || !r.interestRate || !r.tenureMonths
+    );
+    if (priorRenewals.length > 0 && priorMissing) missing.add("prior");
+
+    if (missing.size > 0) {
+      setInvalidSections(missing);
+      const firstId: SectionId = missing.has("prior") ? "prior" : "details";
+      const sectionEl = sectionRefs.current[firstId];
+      if (sectionEl) {
+        const firstInvalid = sectionEl.querySelector<HTMLInputElement | HTMLSelectElement>(
+          "input:invalid, select:invalid, input[required]:placeholder-shown"
+        );
+        if (firstInvalid) {
+          firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+          firstInvalid.focus({ preventScroll: true });
+        } else {
+          sectionEl.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+      return;
+    }
+
+    if (invalidSections.size > 0) setInvalidSections(new Set());
+
     setSaveError("");
     setSaving(true);
     try {
@@ -608,7 +641,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-6xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
+    <form noValidate onSubmit={handleSubmit} className="max-w-6xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
       <FormStepper
         items={[
           { id: "receipt", label: "Receipt", status: sectionStatus.receipt },
