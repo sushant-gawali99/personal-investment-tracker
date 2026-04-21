@@ -43,7 +43,7 @@ export function TopNav() {
                   className={cn(
                     "px-3 py-2 rounded-full text-sm font-medium transition-colors",
                     active
-                      ? "bg-[#1c1c20] text-[#ededed]"
+                      ? "bg-[#ff385c]/10 text-white ring-1 ring-inset ring-[#ff385c]/25"
                       : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
                   )}
                 >
@@ -84,7 +84,7 @@ export function TopNav() {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full",
-                  active ? "bg-[#1c1c20] text-[#ededed]" : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
+                  active ? "bg-[#ff385c]/10 text-white ring-1 ring-inset ring-[#ff385c]/25" : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
                 )}
               >
                 {label}
