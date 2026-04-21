@@ -237,7 +237,16 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
           <div className="ab-card p-6">
             <h2 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Source Document</h2>
-            {fd.sourceImageUrl || fd.sourceImageBackUrl ? (
+            {fd.sourcePdfUrl ? (
+              <a
+                href={fd.sourcePdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
+              >
+                <FileText size={14} /> View PDF
+              </a>
+            ) : fd.sourceImageUrl || fd.sourceImageBackUrl ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {[
                   { url: fd.sourceImageUrl, label: "Front" },
