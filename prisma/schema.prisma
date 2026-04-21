@@ -26,6 +26,7 @@ model FixedDeposit {
   nomineeName         String?
   nomineeRelation     String?
   notes          String?
+  disabled       Boolean  @default(false)
   sourceImageUrl     String?
   sourceImageBackUrl String?
   sourcePdfUrl       String?
