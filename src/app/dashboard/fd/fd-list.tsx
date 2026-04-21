@@ -169,8 +169,9 @@ export function FDList({ fds }: { fds: FD[] }) {
                 return (
                   <Fragment key={fd.id}>
                     <tr
+                      onClick={() => toggleExpanded(fd.id)}
                       className={cn(
-                        "transition-colors",
+                        "cursor-pointer transition-colors",
                         isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]",
                         isExpanded && "bg-[#17171a]"
                       )}
@@ -197,7 +198,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                       <td className="px-4 py-3 text-center">
                         <button
                           type="button"
-                          onClick={() => toggleExpanded(fd.id)}
+                          onClick={(e) => { e.stopPropagation(); toggleExpanded(fd.id); }}
                           aria-label={isExpanded ? "Collapse" : "Expand"}
                           aria-expanded={isExpanded}
                           className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#6e6e73] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
