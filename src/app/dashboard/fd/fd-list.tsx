@@ -1,23 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { useState, Fragment } from "react";
 import { useRouter } from "next/navigation";
-import { AlertTriangle, Trash2, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, Trash2, CheckCircle2, ChevronRight, RefreshCw, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
+import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
 
-interface FD {
-  id: string;
-  bankName: string;
-  fdNumber: string | null;
-  principal: number;
-  interestRate: number;
-  tenureMonths: number;
-  startDate: Date | string;
-  maturityDate: Date | string;
-  maturityAmount: number | null;
-  interestType: string;
-}
+type FD = FDDetailData;
 
 type Filter = "all" | "active" | "matured";
 
@@ -26,12 +17,27 @@ export function FDList({ fds }: { fds: FD[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [bankFilter, setBankFilter] = useState<string>("all");
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const now = new Date();
 
   const banks = Array.from(new Set(fds.map((fd) => fd.bankName))).sort();
 
+  // Compute the "current" (latest-renewal-resolved) values used for row cells.
+  function resolveCurrent(fd: FD) {
+    const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+    return {
+      principal: latest?.principal ?? fd.principal,
+      interestRate: latest?.interestRate ?? fd.interestRate,
+      tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+      startDate: new Date(latest?.startDate ?? fd.startDate),
+      maturityDate: new Date(latest?.maturityDate ?? fd.maturityDate),
+      maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,
+    };
+  }
+
   const filtered = fds.filter((fd) => {
-    const matured = new Date(fd.maturityDate) <= now;
+    const current = resolveCurrent(fd);
+    const matured = current.maturityDate <= now;
     if (filter === "active" && matured) return false;
     if (filter === "matured" && !matured) return false;
     if (bankFilter !== "all" && fd.bankName !== bankFilter) return false;
@@ -48,6 +54,15 @@ export function FDList({ fds }: { fds: FD[] }) {
     }
   }
 
+  function toggleExpanded(id: string) {
+    setExpandedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
   if (fds.length === 0) {
     return (
       <div className="ab-card p-12 text-center">
@@ -59,9 +74,12 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   const counts = {
     all: fds.length,
-    active: fds.filter((fd) => new Date(fd.maturityDate) > now).length,
-    matured: fds.filter((fd) => new Date(fd.maturityDate) <= now).length,
+    active: fds.filter((fd) => resolveCurrent(fd).maturityDate > now).length,
+    matured: fds.filter((fd) => resolveCurrent(fd).maturityDate <= now).length,
   };
+
+  const HEADERS = ["Bank", "FD No.", "Principal", "Rate", "Tenure", "Duration", "At Maturity", "Status", ""];
+  const COL_COUNT = HEADERS.length;
 
   return (
     <div className="space-y-5">
@@ -111,22 +129,12 @@ export function FDList({ fds }: { fds: FD[] }) {
           <table className="w-full text-[14px]">
             <thead>
               <tr className="bg-[#1c1c20]">
-                {[
-                  "Bank",
-                  "FD No.",
-                  "Principal",
-                  "Rate",
-                  "Tenure",
-                  "Duration",
-                  "At Maturity",
-                  "Status",
-                  "",
-                ].map((h, i) => (
+                {HEADERS.map((h, i) => (
                   <th
                     key={i}
                     className={cn(
                       "text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold px-4 py-3",
-                      i === 2 || i === 3 || i === 6 ? "text-right" : "text-left"
+                      i === 2 || i === 3 || i === 6 ? "text-right" : i === 8 ? "text-center w-[44px]" : "text-left"
                     )}
                   >
                     {h}
@@ -136,11 +144,12 @@ export function FDList({ fds }: { fds: FD[] }) {
             </thead>
             <tbody className="divide-y divide-[#2a2a2e]">
               {filtered.map((fd) => {
-                const maturity = new Date(fd.maturityDate);
-                const isMatured = maturity <= now;
-                const days = daysUntil(maturity);
-                const maturityValue = fd.maturityAmount ?? fd.principal;
-                const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - maturity.getTime()) / 86400000) : 0;
+                const current = resolveCurrent(fd);
+                const isMatured = current.maturityDate <= now;
+                const days = daysUntil(current.maturityDate);
+                const displayMaturityValue = current.maturityAmount ?? current.principal;
+                const maturedDaysAgo = isMatured ? Math.floor((now.getTime() - current.maturityDate.getTime()) / 86400000) : 0;
+                const isExpanded = expandedIds.has(fd.id);
 
                 const statusBadge = isMatured ? (
                   <span className="inline-flex items-center gap-1 ab-chip ab-chip-warning">
@@ -158,43 +167,81 @@ export function FDList({ fds }: { fds: FD[] }) {
                 );
 
                 return (
-                  <tr
-                    key={fd.id}
-                    onClick={() => router.push(`/dashboard/fd/${fd.id}`)}
-                    className={cn(
-                      "cursor-pointer transition-colors",
-                      isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]"
-                    )}
-                  >
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                          <span className="font-bold text-[11px] text-[#ff385c]">
-                            {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
-                          </span>
+                  <Fragment key={fd.id}>
+                    <tr
+                      className={cn(
+                        "transition-colors",
+                        isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]",
+                        isExpanded && "bg-[#17171a]"
+                      )}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
+                            <span className="font-bold text-[11px] text-[#ff385c]">
+                              {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                            </span>
+                          </div>
+                          <span className="font-semibold text-[#ededed] text-[14px]">{fd.bankName}</span>
                         </div>
-                        <span className="font-semibold text-[#ededed] text-[14px]">{fd.bankName}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
-                    <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{formatINR(fd.principal)}</td>
-                    <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{fd.interestRate}%</td>
-                    <td className="px-4 py-3 text-[#a0a0a5]">{fd.tenureMonths}m</td>
-                    <td className="px-4 py-3 text-[#a0a0a5] text-[13px] whitespace-nowrap">
-                      {formatDate(fd.startDate)} <span className="text-[#6e6e73]">→</span> {formatDate(fd.maturityDate)}
-                    </td>
-                    <td className="px-4 py-3 text-right mono text-[#ededed] font-semibold">{formatINR(maturityValue)}</td>
-                    <td className="px-4 py-3">{statusBadge}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button
-                        onClick={(e) => { e.preventDefault(); e.stopPropagation(); deleteFD(fd.id); }}
-                        disabled={deleting === fd.id}
-                        className="p-2 rounded-full hover:bg-[#2a1613] text-[#a0a0a5] hover:text-[#ff7a6e] transition-colors disabled:opacity-40"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-4 py-3 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
+                      <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{formatINR(current.principal)}</td>
+                      <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{current.interestRate}%</td>
+                      <td className="px-4 py-3 text-[#a0a0a5]">{current.tenureMonths}m</td>
+                      <td className="px-4 py-3 text-[#a0a0a5] text-[13px] whitespace-nowrap">
+                        {formatDate(current.startDate)} <span className="text-[#6e6e73]">→</span> {formatDate(current.maturityDate)}
+                      </td>
+                      <td className="px-4 py-3 text-right mono text-[#ededed] font-semibold">{formatINR(displayMaturityValue)}</td>
+                      <td className="px-4 py-3">{statusBadge}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          type="button"
+                          onClick={() => toggleExpanded(fd.id)}
+                          aria-label={isExpanded ? "Collapse" : "Expand"}
+                          aria-expanded={isExpanded}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#6e6e73] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
+                        >
+                          <ChevronRight
+                            size={14}
+                            className={cn("transition-transform duration-200", isExpanded && "rotate-90")}
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                    {isExpanded && (
+                      <tr className="bg-[#0e0e11]">
+                        <td colSpan={COL_COUNT} className="px-6 py-6">
+                          <FDDetailContent fd={fd} />
+                          <div className="flex items-center justify-between gap-4 flex-wrap pt-5 mt-5 border-t border-[#2a2a2e]">
+                            <Link
+                              href={`/dashboard/fd/${fd.id}`}
+                              className="text-[12px] text-[#a0a0a5] hover:text-[#ededed] font-medium inline-flex items-center gap-1 transition-colors"
+                            >
+                              Open full page <ArrowUpRight size={12} />
+                            </Link>
+                            <div className="flex items-center gap-2">
+                              <Link
+                                href={`/dashboard/fd/renew/${fd.id}`}
+                                className="ab-btn ab-btn-secondary"
+                              >
+                                <RefreshCw size={13} /> Renew
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => deleteFD(fd.id)}
+                                disabled={deleting === fd.id}
+                                className="ab-btn ab-btn-secondary"
+                                style={{ color: "#ff7a6e", borderColor: "rgba(255, 122, 110, 0.3)" }}
+                              >
+                                <Trash2 size={13} /> {deleting === fd.id ? "Deleting…" : "Delete"}
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 );
               })}
             </tbody>

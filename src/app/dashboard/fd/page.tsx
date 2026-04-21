@@ -7,45 +7,41 @@ import { getSessionUserId } from "@/lib/session";
 
 export default async function FDPage() {
   const userId = await getSessionUserId();
-  const rawFds = await prisma.fixedDeposit.findMany({
+  const fds = await prisma.fixedDeposit.findMany({
     where: { userId: userId ?? "" },
     orderBy: { maturityDate: "asc" },
     include: { renewals: { orderBy: { renewalNumber: "asc" } } },
   });
 
-  // Resolve each FD to its latest renewal values
-  const fds = rawFds.map((fd) => {
+  // Summary stats resolve each FD to its latest-renewal values for totals.
+  const resolved = fds.map((fd) => {
     const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
     return {
-      ...fd,
       principal: latest?.principal ?? fd.principal,
       interestRate: latest?.interestRate ?? fd.interestRate,
-      tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
-      startDate: latest?.startDate ?? fd.startDate,
-      maturityDate: latest?.maturityDate ?? fd.maturityDate,
       maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,
+      startDate: new Date(latest?.startDate ?? fd.startDate),
+      maturityDate: new Date(latest?.maturityDate ?? fd.maturityDate),
     };
   });
 
-  const totalPrincipal = fds.reduce((s, fd) => s + fd.principal, 0);
-  const totalMaturity = fds.reduce((s, fd) => s + (fd.maturityAmount ?? fd.principal), 0);
+  const totalPrincipal = resolved.reduce((s, r) => s + r.principal, 0);
+  const totalMaturity = resolved.reduce((s, r) => s + (r.maturityAmount ?? r.principal), 0);
   const totalInterest = totalMaturity - totalPrincipal;
-  const activeFDs = fds.filter((fd) => new Date(fd.maturityDate) > new Date()).length;
-  const avgRate = fds.length > 0
-    ? fds.reduce((s, fd) => s + fd.interestRate, 0) / fds.length
+  const activeFDs = resolved.filter((r) => r.maturityDate > new Date()).length;
+  const avgRate = resolved.length > 0
+    ? resolved.reduce((s, r) => s + r.interestRate, 0) / resolved.length
     : 0;
 
   const now = new Date();
   const yearStart = new Date(now.getFullYear(), 0, 1);
   const yearEnd = new Date(now.getFullYear(), 11, 31);
-  const interestThisYear = fds.reduce((sum, fd) => {
-    const start = new Date(fd.startDate);
-    const end = new Date(fd.maturityDate);
-    const overlapStart = start < yearStart ? yearStart : start;
-    const overlapEnd = end > yearEnd ? yearEnd : end;
+  const interestThisYear = resolved.reduce((sum, r) => {
+    const overlapStart = r.startDate < yearStart ? yearStart : r.startDate;
+    const overlapEnd = r.maturityDate > yearEnd ? yearEnd : r.maturityDate;
     if (overlapStart >= overlapEnd) return sum;
     const days = (overlapEnd.getTime() - overlapStart.getTime()) / 86400000;
-    return sum + (fd.principal * fd.interestRate / 100) * (days / 365);
+    return sum + (r.principal * r.interestRate / 100) * (days / 365);
   }, 0);
 
   return (
