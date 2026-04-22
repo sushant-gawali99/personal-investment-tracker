@@ -161,7 +161,7 @@ case "atMaturity": return c.maturityAmount ?? c.principal;
           onChange={(e) => setBankFilter(e.target.value)}
           className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] cursor-pointer transition-all"
         >
-          <option value="all">All banks ({fds.length})</option>
+          <option value="all">All banks ({banks.length})</option>
           {banks.map(({ key, label, count }) => (
             <option key={key} value={key}>
               {label} ({count})
