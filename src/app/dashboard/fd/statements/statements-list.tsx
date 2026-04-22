@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Trash2, Download, ExternalLink, Sparkles, Cpu, CalendarDays, Inbox } from "lucide-react";
+import { Trash2, Download, ExternalLink, CalendarDays, Inbox } from "lucide-react";
 import { formatDate } from "@/lib/format";
 
 type Item = {
@@ -83,7 +83,6 @@ export function StatementsList({ items }: { items: Item[] }) {
                 <th className="text-left font-medium px-3 py-3">Uploaded</th>
                 <th className="text-right font-medium px-3 py-3">Transactions</th>
                 <th className="text-right font-medium px-3 py-3">Match rate</th>
-                <th className="text-left font-medium px-3 py-3">Source</th>
                 <th className="text-right font-medium px-5 py-3 w-32"></th>
               </tr>
             </thead>
@@ -137,16 +136,6 @@ export function StatementsList({ items }: { items: Item[] }) {
                           {s.matchedCount}/{s.txnCount}
                         </span>
                       </div>
-                    </td>
-                    <td className="px-3 py-3.5">
-                      <span className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border ${
-                        s.parseMethod === "ai"
-                          ? "bg-[#1a1330] text-[#b79dff] border-[#2a2250]"
-                          : "bg-[#0e2236] text-[#5ba8ff] border-[#173152]"
-                      }`}>
-                        {s.parseMethod === "ai" ? <Sparkles size={10} /> : <Cpu size={10} />}
-                        {s.parseMethod === "ai" ? "AI parsed" : "Regex"}
-                      </span>
                     </td>
                     <td className="px-5 py-3.5 text-right">
                       <div className="inline-flex items-center gap-1">
