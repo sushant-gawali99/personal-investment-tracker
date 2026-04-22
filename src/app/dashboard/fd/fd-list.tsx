@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, Fragment } from "react";
+import { useState, Fragment, useMemo } from "react";
 import { AlertTriangle, CheckCircle2, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
@@ -33,6 +33,10 @@ const HEADERS: HeaderDef[] = [
 ];
 const COL_COUNT = HEADERS.length;
 
+function normalizeBankName(name: string) {
+  return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(" ");
+}
+
 export function FDList({ fds }: { fds: FD[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [bankFilter, setBankFilter] = useState<string>("all");
@@ -41,9 +45,47 @@ export function FDList({ fds }: { fds: FD[] }) {
   const [fdSearch, setFdSearch] = useState("");
   const now = new Date();
 
-  function normalizeBankName(name: string) {
-    return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(" ");
-  }
+  const resolvedForStats = useMemo(() => {
+    const statsNow = new Date();
+    const yearStart = new Date(statsNow.getFullYear(), 0, 1);
+    const yearEnd = new Date(statsNow.getFullYear(), 11, 31);
+
+    return fds
+      .filter((fd) => {
+        if (fd.disabled) return false;
+        if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
+        return true;
+      })
+      .map((fd) => {
+        const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+        const principal = latest?.principal ?? fd.principal;
+        const interestRate = latest?.interestRate ?? fd.interestRate;
+        const maturityAmount = latest?.maturityAmount ?? fd.maturityAmount;
+        const startDate = new Date(latest?.startDate ?? fd.startDate);
+        const maturityDate = new Date(latest?.maturityDate ?? fd.maturityDate);
+
+        const overlapStart = startDate < yearStart ? yearStart : startDate;
+        const overlapEnd = maturityDate > yearEnd ? yearEnd : maturityDate;
+        const daysInYear = overlapStart < overlapEnd
+          ? (overlapEnd.getTime() - overlapStart.getTime()) / 86400000
+          : 0;
+        const interestThisYear = (principal * interestRate / 100) * (daysInYear / 365);
+
+        return { principal, interestRate, maturityAmount, maturityDate, interestThisYear };
+      });
+  }, [fds, bankFilter]);
+
+  const stats = useMemo(() => {
+    const totalPrincipal = resolvedForStats.reduce((s, r) => s + r.principal, 0);
+    const totalMaturity = resolvedForStats.reduce((s, r) => s + (r.maturityAmount ?? r.principal), 0);
+    const totalInterest = totalMaturity - totalPrincipal;
+    const activeFDs = resolvedForStats.filter((r) => r.maturityDate > new Date()).length;
+    const avgRate = resolvedForStats.length > 0
+      ? resolvedForStats.reduce((s, r) => s + r.interestRate, 0) / resolvedForStats.length
+      : 0;
+    const interestThisYear = resolvedForStats.reduce((s, r) => s + r.interestThisYear, 0);
+    return { totalPrincipal, totalMaturity, totalInterest, activeFDs, avgRate, interestThisYear };
+  }, [resolvedForStats]);
 
   // Group variations by normalized name; pick the first-seen variant as canonical display name.
   const bankMap = new Map<string, { label: string; count: number }>();
@@ -138,6 +180,31 @@ case "atMaturity": return c.maturityAmount ?? c.principal;
 
   return (
     <div className="space-y-5">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { label: "Total FD Corpus",    value: formatINR(stats.totalMaturity) },
+          { label: "Avg Interest Rate",  value: `${stats.avgRate.toFixed(2)}%` },
+          { label: "Active Deposits",    value: String(stats.activeFDs) },
+          { label: "Interest This Year", value: formatINR(stats.interestThisYear) },
+        ].map(({ label, value }) => (
+          <div key={label} className="ab-card p-4">
+            <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
+            <p className="mono text-[20px] font-semibold text-[#ededed]">{value}</p>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="ab-card-flat p-4 flex items-center justify-between">
+          <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Principal</p>
+          <p className="mono font-semibold text-[#ededed]">{formatINR(stats.totalPrincipal)}</p>
+        </div>
+        <div className="ab-card-flat p-4 flex items-center justify-between">
+          <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Interest Earned</p>
+          <p className="mono font-semibold text-[#5ee0a4]">{formatINR(stats.totalInterest)}</p>
+        </div>
+      </div>
+
       <div className="flex items-center gap-3 flex-wrap">
         <div className="inline-flex items-center gap-1 p-1 bg-[#1c1c20] rounded-full w-fit">
           {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
