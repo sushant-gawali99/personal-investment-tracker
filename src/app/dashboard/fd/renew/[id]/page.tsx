@@ -37,6 +37,8 @@ export default async function FDRenewPage({ params }: { params: Promise<{ id: st
         principal: fd.principal,
         maturityDate: fd.maturityDate.toISOString(),
         tenureMonths: fd.tenureMonths,
+        tenureDays: fd.tenureDays,
+        tenureText: fd.tenureText,
         interestRate: fd.interestRate,
         nomineeName: fd.nomineeName,
         nomineeRelation: fd.nomineeRelation,
