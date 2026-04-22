@@ -95,66 +95,68 @@ export function GoldFormDialog({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
-      <div className="ab-card w-full max-w-[520px] p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
-        <div className="flex items-center justify-between">
+      <div className="ab-card w-full max-w-[520px] flex flex-col max-h-[calc(100dvh-2rem)]" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
           <h2 className="text-[18px] font-semibold text-[#ededed]">{initial ? "Edit jewellery" : "Add jewellery"}</h2>
           <button onClick={onClose} className="ab-btn ab-btn-ghost"><X size={16} /></button>
         </div>
 
-        <label className="block text-[12px] text-[#a0a0a5]">Title *
-          <input className="ab-input mt-1 w-full" value={input.title} onChange={(e) => update("title", e.target.value)} />
-        </label>
+        <div className="flex-1 overflow-y-auto px-6 space-y-4 pb-2">
+          <label className="block text-[12px] text-[#a0a0a5]">Title *
+            <input className="ab-input mt-1 w-full" value={input.title} onChange={(e) => update("title", e.target.value)} />
+          </label>
 
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block text-[12px] text-[#a0a0a5]">Weight (g) *
-            <input type="number" step="0.001" min="0" className="ab-input mt-1 w-full" value={input.weightGrams} onChange={(e) => update("weightGrams", e.target.value)} />
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block text-[12px] text-[#a0a0a5]">Weight (g) *
+              <input type="number" step="0.001" min="0" className="ab-input mt-1 w-full" value={input.weightGrams} onChange={(e) => update("weightGrams", e.target.value)} />
+            </label>
+            <label className="block text-[12px] text-[#a0a0a5]">Karat *
+              <select className="ab-input mt-1 w-full" value={input.karat} onChange={(e) => update("karat", e.target.value as Input["karat"])}>
+                <option value="24">24K</option>
+                <option value="22">22K</option>
+                <option value="18">18K</option>
+                <option value="14">14K</option>
+              </select>
+            </label>
+          </div>
+
+          <label className="block text-[12px] text-[#a0a0a5]">Purchase price (₹)
+            <input type="number" step="0.01" min="0" className="ab-input mt-1 w-full" value={input.purchasePrice} onChange={(e) => update("purchasePrice", e.target.value)} />
           </label>
-          <label className="block text-[12px] text-[#a0a0a5]">Karat *
-            <select className="ab-input mt-1 w-full" value={input.karat} onChange={(e) => update("karat", e.target.value as Input["karat"])}>
-              <option value="24">24K</option>
-              <option value="22">22K</option>
-              <option value="18">18K</option>
-              <option value="14">14K</option>
-            </select>
+
+          <div className="grid grid-cols-2 gap-3">
+            <label className="block text-[12px] text-[#a0a0a5]">Purchased on
+              <input type="date" className="ab-input mt-1 w-full" value={input.purchasedOn} onChange={(e) => update("purchasedOn", e.target.value)} />
+            </label>
+            <label className="block text-[12px] text-[#a0a0a5]">Purchased from
+              <input className="ab-input mt-1 w-full" value={input.purchasedFrom} onChange={(e) => update("purchasedFrom", e.target.value)} />
+            </label>
+          </div>
+
+          <label className="block text-[12px] text-[#a0a0a5]">Notes
+            <textarea rows={3} className="ab-input mt-1 w-full" value={input.notes} onChange={(e) => update("notes", e.target.value)} />
           </label>
+
+          <div className="space-y-2">
+            <div className="text-[12px] text-[#a0a0a5]">Photo</div>
+            {input.photoUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={input.photoUrl} alt="" className="h-24 rounded object-cover" />
+            )}
+            <label className="ab-btn ab-btn-ghost inline-flex cursor-pointer">
+              <Upload size={14} /> {input.photoUrl ? "Replace photo" : "Upload photo"}
+              <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
+            </label>
+            {input.photoUrl && (
+              <button type="button" className="ab-btn ab-btn-ghost ml-2" onClick={() => update("photoUrl", null)}>Remove photo</button>
+            )}
+            {uploading && <p className="text-[12px] text-[#a0a0a5]">Uploading…</p>}
+          </div>
+
+          {error && <p className="text-[12px] text-[#ff6b7a]">{error}</p>}
         </div>
 
-        <label className="block text-[12px] text-[#a0a0a5]">Purchase price (₹)
-          <input type="number" step="0.01" min="0" className="ab-input mt-1 w-full" value={input.purchasePrice} onChange={(e) => update("purchasePrice", e.target.value)} />
-        </label>
-
-        <div className="grid grid-cols-2 gap-3">
-          <label className="block text-[12px] text-[#a0a0a5]">Purchased on
-            <input type="date" className="ab-input mt-1 w-full" value={input.purchasedOn} onChange={(e) => update("purchasedOn", e.target.value)} />
-          </label>
-          <label className="block text-[12px] text-[#a0a0a5]">Purchased from
-            <input className="ab-input mt-1 w-full" value={input.purchasedFrom} onChange={(e) => update("purchasedFrom", e.target.value)} />
-          </label>
-        </div>
-
-        <label className="block text-[12px] text-[#a0a0a5]">Notes
-          <textarea rows={3} className="ab-input mt-1 w-full" value={input.notes} onChange={(e) => update("notes", e.target.value)} />
-        </label>
-
-        <div className="space-y-2">
-          <div className="text-[12px] text-[#a0a0a5]">Photo</div>
-          {input.photoUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={input.photoUrl} alt="" className="h-24 rounded object-cover" />
-          )}
-          <label className="ab-btn ab-btn-ghost inline-flex cursor-pointer">
-            <Upload size={14} /> {input.photoUrl ? "Replace photo" : "Upload photo"}
-            <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
-          </label>
-          {input.photoUrl && (
-            <button type="button" className="ab-btn ab-btn-ghost ml-2" onClick={() => update("photoUrl", null)}>Remove photo</button>
-          )}
-          {uploading && <p className="text-[12px] text-[#a0a0a5]">Uploading…</p>}
-        </div>
-
-        {error && <p className="text-[12px] text-[#ff6b7a]">{error}</p>}
-
-        <div className="flex justify-end gap-2 pt-2">
+        <div className="flex justify-end gap-2 px-6 py-4 shrink-0 border-t border-[#2a2a2e]">
           <button className="ab-btn ab-btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
           <button className="ab-btn ab-btn-accent" onClick={save} disabled={saving || !input.title || !input.weightGrams}>{saving ? "Saving…" : "Save"}</button>
         </div>
