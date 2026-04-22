@@ -38,6 +38,7 @@ export function FDList({ fds }: { fds: FD[] }) {
   const [bankFilter, setBankFilter] = useState<string>("all");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
+  const [fdSearch, setFdSearch] = useState("");
   const now = new Date();
 
   function normalizeBankName(name: string) {
@@ -83,6 +84,7 @@ export function FDList({ fds }: { fds: FD[] }) {
       if (filter === "matured" && !matured) return false;
     }
     if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
+    if (fdSearch.trim() && !(fd.fdNumber ?? "").toLowerCase().includes(fdSearch.trim().toLowerCase())) return false;
     return true;
   });
 
@@ -167,9 +169,17 @@ case "atMaturity": return c.maturityAmount ?? c.principal;
           ))}
         </select>
 
-        {(bankFilter !== "all" || filter !== "all") && (
+        <input
+          type="text"
+          value={fdSearch}
+          onChange={(e) => setFdSearch(e.target.value)}
+          placeholder="Search FD number…"
+          className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] placeholder:text-[#6e6e73] placeholder:font-normal focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] transition-all w-48"
+        />
+
+        {(bankFilter !== "all" || filter !== "all" || fdSearch.trim()) && (
           <button
-            onClick={() => { setFilter("all"); setBankFilter("all"); }}
+            onClick={() => { setFilter("all"); setBankFilter("all"); setFdSearch(""); }}
             className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
           >
             Clear filters
