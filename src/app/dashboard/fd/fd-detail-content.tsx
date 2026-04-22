@@ -38,6 +38,8 @@ export interface FDDetailData {
   compoundFreq: string | null;
   maturityInstruction: string | null;
   payoutFrequency: string | null;
+  depositorName: string | null;
+  depositorSecondName: string | null;
   nomineeName: string | null;
   nomineeRelation: string | null;
   notes: string | null;
@@ -186,6 +188,14 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
                 {fd.accountNumber ?? "—"}
                 {fd.accountNumber && <CopyButton value={fd.accountNumber} label="Copy account number" />}
               </dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
+              <dt className="text-[#a0a0a5]">Depositor</dt>
+              <dd className="text-[#ededed] text-right">{fd.depositorName ?? "—"}</dd>
+            </div>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
+              <dt className="text-[#a0a0a5]">Second Depositor</dt>
+              <dd className="text-[#ededed] text-right">{fd.depositorSecondName ?? "—"}</dd>
             </div>
             <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
               <dt className="text-[#a0a0a5]">Interest Type</dt>

@@ -13,6 +13,8 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
   "bankName": string,
   "fdNumber": string | null,
   "accountNumber": string | null,
+  "depositorName": string | null,
+  "depositorSecondName": string | null,
   "principal": number,
   "interestRate": number,
   "tenureMonths": number,
@@ -32,6 +34,8 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
 }
 
 Rules:
+- depositorName is the primary account holder's name as printed on the certificate
+- depositorSecondName is the joint/second holder's name if present; null for single-holder FDs
 - interestRate must be per annum percentage (e.g. 7.5 not 0.075)
 - tenureMonths must be an integer: the whole-months portion of the tenure (convert "1 year" → 12, "1.5 years" → 18; if the receipt says "45 days" only, tenureMonths is 0)
 - tenureDays must be an integer: the leftover days beyond whole months (if the receipt says "12 months 37 days", tenureDays is 37; if it says "45 days", tenureDays is 45; if it says only "6 months", tenureDays is 0)

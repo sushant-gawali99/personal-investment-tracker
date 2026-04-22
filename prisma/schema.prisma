@@ -25,6 +25,8 @@ model FixedDeposit {
   compoundFreq   String?  @default("quarterly")
   maturityInstruction String?
   payoutFrequency     String?
+  depositorName       String?
+  depositorSecondName String?
   nomineeName         String?
   nomineeRelation     String?
   notes          String?

@@ -78,6 +78,7 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
 
 interface FDForm {
   bankName: string; fdNumber: string; accountNumber: string;
+  depositorName: string; depositorSecondName: string;
   principal: string; interestRate: string; tenureMonths: string; tenureDays: string; tenureText: string;
   startDate: string; maturityDate: string; maturityAmount: string;
   interestType: string; compoundFreq: string;
@@ -88,6 +89,7 @@ interface FDForm {
 
 const empty: FDForm = {
   bankName: "", fdNumber: "", accountNumber: "",
+  depositorName: "", depositorSecondName: "",
   principal: "", interestRate: "", tenureMonths: "", tenureDays: "", tenureText: "",
   startDate: "", maturityDate: "", maturityAmount: "",
   interestType: "compound", compoundFreq: "quarterly",
@@ -480,6 +482,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         bankName: e.bankName ?? "",
         fdNumber: e.fdNumber ?? "",
         accountNumber: e.accountNumber ?? "",
+        depositorName: e.depositorName ?? "",
+        depositorSecondName: e.depositorSecondName ?? "",
         principal: e.principal?.toString() ?? "",
         interestRate: e.interestRate?.toString() ?? "",
         tenureMonths: e.tenureMonths?.toString() ?? "",
@@ -991,6 +995,14 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           <div>
             <label htmlFor="accountNumber" className="ab-label">Account Number</label>
             <input id="accountNumber" className="ab-input" value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
+          </div>
+          <div>
+            <label htmlFor="depositorName" className="ab-label">Depositor Name</label>
+            <input id="depositorName" className="ab-input" value={form.depositorName} onChange={(e) => set("depositorName", e.target.value)} placeholder="First depositor's full name" />
+          </div>
+          <div>
+            <label htmlFor="depositorSecondName" className="ab-label">Second Depositor Name</label>
+            <input id="depositorSecondName" className="ab-input" value={form.depositorSecondName} onChange={(e) => set("depositorSecondName", e.target.value)} placeholder="Joint account holder (if any)" />
           </div>
         </div>
       </section>
