@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, BarChart2, PiggyBank, Activity, type LucideIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, BarChart2, PiggyBank, Activity, Coins, type LucideIcon } from "lucide-react";
 import { AllocationDonut } from "@/components/charts/allocation-donut";
 import { InterestAccrualChart } from "@/components/charts/interest-accrual-chart";
 import { TopHoldingsChart } from "@/components/charts/top-holdings-chart";
@@ -27,6 +27,13 @@ interface Props {
   mfHoldings: MFHolding[];
   upcomingMaturities: FDRecord[];
   kiteConnected: boolean;
+  goldTotals: {
+    count: number;
+    currentValue: number;
+    invested: number;
+    gainLoss: number | null;
+    hasRate: boolean;
+  };
 }
 
 function StatCard({
@@ -60,12 +67,13 @@ function StatCard({
   );
 }
 
-export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected }: Props) {
+export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals }: Props) {
   const { equity, fd, mf } = summary;
   const hasEquity = holdings.length > 0;
   const hasMF = mfHoldings.length > 0;
   const hasFD = fd.totalPrincipal > 0;
-  const hasAny = hasEquity || hasFD || hasMF;
+  const hasGold = goldTotals.count > 0;
+  const hasAny = hasEquity || hasFD || hasMF || hasGold;
 
   if (!hasAny) {
     return (
@@ -89,7 +97,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
   return (
     <div className="space-y-6">
-      <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           label="Total Portfolio"
           value={formatINR(summary.totalValue)}
@@ -109,6 +117,19 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           sub={hasFD ? `${fd.weightedRate.toFixed(2)}% avg rate` : "No FDs added"}
           Icon={PiggyBank}
         />
+        <Link href="/dashboard/gold" className="block hover:brightness-110 transition">
+          <StatCard
+            label="Gold"
+            value={hasGold && goldTotals.hasRate ? formatINR(goldTotals.currentValue) : hasGold ? "—" : "—"}
+            sub={hasGold
+              ? (goldTotals.gainLoss != null
+                ? `${goldTotals.count} items · ${goldTotals.gainLoss >= 0 ? "+" : ""}${formatINR(goldTotals.gainLoss)}`
+                : `${goldTotals.count} items`)
+              : "No jewellery added"}
+            positive={goldTotals.gainLoss != null ? goldTotals.gainLoss >= 0 : undefined}
+            Icon={Coins}
+          />
+        </Link>
         <StatCard
           label="Portfolio CAGR"
           value={summary.cagr !== 0 ? `${summary.cagr.toFixed(2)}%` : "—"}

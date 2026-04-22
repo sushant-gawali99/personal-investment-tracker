@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { portfolioSummary, fdAccrualTimeline, type Holding, type MFHolding, type FDRecord } from "@/lib/analytics";
 import { OverviewClient } from "./overview-client";
 import { getSessionUserId } from "@/lib/session";
+import { getTodaysRate, valuePerGram } from "@/lib/gold-rate";
 
 async function getData(userId: string | null) {
   const [fds, kiteConfig, snapshot] = await Promise.all([
@@ -46,9 +47,32 @@ async function getData(userId: string | null) {
   return { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected: !!kiteConfig?.accessToken };
 }
 
+async function getGoldTotals(userId: string | null) {
+  const [goldItems, goldRate] = await Promise.all([
+    prisma.goldItem.findMany({ where: { userId: userId ?? "", disabled: false } }),
+    getTodaysRate(),
+  ]);
+  let currentValue = 0;
+  let invested = 0;
+  for (const it of goldItems) {
+    if (goldRate) currentValue += valuePerGram(it.karat, goldRate.rate22kPerG, goldRate.rate24kPerG) * it.weightGrams;
+    if (it.purchasePrice != null) invested += it.purchasePrice;
+  }
+  return {
+    count: goldItems.length,
+    currentValue,
+    invested,
+    gainLoss: invested > 0 && goldRate ? currentValue - invested : null,
+    hasRate: !!goldRate,
+  };
+}
+
 export default async function OverviewPage() {
   const userId = await getSessionUserId();
-  const { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected } = await getData(userId);
+  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected }, goldTotals] = await Promise.all([
+    getData(userId),
+    getGoldTotals(userId),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -63,6 +87,7 @@ export default async function OverviewPage() {
         mfHoldings={mfHoldings}
         upcomingMaturities={upcomingMaturities}
         kiteConnected={kiteConnected}
+        goldTotals={goldTotals}
       />
     </div>
   );
