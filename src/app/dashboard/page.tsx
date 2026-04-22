@@ -44,7 +44,23 @@ async function getData(userId: string | null) {
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
   });
 
-  return { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected: !!kiteConfig?.accessToken };
+  const fdsByBankMap = fdRecords.reduce<Record<string, number>>((acc, fd) => {
+    acc[fd.bankName] = (acc[fd.bankName] ?? 0) + fd.principal;
+    return acc;
+  }, {});
+  const fdsByBank = Object.entries(fdsByBankMap)
+    .map(([bankName, total]) => ({ bankName, total }))
+    .sort((a, b) => b.total - a.total);
+
+  return {
+    summary,
+    timeline,
+    holdings,
+    mfHoldings,
+    upcomingMaturities,
+    kiteConnected: !!kiteConfig?.accessToken,
+    fdsByBank,
+  };
 }
 
 async function getGoldTotals(userId: string | null) {
@@ -69,10 +85,8 @@ async function getGoldTotals(userId: string | null) {
 
 export default async function OverviewPage() {
   const userId = await getSessionUserId();
-  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected }, goldTotals] = await Promise.all([
-    getData(userId),
-    getGoldTotals(userId),
-  ]);
+  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, fdsByBank }, goldTotals] =
+    await Promise.all([getData(userId), getGoldTotals(userId)]);
 
   return (
     <div className="space-y-6">
@@ -88,6 +102,8 @@ export default async function OverviewPage() {
         upcomingMaturities={upcomingMaturities}
         kiteConnected={kiteConnected}
         goldTotals={goldTotals}
+        fdsByBank={fdsByBank}
+        userEmail={userId ?? ""}
       />
     </div>
   );

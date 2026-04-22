@@ -1,12 +1,15 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, BarChart2, PiggyBank, Activity, Coins, type LucideIcon } from "lucide-react";
+import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, BarChart2, PiggyBank, Activity, Coins, Printer, Loader2, type LucideIcon } from "lucide-react";
 import { AllocationDonut } from "@/components/charts/allocation-donut";
 import { InterestAccrualChart } from "@/components/charts/interest-accrual-chart";
 import { TopHoldingsChart } from "@/components/charts/top-holdings-chart";
 import { WealthProjectionChart } from "@/components/charts/wealth-projection-chart";
 import { formatINR, formatINRCompact, formatPercent, formatDate, daysUntil } from "@/lib/format";
+import { buildPdfData } from "@/lib/pdf-data";
+import { generateOverviewPdf } from "@/lib/generate-overview-pdf";
 import { cn } from "@/lib/utils";
 import type { Holding, MFHolding, FDRecord } from "@/lib/analytics";
 
@@ -34,6 +37,8 @@ interface Props {
     gainLoss: number | null;
     hasRate: boolean;
   };
+  fdsByBank: { bankName: string; total: number }[];
+  userEmail: string;
 }
 
 function StatCard({
@@ -67,7 +72,8 @@ function StatCard({
   );
 }
 
-export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals }: Props) {
+export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals, fdsByBank, userEmail }: Props) {
+  const [printing, setPrinting] = useState(false);
   const { equity, fd, mf } = summary;
   const hasEquity = holdings.length > 0;
   const hasMF = mfHoldings.length > 0;
@@ -77,6 +83,21 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
   const allocationTotal = summary.totalValue + goldTotals.currentValue;
   const allocationPct = (v: number) => (allocationTotal > 0 ? (v / allocationTotal) * 100 : 0);
+
+  async function handlePrint() {
+    setPrinting(true);
+    try {
+      const data = buildPdfData(
+        { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank },
+        userEmail,
+      );
+      await generateOverviewPdf(data);
+    } catch (err) {
+      console.error("PDF generation failed", err);
+    } finally {
+      setPrinting(false);
+    }
+  }
 
   if (!hasAny) {
     return (
@@ -100,6 +121,17 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
   return (
     <div className="space-y-6">
+      <div className="flex justify-end">
+        <button
+          onClick={handlePrint}
+          disabled={printing}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+          {printing ? "Generating…" : "Print PDF"}
+        </button>
+      </div>
+
       <section className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           label="Total Portfolio"
