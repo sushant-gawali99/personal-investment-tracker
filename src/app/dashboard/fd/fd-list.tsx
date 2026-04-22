@@ -13,9 +13,25 @@ type FD = FDDetailData & { disabled: boolean };
 type Filter = "all" | "active" | "matured" | "disabled";
 type SortCol = "principal" | "rate" | "tenure" | "atMaturity";
 type SortDir = "asc" | "desc";
-type HeaderDef =
-  | { label: string; sortCol?: undefined; align: "left" | "right" | "center"; className?: string }
-  | { label: string; sortCol: SortCol; align: "left" | "right" | "center"; className?: string };
+type HeaderDef = {
+  label: string;
+  sortCol?: SortCol;
+  align: "left" | "right" | "center";
+  className?: string;
+};
+
+const HEADERS: HeaderDef[] = [
+  { label: "Bank",        align: "left" },
+  { label: "FD No.",      align: "left" },
+  { label: "Principal",   align: "right", sortCol: "principal" },
+  { label: "Rate",        align: "right", sortCol: "rate" },
+  { label: "Tenure",      align: "left",  sortCol: "tenure" },
+  { label: "Duration",    align: "left" },
+  { label: "At Maturity", align: "right", sortCol: "atMaturity" },
+  { label: "Status",      align: "left" },
+  { label: "",            align: "center", className: "w-[44px]" },
+];
+const COL_COUNT = HEADERS.length;
 
 export function FDList({ fds }: { fds: FD[] }) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -117,19 +133,6 @@ export function FDList({ fds }: { fds: FD[] }) {
     disabled: fds.filter((fd) => fd.disabled).length,
   };
 
-  const HEADERS: HeaderDef[] = [
-    { label: "Bank",        align: "left" },
-    { label: "FD No.",      align: "left" },
-    { label: "Principal",   align: "right", sortCol: "principal" },
-    { label: "Rate",        align: "right", sortCol: "rate" },
-    { label: "Tenure",      align: "left",  sortCol: "tenure" },
-    { label: "Duration",    align: "left" },
-    { label: "At Maturity", align: "right", sortCol: "atMaturity" },
-    { label: "Status",      align: "left" },
-    { label: "",            align: "center", className: "w-[44px]" },
-  ];
-  const COL_COUNT = HEADERS.length;
-
   return (
     <div className="space-y-5">
       <div className="flex items-center gap-3 flex-wrap">
@@ -187,22 +190,25 @@ export function FDList({ fds }: { fds: FD[] }) {
                     <th
                       key={i}
                       onClick={h.sortCol ? () => handleSort(h.sortCol!) : undefined}
+                      onKeyDown={h.sortCol ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleSort(h.sortCol!); } } : undefined}
+                      tabIndex={h.sortCol ? 0 : undefined}
+                      aria-sort={h.sortCol ? (isActive ? (sort!.dir === "asc" ? "ascending" : "descending") : "none") : undefined}
                       className={cn(
                         "text-[11px] uppercase tracking-wider font-semibold px-4 py-3 select-none",
                         h.align === "right" ? "text-right" : h.align === "center" ? "text-center" : "text-left",
                         h.className,
-                        h.sortCol ? "cursor-pointer hover:text-[#ededed] transition-colors" : "",
+                        h.sortCol && "cursor-pointer hover:text-[#ededed] transition-colors",
                         isActive ? "text-[#ededed]" : "text-[#a0a0a5]"
                       )}
                     >
                       {h.sortCol ? (
                         <span className="inline-flex items-center gap-1">
                           {h.align === "right" && (
-                            <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
+                            <SortIcon size={11} />
                           )}
                           {h.label}
                           {h.align === "left" && (
-                            <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
+                            <SortIcon size={11} />
                           )}
                         </span>
                       ) : (
