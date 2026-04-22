@@ -13,6 +13,9 @@ type FD = FDDetailData & { disabled: boolean };
 type Filter = "all" | "active" | "matured" | "disabled";
 type SortCol = "principal" | "rate" | "tenure" | "atMaturity";
 type SortDir = "asc" | "desc";
+type HeaderDef =
+  | { label: string; sortCol?: undefined; align: "left" | "right" | "center"; className?: string }
+  | { label: string; sortCol: SortCol; align: "left" | "right" | "center"; className?: string };
 
 export function FDList({ fds }: { fds: FD[] }) {
   const [filter, setFilter] = useState<Filter>("all");
@@ -114,10 +117,6 @@ export function FDList({ fds }: { fds: FD[] }) {
     disabled: fds.filter((fd) => fd.disabled).length,
   };
 
-  type HeaderDef =
-    | { label: string; sortCol?: undefined; align: "left" | "right" | "center"; className?: string }
-    | { label: string; sortCol: SortCol; align: "left" | "right" | "center"; className?: string };
-
   const HEADERS: HeaderDef[] = [
     { label: "Bank",        align: "left" },
     { label: "FD No.",      align: "left" },
@@ -202,7 +201,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                             <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
                           )}
                           {h.label}
-                          {h.align !== "right" && (
+                          {h.align === "left" && (
                             <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
                           )}
                         </span>
