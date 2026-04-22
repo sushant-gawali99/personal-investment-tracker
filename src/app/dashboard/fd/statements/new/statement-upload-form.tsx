@@ -103,7 +103,7 @@ export function StatementUploadForm({ banks }: { banks: BankGroup[] }) {
         type: t.type,
         detectedFdNumber: t.detectedFdNumber,
         fdId: t.suggestedFdId,
-        skip: t.type === "other",
+        skip: false,
       })),
     );
     setStep(2);
