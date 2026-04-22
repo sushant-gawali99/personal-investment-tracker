@@ -75,3 +75,32 @@ model KiteSnapshot {
   mfHoldingsJson String
   syncedAt       DateTime @default(now())
 }
+
+model GoldItem {
+  id             String   @id @default(cuid())
+  userId         String   @default("")
+  title          String
+  weightGrams    Float
+  karat          Int
+  photoUrl       String?
+  purchasedOn    DateTime?
+  purchasedFrom  String?
+  purchasePrice  Float?
+  notes          String?
+  disabled       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model GoldRate {
+  id           String   @id @default(cuid())
+  date         DateTime
+  source       String
+  rate24kPerG  Float
+  rate22kPerG  Float
+  fetchedAt    DateTime @default(now())
+
+  @@unique([date, source])
+}
