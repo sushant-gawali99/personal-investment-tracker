@@ -29,6 +29,24 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
   if (!fd) notFound();
   if (fd.userId && fd.userId !== "" && fd.userId !== userId) notFound();
 
+  const statementTxns = await prisma.fDStatementTxn.findMany({
+    where: { fdId: fd.id },
+    orderBy: { txnDate: "desc" },
+    select: {
+      id: true,
+      txnDate: true,
+      particulars: true,
+      debit: true,
+      credit: true,
+      type: true,
+      statementId: true,
+    },
+  });
+  const serializedTxns = statementTxns.map((t) => ({
+    ...t,
+    txnDate: t.txnDate.toISOString(),
+  }));
+
   const now = new Date();
   const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
   const activePrincipal = latest?.principal ?? fd.principal;
@@ -137,7 +155,7 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
         </div>
       </div>
 
-      <FDDetailContent fd={fd} />
+      <FDDetailContent fd={{ ...fd, txns: serializedTxns }} />
     </div>
   );
 }

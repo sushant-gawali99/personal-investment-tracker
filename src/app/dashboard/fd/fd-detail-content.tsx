@@ -4,6 +4,7 @@ import { useState } from "react";
 import { FileText, Copy, Check } from "lucide-react";
 import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { FdTxnSection, type FdTxnRow } from "./statements/fd-txn-section";
 
 export interface FDRenewalData {
   id: string;
@@ -45,6 +46,7 @@ export interface FDDetailData {
   sourcePdfUrl: string | null;
   createdAt: Date | string;
   renewals: FDRenewalData[];
+  txns: FdTxnRow[];
 }
 
 const INSTRUCTION_LABEL: Record<string, string> = {
@@ -311,6 +313,8 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
           </div>
         </div>
       )}
+
+      <FdTxnSection rows={fd.txns} />
     </div>
   );
 }
