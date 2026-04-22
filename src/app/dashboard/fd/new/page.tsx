@@ -10,7 +10,7 @@ export default async function NewFDPage({ searchParams }: { searchParams: Promis
   if (renewedFromId && userId) {
     renewedFrom = await prisma.fixedDeposit.findFirst({
       where: { id: renewedFromId, userId },
-      select: { id: true, bankName: true, fdNumber: true, principal: true, maturityDate: true, interestRate: true, tenureMonths: true, nomineeName: true, nomineeRelation: true },
+      select: { id: true, bankName: true, fdNumber: true, principal: true, maturityDate: true, interestRate: true, tenureMonths: true, tenureDays: true, tenureText: true, nomineeName: true, nomineeRelation: true },
     });
   }
 

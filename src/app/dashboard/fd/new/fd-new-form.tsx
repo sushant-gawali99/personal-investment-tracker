@@ -78,7 +78,7 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
 
 interface FDForm {
   bankName: string; fdNumber: string; accountNumber: string;
-  principal: string; interestRate: string; tenureMonths: string;
+  principal: string; interestRate: string; tenureMonths: string; tenureDays: string; tenureText: string;
   startDate: string; maturityDate: string; maturityAmount: string;
   interestType: string; compoundFreq: string;
   maturityInstruction: string; payoutFrequency: string;
@@ -88,7 +88,7 @@ interface FDForm {
 
 const empty: FDForm = {
   bankName: "", fdNumber: "", accountNumber: "",
-  principal: "", interestRate: "", tenureMonths: "",
+  principal: "", interestRate: "", tenureMonths: "", tenureDays: "", tenureText: "",
   startDate: "", maturityDate: "", maturityAmount: "",
   interestType: "compound", compoundFreq: "quarterly",
   maturityInstruction: "", payoutFrequency: "",
@@ -227,10 +227,10 @@ function PdfDropZone({
   );
 }
 
-type PriorRenewal = { startDate: string; maturityDate: string; principal: string; interestRate: string; tenureMonths: string; maturityAmount: string };
-const emptyPrior = (): PriorRenewal => ({ startDate: "", maturityDate: "", principal: "", interestRate: "", tenureMonths: "", maturityAmount: "" });
+type PriorRenewal = { startDate: string; maturityDate: string; principal: string; interestRate: string; tenureMonths: string; tenureDays: string; tenureText: string; maturityAmount: string };
+const emptyPrior = (): PriorRenewal => ({ startDate: "", maturityDate: "", principal: "", interestRate: "", tenureMonths: "", tenureDays: "", tenureText: "", maturityAmount: "" });
 
-type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; nomineeName: string | null; nomineeRelation: string | null } | null;
+type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; tenureDays: number; tenureText: string | null; nomineeName: string | null; nomineeRelation: string | null } | null;
 
 type SectionId = "receipt" | "prior" | "details" | "renewal" | "notes";
 type SectionStatus = "empty" | "partial" | "complete" | "error";
@@ -331,6 +331,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     startDate: new Date(renewedFrom.maturityDate).toISOString().split("T")[0],
     interestRate: renewedFrom.interestRate.toString(),
     tenureMonths: renewedFrom.tenureMonths.toString(),
+    tenureDays: renewedFrom.tenureDays.toString(),
+    tenureText: renewedFrom.tenureText ?? "",
     nomineeName: renewedFrom.nomineeName ?? "",
     nomineeRelation: renewedFrom.nomineeRelation ?? "",
   } : empty);
@@ -364,18 +366,19 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       form.bankName,
       form.principal,
       form.interestRate,
-      form.tenureMonths,
       form.startDate,
       form.maturityDate,
       form.interestType,
     ];
-    const detailsFilled = detailsRequired.filter((v) => v && v.trim() !== "").length;
+    const hasTenure = (form.tenureMonths && form.tenureMonths.trim() !== "" && parseInt(form.tenureMonths) > 0)
+      || (form.tenureDays && form.tenureDays.trim() !== "" && parseInt(form.tenureDays) > 0);
+    const detailsFilled = detailsRequired.filter((v) => v && v.trim() !== "").length + (hasTenure ? 1 : 0);
 
     const priorAllComplete = priorRenewals.every((r) =>
-      r.startDate && r.maturityDate && r.principal && r.interestRate && r.tenureMonths
+      r.startDate && r.maturityDate && r.principal && r.interestRate && (r.tenureMonths || r.tenureDays)
     );
     const priorAnyFilled = priorRenewals.some((r) =>
-      r.startDate || r.maturityDate || r.principal || r.interestRate || r.tenureMonths
+      r.startDate || r.maturityDate || r.principal || r.interestRate || r.tenureMonths || r.tenureDays
     );
 
     const receiptHasFile = !!frontFile || !!pdfFile;
@@ -390,7 +393,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       prior: statusFor("prior", priorRenewals.length === 0 ? "empty" : priorAllComplete ? "complete" : priorAnyFilled ? "partial" : "empty"),
       details: statusFor(
         "details",
-        detailsFilled === detailsRequired.length ? "complete" : detailsFilled === 0 ? "empty" : "partial"
+        detailsFilled === detailsRequired.length + 1 ? "complete" : detailsFilled === 0 ? "empty" : "partial"
       ),
       renewal: statusFor("renewal", renewalAnyFilled ? "complete" : "empty"),
       notes: statusFor("notes", notesAnyFilled ? "complete" : "empty"),
@@ -480,6 +483,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         principal: e.principal?.toString() ?? "",
         interestRate: e.interestRate?.toString() ?? "",
         tenureMonths: e.tenureMonths?.toString() ?? "",
+        tenureDays: e.tenureDays?.toString() ?? "",
+        tenureText: e.tenureText ?? "",
         startDate: toDateInput(e.startDate),
         maturityDate: toDateInput(e.maturityDate),
         maturityAmount: e.maturityAmount?.toString() ?? "",
@@ -505,6 +510,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               principal: p.principal != null ? p.principal.toString() : "",
               interestRate: p.interestRate != null ? p.interestRate.toString() : "",
               tenureMonths: p.tenureMonths != null ? p.tenureMonths.toString() : "",
+              tenureDays: p.tenureDays != null ? p.tenureDays.toString() : "",
+              tenureText: p.tenureText ?? "",
               maturityAmount: p.maturityAmount != null ? p.maturityAmount.toString() : "",
             };
           })
@@ -532,13 +539,17 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
 
     const missing = new Set<SectionId>();
 
+    const tenureMonthsNum = parseInt(form.tenureMonths || "0") || 0;
+    const tenureDaysNum = parseInt(form.tenureDays || "0") || 0;
     const detailsMissing =
       !form.bankName || !form.principal || !form.interestRate ||
-      !form.tenureMonths || !form.startDate || !form.maturityDate || !form.interestType;
+      (tenureMonthsNum <= 0 && tenureDaysNum <= 0) ||
+      !form.startDate || !form.maturityDate || !form.interestType;
     if (detailsMissing) missing.add("details");
 
     const priorMissing = priorRenewals.some(
-      (r) => !r.startDate || !r.maturityDate || !r.principal || !r.interestRate || !r.tenureMonths
+      (r) => !r.startDate || !r.maturityDate || !r.principal || !r.interestRate ||
+        ((parseInt(r.tenureMonths || "0") || 0) <= 0 && (parseInt(r.tenureDays || "0") || 0) <= 0)
     );
     if (priorRenewals.length > 0 && priorMissing) missing.add("prior");
 
@@ -587,7 +598,9 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           // otherwise stores AI-extracted data as-is
           principal: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].principal) : parseFloat(form.principal),
           interestRate: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].interestRate) : parseFloat(form.interestRate),
-          tenureMonths: priorRenewals.length > 0 ? parseInt(priorRenewals[0].tenureMonths) : parseInt(form.tenureMonths),
+          tenureMonths: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureMonths) || 0) : (parseInt(form.tenureMonths) || 0),
+          tenureDays: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureDays) || 0) : (parseInt(form.tenureDays) || 0),
+          tenureText: priorRenewals.length > 0 ? (priorRenewals[0].tenureText || null) : (form.tenureText || null),
           startDate: priorRenewals.length > 0 ? priorRenewals[0].startDate : form.startDate,
           maturityDate: priorRenewals.length > 0 ? priorRenewals[0].maturityDate : form.maturityDate,
           maturityAmount: priorRenewals.length > 0
@@ -605,7 +618,9 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
                 maturityDate: r.maturityDate,
                 principal: parseFloat(r.principal),
                 interestRate: parseFloat(r.interestRate),
-                tenureMonths: parseInt(r.tenureMonths),
+                tenureMonths: parseInt(r.tenureMonths) || 0,
+                tenureDays: parseInt(r.tenureDays) || 0,
+                tenureText: r.tenureText || null,
                 maturityAmount: r.maturityAmount ? parseFloat(r.maturityAmount) : null,
               })),
               {
@@ -614,7 +629,9 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
                 maturityDate: form.maturityDate,
                 principal: parseFloat(form.principal),
                 interestRate: parseFloat(form.interestRate),
-                tenureMonths: parseInt(form.tenureMonths),
+                tenureMonths: parseInt(form.tenureMonths) || 0,
+                tenureDays: parseInt(form.tenureDays) || 0,
+                tenureText: form.tenureText || null,
                 maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
                 maturityInstruction: form.maturityInstruction || null,
                 payoutFrequency: form.payoutFrequency || null,
@@ -841,7 +858,6 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             {[
               { label: "Principal (₹)", key: "principal" },
               { label: "Interest Rate (% p.a.)", key: "interestRate" },
-              { label: "Tenure (months)", key: "tenureMonths" },
               { label: "Maturity Amount (₹)", key: "maturityAmount" },
             ].map(({ label, key }) => (
               <div key={key}>
@@ -856,6 +872,28 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
                 />
               </div>
             ))}
+            <div>
+              <label className="ab-label">Tenure (months)</label>
+              <input
+                type="number"
+                min="0"
+                className="ab-input mono"
+                value={r.tenureMonths}
+                onChange={(e) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, tenureMonths: e.target.value } : p))}
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="ab-label">Tenure (days)</label>
+              <input
+                type="number"
+                min="0"
+                className="ab-input mono"
+                value={r.tenureDays}
+                onChange={(e) => setPriorRenewals((prev) => prev.map((p, j) => j === i ? { ...p, tenureDays: e.target.value } : p))}
+                placeholder="0"
+              />
+            </div>
           </div>
             </section>
           ))}
@@ -889,7 +927,27 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
 
           <div>
             <label htmlFor="tenureMonths" className="ab-label">Tenure (months) *</label>
-            <input id="tenureMonths" type="number" min="1" className="ab-input mono" value={form.tenureMonths} onChange={(e) => set("tenureMonths", e.target.value)} placeholder="24" required />
+            <input
+              id="tenureMonths"
+              type="number"
+              min="0"
+              className="ab-input mono"
+              value={form.tenureMonths}
+              onChange={(e) => set("tenureMonths", e.target.value)}
+              placeholder="24"
+            />
+          </div>
+          <div>
+            <label htmlFor="tenureDays" className="ab-label">Tenure (days) *</label>
+            <input
+              id="tenureDays"
+              type="number"
+              min="0"
+              className="ab-input mono"
+              value={form.tenureDays}
+              onChange={(e) => set("tenureDays", e.target.value)}
+              placeholder="0"
+            />
           </div>
 
           <div>
