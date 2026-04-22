@@ -16,6 +16,8 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
   "principal": number,
   "interestRate": number,
   "tenureMonths": number,
+  "tenureDays": number,
+  "tenureText": string | null,
   "startDate": "YYYY-MM-DD",
   "maturityDate": "YYYY-MM-DD",
   "maturityAmount": number | null,
@@ -26,12 +28,14 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
   "nomineeName": string | null,
   "nomineeRelation": string | null,
   "renewalNumber": number | null,
-  "priorPeriods": Array<{ "startDate": "YYYY-MM-DD" | null, "maturityDate": "YYYY-MM-DD" | null, "principal": number | null, "interestRate": number | null, "tenureMonths": number | null, "maturityAmount": number | null }> | null
+  "priorPeriods": Array<{ "startDate": "YYYY-MM-DD" | null, "maturityDate": "YYYY-MM-DD" | null, "principal": number | null, "interestRate": number | null, "tenureMonths": number | null, "tenureDays": number | null, "tenureText": string | null, "maturityAmount": number | null }> | null
 }
 
 Rules:
 - interestRate must be per annum percentage (e.g. 7.5 not 0.075)
-- tenureMonths must be an integer (convert years to months if needed)
+- tenureMonths must be an integer: the whole-months portion of the tenure (convert "1 year" → 12, "1.5 years" → 18; if the receipt says "45 days" only, tenureMonths is 0)
+- tenureDays must be an integer: the leftover days beyond whole months (if the receipt says "12 months 37 days", tenureDays is 37; if it says "45 days", tenureDays is 45; if it says only "6 months", tenureDays is 0)
+- tenureText is the verbatim tenure label as printed on the receipt (e.g., "12 months 37 days", "1 year 2 months", "45 days"). Preserve wording, units, and spacing exactly. If no tenure label is legible, set tenureText to null.
 - dates must be in YYYY-MM-DD format
 - If compounding frequency is not mentioned, default to "quarterly" for compound type
 - maturityInstruction: "renew_principal_interest" = auto-renew with interest; "renew_principal" = auto-renew principal, payout interest; "payout" = credit to savings on maturity
