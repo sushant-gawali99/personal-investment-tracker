@@ -2,7 +2,6 @@ import { Document, Page, View, Text, StyleSheet } from '@react-pdf/renderer'
 import { AllocationDonut } from './charts/AllocationDonut'
 import { FdByBankBars } from './charts/FdByBankBars'
 import { TopHoldingsBars } from './charts/TopHoldingsBars'
-import { FdAccrualArea } from './charts/FdAccrualArea'
 import { fmtINRPdf } from '@/lib/pdf-data'
 import type { PdfData } from '@/lib/pdf-data'
 
@@ -155,21 +154,13 @@ export function OverviewPdf({ data }: Props) {
           </View>
         )}
 
-        {/* Top Holdings + FD Accrual */}
-        <View style={styles.twoCol}>
-          {data.holdings.length > 0 && (
-            <View style={[styles.section, { flex: 1 }]}>
-              <Text style={styles.sectionLabel}>Top Holdings</Text>
-              <TopHoldingsBars data={data} />
-            </View>
-          )}
-          {data.timeline.length > 0 && (
-            <View style={[styles.section, { flex: 1 }]}>
-              <Text style={styles.sectionLabel}>FD Interest Accrual (24 mo)</Text>
-              <FdAccrualArea data={data} />
-            </View>
-          )}
-        </View>
+        {/* Top Holdings */}
+        {data.holdings.length > 0 && (
+          <View style={[styles.section, { marginBottom: 14 }]}>
+            <Text style={styles.sectionLabel}>Top Holdings</Text>
+            <TopHoldingsBars data={data} />
+          </View>
+        )}
 
         {/* Footer */}
         <View style={styles.footer}>

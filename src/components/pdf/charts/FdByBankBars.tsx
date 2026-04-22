@@ -1,4 +1,4 @@
-import { Svg, Rect, Text, G } from '@react-pdf/renderer'
+import { View, Text } from '@react-pdf/renderer'
 import { fmtINRPdf } from '@/lib/pdf-data'
 import type { PdfData } from '@/lib/pdf-data'
 
@@ -6,39 +6,40 @@ interface Props {
   data: PdfData
 }
 
+function truncate(s: string, max: number) {
+  return s.length > max ? s.slice(0, max - 1) + '\u2026' : s
+}
+
 export function FdByBankBars({ data }: Props) {
   const { fdsByBank } = data
   if (fdsByBank.length === 0) return null
 
-  const MAX_BAR_W = 220
-  const ROW_H = 14
-  const GAP = 6
   const maxTotal = Math.max(...fdsByBank.map(b => b.total))
   const totalFd = fdsByBank.reduce((s, b) => s + b.total, 0)
-  const svgH = fdsByBank.length * (ROW_H + GAP)
 
   return (
-    <Svg width="460" height={svgH} viewBox={`0 0 460 ${svgH}`}>
-      {fdsByBank.map((bank, i) => {
-        const barW = (bank.total / maxTotal) * MAX_BAR_W
+    <View>
+      {fdsByBank.map((bank) => {
         const pct = ((bank.total / totalFd) * 100).toFixed(0)
-        const y = i * (ROW_H + GAP)
+        const barPct = (bank.total / maxTotal) * 100
         return (
-          <G key={bank.bankName}>
-            <Text x="0" y={y + ROW_H - 3} style={{ fontSize: 8, fill: '#444' }}>
-              {bank.bankName}
+          <View key={bank.bankName} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
+            <Text style={{ fontSize: 8, color: '#444', width: 110 }}>
+              {truncate(bank.bankName, 22)}
             </Text>
-            <Rect x="80" y={y + 2} width={MAX_BAR_W} height={ROW_H - 4} fill="#e8e8ea" rx="2" />
-            <Rect x="80" y={y + 2} width={barW} height={ROW_H - 4} fill="#3b82f6" rx="2" />
-            <Text x="310" y={y + ROW_H - 3} style={{ fontSize: 8, fill: '#333', fontWeight: 'bold' }}>
+            <View style={{ flex: 1, height: 8, backgroundColor: '#e8e8ea', borderRadius: 2, marginLeft: 6, marginRight: 8 }}>
+              {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+              <View style={{ width: `${barPct}%` as any, height: 8, backgroundColor: '#3b82f6', borderRadius: 2 }} />
+            </View>
+            <Text style={{ fontSize: 8, color: '#333', fontFamily: 'Helvetica-Bold', width: 72 }}>
               {fmtINRPdf(bank.total)}
             </Text>
-            <Text x="430" y={y + ROW_H - 3} style={{ fontSize: 8, fill: '#888' }}>
+            <Text style={{ fontSize: 8, color: '#888', width: 28, textAlign: 'right' }}>
               {pct}%
             </Text>
-          </G>
+          </View>
         )
       })}
-    </Svg>
+    </View>
   )
 }
