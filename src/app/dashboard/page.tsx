@@ -44,8 +44,10 @@ async function getData(userId: string | null) {
     return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
   });
 
+  const normBank = (s: string) => s.split(/\s+/).slice(0, 2).join(' ')
   const fdsByBankMap = fdRecords.reduce<Record<string, number>>((acc, fd) => {
-    acc[fd.bankName] = (acc[fd.bankName] ?? 0) + fd.principal;
+    const key = normBank(fd.bankName)
+    acc[key] = (acc[key] ?? 0) + fd.principal;
     return acc;
   }, {});
   const fdsByBank = Object.entries(fdsByBankMap)
