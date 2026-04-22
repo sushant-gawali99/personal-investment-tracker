@@ -4,6 +4,7 @@ import { requireUserId } from "@/lib/session";
 import { parseStatementPdf } from "@/lib/fd-statement/parse-pdf";
 import { matchFd } from "@/lib/fd-statement/match";
 import type { MatchCandidate } from "@/lib/fd-statement/types";
+import { normalizeBankName } from "@/lib/fd-bank";
 
 export async function POST(req: NextRequest) {
   const result = await requireUserId();
@@ -24,10 +25,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Could not parse statement; please check format" }, { status: 422 });
   }
 
-  const fds = await prisma.fixedDeposit.findMany({
-    where: { userId, bankName },
-    select: { id: true, fdNumber: true, accountNumber: true, maturityDate: true, principal: true },
+  const bankKey = normalizeBankName(bankName);
+  const allFds = await prisma.fixedDeposit.findMany({
+    where: { userId },
+    select: { id: true, bankName: true, fdNumber: true, accountNumber: true, maturityDate: true, principal: true },
   });
+  const fds = allFds.filter((f) => normalizeBankName(f.bankName) === bankKey);
   const candidates: MatchCandidate[] = fds.map((f) => ({
     fdId: f.id,
     fdNumber: f.fdNumber,

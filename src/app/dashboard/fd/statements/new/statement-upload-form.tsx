@@ -6,6 +6,7 @@ import {
   TrendingUp, CheckCircle, XCircle, ArrowDownLeft, ArrowUpRight, Minus, Circle,
 } from "lucide-react";
 import type { TxnType, MatchCandidate } from "@/lib/fd-statement/types";
+import type { BankGroup } from "@/lib/fd-bank";
 import { formatINR, formatDate } from "@/lib/format";
 
 type ReviewTxn = {
@@ -45,10 +46,12 @@ function formatBytes(n: number): string {
   return `${(n / (1024 * 1024)).toFixed(2)} MB`;
 }
 
-export function StatementUploadForm({ banks }: { banks: string[] }) {
+export function StatementUploadForm({ banks }: { banks: BankGroup[] }) {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
-  const [bank, setBank] = useState(banks[0] ?? "");
+  const [bankKey, setBankKey] = useState(banks[0]?.key ?? "");
+  const selectedBank = banks.find((b) => b.key === bankKey);
+  const bank = selectedBank?.label ?? "";
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -146,14 +149,18 @@ export function StatementUploadForm({ banks }: { banks: string[] }) {
             </label>
             <div className="relative">
               <select
-                value={bank}
-                onChange={(e) => setBank(e.target.value)}
+                value={bankKey}
+                onChange={(e) => setBankKey(e.target.value)}
                 disabled={banks.length === 0}
                 className="block w-full bg-[#18181c] border border-[#2a2a2e] rounded-lg px-4 py-2.5 text-[14px] text-[#ededed] appearance-none pr-10 focus:outline-none focus:border-[#ff385c] focus:ring-1 focus:ring-[#ff385c]/30 transition-colors"
               >
                 {banks.length === 0
                   ? <option>No banks found — add an FD first</option>
-                  : banks.map((b) => <option key={b}>{b}</option>)}
+                  : banks.map((b) => (
+                      <option key={b.key} value={b.key}>
+                        {b.label} {b.count > 1 ? `(${b.count} FDs)` : ""}
+                      </option>
+                    ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#6e6e73]">
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
