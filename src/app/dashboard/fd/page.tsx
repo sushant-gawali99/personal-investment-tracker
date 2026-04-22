@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, Upload } from "lucide-react";
+import { Plus, Upload, FileText } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { FDList } from "./fd-list";
 import { getSessionUserId } from "@/lib/session";
@@ -20,6 +20,10 @@ export default async function FDPage() {
           <p className="text-[14px] text-[#a0a0a5] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
         <div className="flex items-center gap-2">
+          <Link href="/dashboard/fd/statements" className="ab-btn ab-btn-ghost">
+            <FileText size={15} />
+            Statements
+          </Link>
           <Link
             href="/dashboard/fd/bulk"
             className="ab-btn ab-btn-ghost relative"
@@ -44,7 +48,7 @@ export default async function FDPage() {
         </div>
       </div>
 
-      <FDList fds={fds} />
+      <FDList fds={fds.map((fd) => ({ ...fd, txns: [] }))} />
     </div>
   );
 }
