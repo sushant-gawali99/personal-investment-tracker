@@ -16,6 +16,8 @@ model FixedDeposit {
   principal      Float
   interestRate   Float
   tenureMonths   Int
+  tenureDays     Int      @default(0)
+  tenureText     String?
   startDate      DateTime
   maturityDate   DateTime
   maturityAmount Float?
@@ -47,6 +49,8 @@ model FDRenewal {
   principal      Float
   interestRate   Float
   tenureMonths   Int
+  tenureDays     Int      @default(0)
+  tenureText     String?
   maturityAmount Float?
   maturityInstruction String?
   payoutFrequency     String?
