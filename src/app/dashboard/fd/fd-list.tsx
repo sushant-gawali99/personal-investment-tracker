@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, Fragment } from "react";
-import { AlertTriangle, CheckCircle2, ChevronRight, RefreshCw, ArrowUpRight } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil } from "@/lib/format";
 import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
@@ -114,7 +114,21 @@ export function FDList({ fds }: { fds: FD[] }) {
     disabled: fds.filter((fd) => fd.disabled).length,
   };
 
-  const HEADERS = ["Bank", "FD No.", "Principal", "Rate", "Tenure", "Duration", "At Maturity", "Status", ""];
+  type HeaderDef =
+    | { label: string; sortCol?: undefined; align: "left" | "right" | "center"; className?: string }
+    | { label: string; sortCol: SortCol; align: "left" | "right" | "center"; className?: string };
+
+  const HEADERS: HeaderDef[] = [
+    { label: "Bank",        align: "left" },
+    { label: "FD No.",      align: "left" },
+    { label: "Principal",   align: "right", sortCol: "principal" },
+    { label: "Rate",        align: "right", sortCol: "rate" },
+    { label: "Tenure",      align: "left",  sortCol: "tenure" },
+    { label: "Duration",    align: "left" },
+    { label: "At Maturity", align: "right", sortCol: "atMaturity" },
+    { label: "Status",      align: "left" },
+    { label: "",            align: "center", className: "w-[44px]" },
+  ];
   const COL_COUNT = HEADERS.length;
 
   return (
@@ -165,17 +179,39 @@ export function FDList({ fds }: { fds: FD[] }) {
           <table className="w-full text-[14px]">
             <thead>
               <tr className="bg-[#1c1c20]">
-                {HEADERS.map((h, i) => (
-                  <th
-                    key={i}
-                    className={cn(
-                      "text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold px-4 py-3",
-                      i === 2 || i === 3 || i === 6 ? "text-right" : i === 8 ? "text-center w-[44px]" : "text-left"
-                    )}
-                  >
-                    {h}
-                  </th>
-                ))}
+                {HEADERS.map((h, i) => {
+                  const isActive = h.sortCol !== undefined && sort?.col === h.sortCol;
+                  const SortIcon = isActive
+                    ? sort!.dir === "asc" ? ChevronUp : ChevronDown
+                    : ChevronsUpDown;
+                  return (
+                    <th
+                      key={i}
+                      onClick={h.sortCol ? () => handleSort(h.sortCol!) : undefined}
+                      className={cn(
+                        "text-[11px] uppercase tracking-wider font-semibold px-4 py-3 select-none",
+                        h.align === "right" ? "text-right" : h.align === "center" ? "text-center" : "text-left",
+                        h.className,
+                        h.sortCol ? "cursor-pointer hover:text-[#ededed] transition-colors" : "",
+                        isActive ? "text-[#ededed]" : "text-[#a0a0a5]"
+                      )}
+                    >
+                      {h.sortCol ? (
+                        <span className="inline-flex items-center gap-1">
+                          {h.align === "right" && (
+                            <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
+                          )}
+                          {h.label}
+                          {h.align !== "right" && (
+                            <SortIcon size={11} className={isActive ? "text-[#ededed]" : "text-[#6e6e73]"} />
+                          )}
+                        </span>
+                      ) : (
+                        h.label
+                      )}
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             <tbody className="divide-y divide-[#2a2a2e]">
