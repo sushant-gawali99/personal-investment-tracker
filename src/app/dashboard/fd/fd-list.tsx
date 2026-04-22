@@ -257,26 +257,26 @@ case "atMaturity": return c.maturityAmount ?? c.principal;
                         isExpanded && "bg-[#17171a]"
                       )}
                     >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                            <span className="font-bold text-[11px] text-[#ff385c]">
+                      <td className="px-4 py-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
+                            <span className="font-bold text-[10px] text-[#ff385c]">
                               {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
                             </span>
                           </div>
-                          <span className="font-semibold text-[#ededed] text-[14px]">{fd.bankName}</span>
+                          <span className="font-semibold text-[#ededed] text-[13px]">{fd.bankName}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{formatINR(current.principal)}</td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{current.interestRate}%</td>
-                      <td className="px-4 py-3 text-[#a0a0a5]">{formatTenure(current)}</td>
-                      <td className="px-4 py-3 text-[#a0a0a5] text-[13px] whitespace-nowrap">
+                      <td className="px-4 py-2 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
+                      <td className="px-4 py-2 text-right mono text-[#ededed] font-medium text-[13px]">{formatINR(current.principal)}</td>
+                      <td className="px-4 py-2 text-right mono text-[#ededed] font-medium text-[13px]">{current.interestRate}%</td>
+                      <td className="px-4 py-2 text-[13px] text-[#a0a0a5]">{formatTenure(current)}</td>
+                      <td className="px-4 py-2 text-[#a0a0a5] text-[12px] whitespace-nowrap">
                         {formatDate(current.startDate)} <span className="text-[#6e6e73]">→</span> {formatDate(current.maturityDate)}
                       </td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed] font-semibold">{formatINR(displayMaturityValue)}</td>
-                      <td className="px-4 py-3">{statusBadge}</td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-4 py-2 text-right mono text-[#ededed] font-semibold text-[13px]">{formatINR(displayMaturityValue)}</td>
+                      <td className="px-4 py-2">{statusBadge}</td>
+                      <td className="px-4 py-2 text-center">
                         <button
                           type="button"
                           onClick={(e) => { e.stopPropagation(); toggleExpanded(fd.id); }}
