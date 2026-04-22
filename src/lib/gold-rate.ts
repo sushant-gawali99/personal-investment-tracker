@@ -1,15 +1,15 @@
 import * as cheerio from "cheerio";
 import { prisma } from "@/lib/prisma";
 
-const SOURCE_SCRAPE = "goodreturns-pune";
+const SOURCE_SCRAPE = "ibja";
 const SOURCE_MANUAL = "manual";
-const URL = "https://www.goodreturns.in/gold-rates/pune.html";
+const URL = "https://ibjarates.com/";
 
 export type GoldRatePayload = {
   date: string;              // ISO date (yyyy-mm-dd UTC) of the rate row used
   rate22kPerG: number;
   rate24kPerG: number;
-  source: string;            // "goodreturns-pune" | "manual"
+  source: string;            // "ibja" | "manual"
   staleAsOf?: string;        // present when today's rate was unavailable
 };
 
@@ -29,35 +29,40 @@ function toPayload(row: { date: Date; rate22kPerG: number; rate24kPerG: number; 
   };
 }
 
-// Extract the first INR-per-gram value near a label such as "22 Carat" or "24 Carat".
-// goodreturns.in typically renders a table with "Today" 1g prices per karat.
+// IBJA publishes a table of daily reference rates. Each row has cells labelled
+// with `data-label="Gold 999"` (24K, per 10g) and `data-label="Gold 916"` (22K, per 10g).
+// We take the first (most recent) row.
 function parseRates(html: string): { rate22kPerG: number; rate24kPerG: number } {
   const $ = cheerio.load(html);
-  const text = $("body").text().replace(/\s+/g, " ");
 
-  function findGramRate(karatLabel: "22" | "24"): number {
-    // Match "22 Carat Gold ... 1 gram ... ₹6,820" or similar variants.
-    const re = new RegExp(`${karatLabel}\\s*Carat[^₹]*?₹\\s*([0-9,]+)`, "i");
-    const m = text.match(re);
-    if (!m) throw new Error(`Could not locate ${karatLabel}K rate on page`);
-    return Number(m[1].replace(/,/g, ""));
+  function firstCell(label: string): number {
+    const el = $(`td[data-label="${label}"]`).first();
+    if (!el.length) throw new Error(`Could not locate ${label} cell on IBJA page`);
+    const raw = el.text().replace(/[^0-9.]/g, "");
+    const n = Number(raw);
+    if (!(n > 0)) throw new Error(`Invalid ${label} value: ${el.text()}`);
+    return n;
   }
 
-  const rate22kPerG = findGramRate("22");
-  const rate24kPerG = findGramRate("24");
-  if (!rate22kPerG || !rate24kPerG) throw new Error("Parsed gold rates are invalid");
+  const per10g24 = firstCell("Gold 999");
+  const per10g22 = firstCell("Gold 916");
+  // IBJA quotes per 10 grams in INR — divide by 10 for per-gram rate.
+  const rate24kPerG = per10g24 / 10;
+  const rate22kPerG = per10g22 / 10;
+  if (!rate22kPerG || !rate24kPerG) throw new Error("Parsed IBJA gold rates are invalid");
   return { rate22kPerG, rate24kPerG };
 }
 
-export async function scrapeGoodreturnsPune(): Promise<{ rate22kPerG: number; rate24kPerG: number }> {
+export async function scrapeIbja(): Promise<{ rate22kPerG: number; rate24kPerG: number }> {
   const res = await fetch(URL, {
     headers: {
-      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Safari/605.1.15",
-      "Accept": "text/html,application/xhtml+xml",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
     },
     cache: "no-store",
   });
-  if (!res.ok) throw new Error(`goodreturns responded ${res.status}`);
+  if (!res.ok) throw new Error(`IBJA responded ${res.status}`);
   const html = await res.text();
   return parseRates(html);
 }
@@ -75,7 +80,7 @@ export async function getTodaysRate(): Promise<GoldRatePayload | null> {
   if (scraped) return toPayload(scraped);
 
   try {
-    const { rate22kPerG, rate24kPerG } = await scrapeGoodreturnsPune();
+    const { rate22kPerG, rate24kPerG } = await scrapeIbja();
     const row = await prisma.goldRate.upsert({
       where: { date_source: { date: today, source: SOURCE_SCRAPE } },
       create: { date: today, source: SOURCE_SCRAPE, rate22kPerG, rate24kPerG },
@@ -90,7 +95,7 @@ export async function getTodaysRate(): Promise<GoldRatePayload | null> {
 
 export async function refreshTodaysRate(): Promise<GoldRatePayload> {
   const today = todayUtcMidnight();
-  const { rate22kPerG, rate24kPerG } = await scrapeGoodreturnsPune();
+  const { rate22kPerG, rate24kPerG } = await scrapeIbja();
   const row = await prisma.goldRate.upsert({
     where: { date_source: { date: today, source: SOURCE_SCRAPE } },
     create: { date: today, source: SOURCE_SCRAPE, rate22kPerG, rate24kPerG },
