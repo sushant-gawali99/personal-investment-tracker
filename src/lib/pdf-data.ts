@@ -51,8 +51,7 @@ export function arcPath(
   const ex = cx + r * Math.cos(toRad(end))
   const ey = cy + r * Math.sin(toRad(end))
   const large = end - startDeg > 180 ? 1 : 0
-  const rotation = endDeg - startDeg >= 360 ? f(end) : '0'
-  return `M ${cx} ${cy} L ${f(sx)} ${f(sy)} A ${r} ${r} ${rotation} ${large} 1 ${f(ex)} ${f(ey)} Z`
+  return `M ${cx} ${cy} L ${f(sx)} ${f(sy)} A ${r} ${r} 0 ${large} 1 ${f(ex)} ${f(ey)} Z`
 }
 
 // ── Data builder ──────────────────────────────────────────────────────────────

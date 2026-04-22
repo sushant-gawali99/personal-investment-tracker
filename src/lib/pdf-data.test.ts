@@ -23,9 +23,12 @@ describe('arcPath', () => {
     expect(path).toMatch(/^M 50 50 L/)
     expect(path).toContain(' A 40 40 0 ')
   })
-  it('caps full-circle to 359.99 degrees', () => {
+  it('caps full-circle to avoid degenerate arc', () => {
     const path = arcPath(50, 50, 40, 0, 360)
-    expect(path).toContain('359.99')
+    // x-axis-rotation must be 0 (3rd field after 'A rx ry')
+    expect(path).toContain(' A 40 40 0 ')
+    // large-arc-flag must be 1 (arc > 180 degrees)
+    expect(path).toMatch(/ A 40 40 0 1 1 /)
   })
 })
 
