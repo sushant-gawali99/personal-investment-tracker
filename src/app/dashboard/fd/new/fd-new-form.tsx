@@ -640,7 +640,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   return (
-    <form noValidate onSubmit={handleSubmit} className="max-w-6xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
+    <form noValidate onSubmit={handleSubmit} className="max-w-7xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
       <FormStepper
         items={[
           { id: "receipt", label: "Receipt", status: sectionStatus.receipt },
@@ -822,7 +822,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             </span>
             <p className="text-[13px] text-[#a0a0a5]">Fill in the details for this period</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
               <div key={key}>
                 <label className="ab-label">
@@ -871,8 +871,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">FD Details</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="sm:col-span-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="sm:col-span-2 lg:col-span-3">
             <label htmlFor="bankName" className="ab-label">Bank Name *</label>
             <input id="bankName" className="ab-input" value={form.bankName} onChange={(e) => set("bankName", e.target.value)} placeholder="State Bank of India" required />
           </div>
@@ -943,7 +943,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</p>
           <p className="text-[13px] text-[#a0a0a5] mt-0.5">Usually printed on the back of the FD receipt.</p>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
             <label className="ab-label">Maturity Instruction</label>
             <select className="ab-input" value={form.maturityInstruction} onChange={(e) => set("maturityInstruction", e.target.value)}>
@@ -1006,7 +1006,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       </div>
 
       <div className="fixed bottom-0 inset-x-0 z-30 bg-[#0e0e10]/95 backdrop-blur border-t border-[#2a2a2e]">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-end gap-3">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end gap-3">
           <button
             type="button"
             onClick={() => router.back()}
