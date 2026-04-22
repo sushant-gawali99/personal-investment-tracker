@@ -65,16 +65,21 @@ export function FDList({ fds }: { fds: FD[] }) {
     return true;
   });
 
-  const sorted = sort === null ? filtered : [...filtered].sort((a, b) => {
-    const ca = resolveCurrent(a);
-    const cb = resolveCurrent(b);
-    let va: number, vb: number;
-    if (sort.col === "principal") { va = ca.principal; vb = cb.principal; }
-    else if (sort.col === "rate") { va = ca.interestRate; vb = cb.interestRate; }
-    else if (sort.col === "tenure") { va = ca.tenureMonths; vb = cb.tenureMonths; }
-    else { va = ca.maturityAmount ?? ca.principal; vb = cb.maturityAmount ?? cb.principal; }
-    return sort.dir === "asc" ? va - vb : vb - va;
-  });
+  const sorted = sort === null ? filtered : (() => {
+    const key = (fd: FD): number => {
+      const c = resolveCurrent(fd);
+      switch (sort.col) {
+        case "principal":  return c.principal;
+        case "rate":       return c.interestRate;
+        case "tenure":     return c.tenureMonths;
+        case "atMaturity": return c.maturityAmount ?? c.principal;
+      }
+    };
+    return [...filtered].sort((a, b) => {
+      const d = key(a) - key(b);
+      return sort.dir === "asc" ? d : -d;
+    });
+  })();
 
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {
