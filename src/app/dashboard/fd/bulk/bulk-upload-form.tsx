@@ -1,8 +1,9 @@
 "use client";
 
 import { useReducer, useRef, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Loader2, Trash2 } from "lucide-react";
+import { CheckCircle2, Loader2, Trash2 } from "lucide-react";
 import { bulkReducer, initialState, mergedFields } from "./bulk-state";
 import type { BulkRow, EditableFields, FdExtracted } from "./bulk-state";
 import { BulkDropZone, MAX_FILES, MAX_FILE_SIZE, MAX_ZIP_SIZE } from "./bulk-drop-zone";
@@ -348,6 +349,39 @@ export function BulkUploadForm() {
           onFiles={handleFiles}
           disabled={inFlight}
         />
+      )}
+
+      {counts.saved > 0 && !inFlight && (
+        <div
+          className="ab-card-flat flex items-center justify-between flex-wrap gap-3 px-4 py-3"
+          style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
+        >
+          <div className="flex items-center gap-2 text-[13px]">
+            <CheckCircle2 size={16} />
+            <span className="font-semibold">
+              {counts.saved} saved
+            </span>
+            {counts.failedSave > 0 && (
+              <span className="text-[#ff7a6e]">· {counts.failedSave} failed to save</span>
+            )}
+            {counts.failedExtract > 0 && (
+              <span className="text-[#ff7a6e]">· {counts.failedExtract} failed to extract</span>
+            )}
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleReset}
+              className="ab-btn ab-btn-ghost"
+              style={{ fontSize: "13px" }}
+            >
+              Upload more
+            </button>
+            <Link href="/dashboard/fd" className="ab-btn ab-btn-accent" style={{ fontSize: "13px" }}>
+              Go to FDs
+            </Link>
+          </div>
+        </div>
       )}
 
       {state.rows.length > 0 && (
