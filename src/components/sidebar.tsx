@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   TrendingUp,
   Landmark,
+  Coins,
   Settings,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +19,7 @@ const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
   { href: "/dashboard/zerodha", label: "Zerodha", icon: TrendingUp },
   { href: "/dashboard/fd", label: "Fixed Deposits", icon: Landmark },
+  { href: "/dashboard/gold", label: "Gold", icon: Coins },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 
