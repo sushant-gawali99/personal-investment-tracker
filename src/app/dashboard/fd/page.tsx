@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Upload } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { FDList } from "./fd-list";
 import { formatINR } from "@/lib/format";
@@ -52,13 +52,22 @@ export default async function FDPage() {
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Fixed Deposits</h1>
           <p className="text-[14px] text-[#a0a0a5] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
-        <Link
-          href="/dashboard/fd/new"
-          className="ab-btn ab-btn-accent"
-        >
-          <Plus size={15} />
-          Add FD
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/dashboard/fd/bulk"
+            className="ab-btn ab-btn-ghost border border-[#2a2a2e]"
+          >
+            <Upload size={15} />
+            Bulk Upload
+          </Link>
+          <Link
+            href="/dashboard/fd/new"
+            className="ab-btn ab-btn-accent"
+          >
+            <Plus size={15} />
+            Add FD
+          </Link>
+        </div>
       </div>
 
       {fds.length > 0 && (
