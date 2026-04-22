@@ -11,7 +11,7 @@ import { FDDisableButton } from "./fd-disable-button";
 type FD = FDDetailData & { disabled: boolean };
 
 type Filter = "all" | "active" | "matured" | "disabled";
-type SortCol = "principal" | "rate" | "tenure" | "atMaturity";
+type SortCol = "principal" | "rate" | "atMaturity";
 type SortDir = "asc" | "desc";
 type HeaderDef = {
   label: string;
@@ -25,7 +25,7 @@ const HEADERS: HeaderDef[] = [
   { label: "FD No.",      align: "left" },
   { label: "Principal",   align: "right", sortCol: "principal" },
   { label: "Rate",        align: "right", sortCol: "rate" },
-  { label: "Tenure",      align: "left",  sortCol: "tenure" },
+  { label: "Tenure",      align: "left" },
   { label: "Duration",    align: "left" },
   { label: "At Maturity", align: "right", sortCol: "atMaturity" },
   { label: "Status",      align: "left" },
@@ -92,8 +92,7 @@ export function FDList({ fds }: { fds: FD[] }) {
       switch (sort.col) {
         case "principal":  return c.principal;
         case "rate":       return c.interestRate;
-        case "tenure":     return c.tenureMonths;
-        case "atMaturity": return c.maturityAmount ?? c.principal;
+case "atMaturity": return c.maturityAmount ?? c.principal;
       }
     };
     return [...filtered].sort((a, b) => {
