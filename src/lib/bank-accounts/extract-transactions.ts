@@ -3,6 +3,7 @@ import type { ExtractedTxn } from "./types";
 import { buildSystemPrompt, buildUserText } from "./extract-transactions-prompt";
 import { estimateCostUsd } from "./cost-tracking";
 import { extractPdfText, TEXT_VISION_FALLBACK_THRESHOLD } from "./pdf-text";
+import { parseStatementText } from "./js-parser";
 
 type DocumentBlockParam = {
   type: "document";
@@ -84,6 +85,26 @@ export async function extractTransactions(
   } catch (e) {
     console.log(`[extract] pdf-parse FAILED after ${Date.now() - tPdf}ms:`, e instanceof Error ? e.message : e);
     // pdf-parse failed (e.g. encrypted PDF); fall through to vision
+  }
+
+  // JS-first: try deterministic regex parsers for known bank formats. If
+  // confident, skip Claude entirely (instant, free, no API dependency).
+  if (extractedText) {
+    const jsParsed = parseStatementText(extractedText);
+    if (jsParsed.confident) {
+      console.log(
+        `[extract] js-parser hit: ${jsParsed.transactions.length} txns, ${jsParsed.unparsedBlocks.length} unparsed blocks`,
+      );
+      return {
+        statementPeriodStart: jsParsed.statementPeriodStart,
+        statementPeriodEnd: jsParsed.statementPeriodEnd,
+        transactions: jsParsed.transactions,
+        inputTokens: 0,
+        outputTokens: 0,
+        costUsd: 0,
+      };
+    }
+    console.log("[extract] js-parser unknown format, falling back to Claude");
   }
 
   const systemPrompt = buildSystemPrompt({ categoryNames, extractedText });

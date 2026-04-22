@@ -54,13 +54,16 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
         newCount: number;
         duplicateCount: number;
       };
-      if (data.status === "preview") {
+      // Extraction auto-commits now — we jump straight from "extracting" to "saved"
+      // (skipping preview). "preview" is only still possible if auto-commit fails.
+      if (data.status === "saved" || data.status === "preview") {
         stopPolling();
         setRows(data.stagedTransactions);
         setSummary({ new: data.newCount, dup: data.duplicateCount });
         setStatus("ready");
         setBusy(false);
-        setStep(2);
+        setStep(3); // jump straight to the "done" step
+        router.refresh();
       } else if (data.status === "failed") {
         stopPolling();
         setError(data.errorMessage ?? "Extraction failed");
@@ -190,7 +193,14 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
   return (
     <div className="ab-card p-4 space-y-3">
-      <p>Import saved. Open the <a className="underline" href="/dashboard/bank-accounts">overview</a> to see analytics, or <a className="underline" href="/dashboard/bank-accounts/list">list</a> to browse.</p>
+      {summary && (
+        <p className="text-sm text-[#a0a0a5]">
+          {summary.new} new transactions saved · {summary.dup} duplicates auto-skipped.
+        </p>
+      )}
+      <p>
+        Import saved. Open the <a className="underline" href="/dashboard/bank-accounts">overview</a> to see analytics, or <a className="underline" href="/dashboard/bank-accounts/list">list</a> to browse and categorise.
+      </p>
     </div>
   );
 }

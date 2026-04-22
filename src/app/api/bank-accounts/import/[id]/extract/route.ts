@@ -7,6 +7,7 @@ import { extractTransactions } from "@/lib/bank-accounts/extract-transactions";
 import { categorizeRows } from "@/lib/bank-accounts/categorize";
 import { markDuplicates } from "@/lib/bank-accounts/dedup";
 import { normalizeDescription } from "@/lib/bank-accounts/normalize-description";
+import { commitImport } from "@/lib/bank-accounts/commit-import";
 import type { StagedTxn, CategoryLite } from "@/lib/bank-accounts/types";
 
 function resolveLocalPath(fileUrl: string): string {
@@ -92,7 +93,15 @@ async function runExtraction(importId: string, userId: string): Promise<void> {
         stagedTransactions: JSON.stringify(staged),
       },
     });
-    console.log(`[extract] import ${importId} done in ${Date.now() - started}ms`);
+    console.log(`[extract] import ${importId} extracted in ${Date.now() - started}ms, auto-committing…`);
+
+    // Auto-commit: persist non-duplicate, non-skipped rows immediately. Transitions
+    // status preview → saved. User can still re-categorise rows from the
+    // transactions list afterwards.
+    const commitResult = await commitImport(importId, userId, staged);
+    console.log(
+      `[extract] import ${importId} committed: ${commitResult.inserted} inserted, ${commitResult.transfersDetected} transfer pairs, total ${Date.now() - started}ms`,
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.log(`[extract] import ${importId} FAILED after ${Date.now() - started}ms: ${msg}`);
