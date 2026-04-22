@@ -7,19 +7,28 @@ export interface ParseOutput {
   parseMethod: "regex" | "ai";
 }
 
-export async function parseStatementPdf(pdfBytes: Buffer): Promise<ParseOutput> {
-  // pdf-parse v2 is ESM and class-based; dynamic import avoids Next bundler issues.
-  const { PDFParse } = await import("pdf-parse");
-  const parser = new PDFParse({ data: new Uint8Array(pdfBytes) });
-  let text = "";
+async function extractText(pdfBytes: Buffer): Promise<string | null> {
   try {
-    const result = await parser.getText();
-    text = result.text ?? "";
-  } finally {
-    await parser.destroy();
+    const { PDFParse } = await import("pdf-parse");
+    const parser = new PDFParse({ data: new Uint8Array(pdfBytes) });
+    try {
+      const result = await parser.getText();
+      return result.text ?? "";
+    } finally {
+      await parser.destroy();
+    }
+  } catch (err) {
+    console.warn("[fd-statement] pdf-parse unavailable, falling back to AI:", err instanceof Error ? err.message : err);
+    return null;
   }
-  const regexTxns = parseStatementText(text);
-  if (regexTxns.length > 0) return { txns: regexTxns, parseMethod: "regex" };
+}
+
+export async function parseStatementPdf(pdfBytes: Buffer): Promise<ParseOutput> {
+  const text = await extractText(pdfBytes);
+  if (text !== null) {
+    const regexTxns = parseStatementText(text);
+    if (regexTxns.length > 0) return { txns: regexTxns, parseMethod: "regex" };
+  }
   const aiTxns = await parseWithAI(pdfBytes);
   return { txns: aiTxns, parseMethod: "ai" };
 }
