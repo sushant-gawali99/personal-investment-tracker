@@ -55,10 +55,17 @@ export default async function FDPage() {
         <div className="flex items-center gap-2">
           <Link
             href="/dashboard/fd/bulk"
-            className="ab-btn ab-btn-ghost border border-[#2a2a2e]"
+            className="ab-btn ab-btn-ghost relative"
+            style={{ borderColor: "#ff385c", border: "1px solid #ff385c", color: "#ff385c" }}
           >
             <Upload size={15} />
             Bulk Upload
+            <span
+              className="ab-chip ab-chip-accent"
+              style={{ fontSize: "10px", padding: "2px 6px", marginLeft: "4px" }}
+            >
+              New
+            </span>
           </Link>
           <Link
             href="/dashboard/fd/new"
