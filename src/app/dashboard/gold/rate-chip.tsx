@@ -24,48 +24,47 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
   const sourceLabel = rate?.source === "manual" ? "Manual override" : "India (IBJA)";
 
   return (
-    <div className="ab-card p-5">
-      <div className="flex items-start justify-between gap-3 flex-wrap mb-4">
-        <div className="flex items-center gap-2">
-          <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#f5a524]/15 text-[#f5a524]">
-            <Coins size={16} />
-          </span>
-          <div>
-            <p className="text-[14px] font-semibold text-[#ededed] leading-tight">Today's Gold Rate</p>
-            <p className="text-[11px] text-[#a0a0a5] mt-0.5">
-              {rate ? (
-                <>
-                  {sourceLabel} · as of {rate.date}
-                  {stale && <span className="ml-1 text-[#f5a524]">(stale)</span>}
-                </>
-              ) : (
-                "No rate available"
-              )}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <button
-            onClick={refresh}
-            disabled={refreshing}
-            className="ab-btn ab-btn-ghost"
-            title="Refresh rate"
-          >
-            <RefreshCw size={14} className={refreshing ? "animate-spin" : ""} />
-          </button>
-          <button
-            onClick={() => setManualOpen(true)}
-            className="ab-btn ab-btn-ghost"
-            title="Set manual rate"
-          >
-            <Pencil size={14} /> Manual
-          </button>
+    <div className="ab-card px-4 py-3 flex items-center gap-4 flex-wrap">
+      <div className="flex items-center gap-2 shrink-0">
+        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#f5a524]/15 text-[#f5a524]">
+          <Coins size={14} />
+        </span>
+        <div className="leading-tight">
+          <p className="text-[12px] font-semibold text-[#ededed]">Today's Gold Rate</p>
+          <p className="text-[10px] text-[#a0a0a5] mt-0.5">
+            {rate ? (
+              <>
+                {sourceLabel} · {rate.date}
+                {stale && <span className="ml-1 text-[#f5a524]">(stale)</span>}
+              </>
+            ) : (
+              "No rate available"
+            )}
+          </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <KaratTile label="22K" sub="91.6% purity" value={rate?.rate22kPerG} />
-        <KaratTile label="24K" sub="99.9% purity" value={rate?.rate24kPerG} highlight />
+      <div className="flex items-center gap-2 flex-1 min-w-[220px]">
+        <KaratTile label="22K" value={rate?.rate22kPerG} />
+        <KaratTile label="24K" value={rate?.rate24kPerG} highlight />
+      </div>
+
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={refresh}
+          disabled={refreshing}
+          className="ab-btn ab-btn-ghost"
+          title="Refresh rate"
+        >
+          <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
+        </button>
+        <button
+          onClick={() => setManualOpen(true)}
+          className="ab-btn ab-btn-ghost"
+          title="Set manual rate"
+        >
+          <Pencil size={13} /> Manual
+        </button>
       </div>
 
       {manualOpen && (
@@ -85,18 +84,16 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
 
 function KaratTile({
   label,
-  sub,
   value,
   highlight,
 }: {
   label: string;
-  sub: string;
   value?: number;
   highlight?: boolean;
 }) {
   return (
     <div
-      className="rounded-lg p-4 border"
+      className="rounded-md px-3 py-2 border flex-1 flex items-baseline gap-2"
       style={{
         borderColor: highlight ? "rgba(245,165,36,0.35)" : "#2a2a2e",
         background: highlight
@@ -104,16 +101,13 @@ function KaratTile({
           : "#141418",
       }}
     >
-      <div className="flex items-center justify-between mb-1">
-        <span className="text-[11px] uppercase tracking-wider font-semibold text-[#a0a0a5]">
-          {label}
-        </span>
-        <span className="text-[10px] text-[#6c6c73]">{sub}</span>
-      </div>
-      <p className="mono text-[26px] font-bold text-[#ededed] leading-tight">
+      <span className="text-[10px] uppercase tracking-wider font-semibold text-[#a0a0a5]">
+        {label}
+      </span>
+      <p className="mono text-[16px] font-bold text-[#ededed] leading-tight">
         {value != null ? `₹${Math.round(value).toLocaleString("en-IN")}` : "—"}
       </p>
-      <p className="text-[11px] text-[#a0a0a5] mt-0.5">per gram</p>
+      <span className="text-[10px] text-[#6c6c73] ml-auto">/g</span>
     </div>
   );
 }
