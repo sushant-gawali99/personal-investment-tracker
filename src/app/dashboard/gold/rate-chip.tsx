@@ -21,35 +21,31 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
   }
 
   const stale = !!rate?.staleAsOf;
-  const sourceLabel = rate?.source === "manual" ? "Manual override" : "India (IBJA)";
+  const sourceLabel = rate?.source === "manual" ? "Manual" : "IBJA";
 
   return (
-    <div className="ab-card px-4 py-3 flex items-center gap-4 flex-wrap">
+    <div className="ab-card px-4 py-2.5 flex items-center gap-3 flex-wrap">
       <div className="flex items-center gap-2 shrink-0">
-        <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-[#f5a524]/15 text-[#f5a524]">
-          <Coins size={14} />
+        <Coins size={14} className="text-[#f5a524]" />
+        <span className="text-[12px] font-semibold text-[#ededed]">Gold Rate</span>
+        <span className="text-[11px] text-[#6c6c73]">
+          {rate ? (
+            <>
+              {sourceLabel} · {rate.date}
+              {stale && <span className="ml-1 text-[#f5a524]">(stale)</span>}
+            </>
+          ) : (
+            "—"
+          )}
         </span>
-        <div className="leading-tight">
-          <p className="text-[12px] font-semibold text-[#ededed]">Today's Gold Rate</p>
-          <p className="text-[10px] text-[#a0a0a5] mt-0.5">
-            {rate ? (
-              <>
-                {sourceLabel} · {rate.date}
-                {stale && <span className="ml-1 text-[#f5a524]">(stale)</span>}
-              </>
-            ) : (
-              "No rate available"
-            )}
-          </p>
-        </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-1 min-w-[220px]">
-        <KaratTile label="22K" value={rate?.rate22kPerG} />
-        <KaratTile label="24K" value={rate?.rate24kPerG} highlight />
+      <div className="flex items-center gap-2 shrink-0">
+        <KaratPill label="22K" value={rate?.rate22kPerG} />
+        <KaratPill label="24K" value={rate?.rate24kPerG} highlight />
       </div>
 
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-1 ml-auto shrink-0">
         <button
           onClick={refresh}
           disabled={refreshing}
@@ -82,7 +78,7 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
   );
 }
 
-function KaratTile({
+function KaratPill({
   label,
   value,
   highlight,
@@ -93,21 +89,25 @@ function KaratTile({
 }) {
   return (
     <div
-      className="rounded-md px-3 py-2 border flex-1 flex items-baseline gap-2"
+      className="rounded-full pl-2 pr-3 py-1 inline-flex items-center gap-2 border"
       style={{
-        borderColor: highlight ? "rgba(245,165,36,0.35)" : "#2a2a2e",
-        background: highlight
-          ? "linear-gradient(135deg, rgba(245,165,36,0.08), rgba(245,165,36,0.02))"
-          : "#141418",
+        borderColor: highlight ? "rgba(245,165,36,0.4)" : "#2a2a2e",
+        background: highlight ? "rgba(245,165,36,0.08)" : "#141418",
       }}
     >
-      <span className="text-[10px] uppercase tracking-wider font-semibold text-[#a0a0a5]">
+      <span
+        className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-full"
+        style={{
+          color: highlight ? "#f5a524" : "#a0a0a5",
+          background: highlight ? "rgba(245,165,36,0.15)" : "#1c1c20",
+        }}
+      >
         {label}
       </span>
-      <p className="mono text-[16px] font-bold text-[#ededed] leading-tight">
+      <span className="mono text-[14px] font-bold text-[#ededed] leading-none">
         {value != null ? `₹${Math.round(value).toLocaleString("en-IN")}` : "—"}
-      </p>
-      <span className="text-[10px] text-[#6c6c73] ml-auto">/g</span>
+      </span>
+      <span className="text-[10px] text-[#6c6c73] leading-none">/g</span>
     </div>
   );
 }
