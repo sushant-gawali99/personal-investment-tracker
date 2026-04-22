@@ -100,7 +100,10 @@ export async function extractTransactions(
 
   const res = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 16000,
+    // Haiku 4.5 supports up to 64k output tokens. Each transaction serialises
+    // to ~150 tokens of JSON, so 16k was only good for ~90 txns — a busy
+    // month of UPI activity easily exceeds that.
+    max_tokens: 64000,
     system: [
       { type: "text", text: systemPrompt, cache_control: { type: "ephemeral" } } as never,
     ] as never,
