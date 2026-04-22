@@ -98,7 +98,11 @@ export async function extractTransactions(
   }
   userContent.push({ type: "text", text: buildUserText(extractedText) });
 
-  const res = await anthropic.messages.create({
+  // Use streaming: the SDK requires it when max_tokens is large enough that
+  // generation could theoretically exceed 10 minutes. We still collect the
+  // whole response before returning — the streaming is purely transport.
+  const tClaude = Date.now();
+  const stream = anthropic.messages.stream({
     model: "claude-haiku-4-5-20251001",
     // Haiku 4.5 supports up to 64k output tokens. Each transaction serialises
     // to ~150 tokens of JSON, so 16k was only good for ~90 txns — a busy
@@ -111,6 +115,8 @@ export async function extractTransactions(
       { role: "user", content: userContent as never },
     ],
   });
+  const res = await stream.finalMessage();
+  console.log(`[extract] claude stream completed in ${Date.now() - tClaude}ms`);
 
   console.log(
     `[extract] claude ${res.usage.input_tokens}→${res.usage.output_tokens} tok, stop=${res.stop_reason}`,
