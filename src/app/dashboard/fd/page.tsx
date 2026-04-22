@@ -12,6 +12,48 @@ export default async function FDPage() {
     include: { renewals: { orderBy: { renewalNumber: "asc" } } },
   });
 
+  const fdIds = fds.map((f) => f.id);
+  const allTxns =
+    fdIds.length === 0
+      ? []
+      : await prisma.fDStatementTxn.findMany({
+          where: { fdId: { in: fdIds } },
+          orderBy: { txnDate: "desc" },
+          select: {
+            id: true,
+            fdId: true,
+            txnDate: true,
+            particulars: true,
+            debit: true,
+            credit: true,
+            type: true,
+            statementId: true,
+          },
+        });
+
+  const txnsByFd = new Map<
+    string,
+    Array<{
+      id: string;
+      txnDate: string;
+      particulars: string;
+      debit: number;
+      credit: number;
+      type: string;
+      statementId: string;
+    }>
+  >();
+  for (const t of allTxns) {
+    if (!t.fdId) continue;
+    const { fdId, ...rest } = t;
+    const row = { ...rest, txnDate: t.txnDate.toISOString() };
+    const arr = txnsByFd.get(fdId) ?? [];
+    arr.push(row);
+    txnsByFd.set(fdId, arr);
+  }
+
+  const fdsWithTxns = fds.map((f) => ({ ...f, txns: txnsByFd.get(f.id) ?? [] }));
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -48,7 +90,7 @@ export default async function FDPage() {
         </div>
       </div>
 
-      <FDList fds={fds.map((fd) => ({ ...fd, txns: [] }))} />
+      <FDList fds={fdsWithTxns} />
     </div>
   );
 }
