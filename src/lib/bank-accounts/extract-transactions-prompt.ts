@@ -34,6 +34,9 @@ Rules:
 - Output the JSON object and nothing else.`;
 }
 
-export function buildUserText(): string {
+export function buildUserText(extractedText?: string | null): string {
+  if (extractedText && extractedText.trim().length > 0) {
+    return `Extract all transactions from the statement text below.\n\n<statement>\n${extractedText}\n</statement>`;
+  }
   return "Extract all transactions from this statement.";
 }
