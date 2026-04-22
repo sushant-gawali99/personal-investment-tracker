@@ -140,3 +140,108 @@ model FDStatementTxn {
   @@index([statementId])
   @@unique([statementId, txnDate, particulars, debit, credit])
 }
+
+model BankAccount {
+  id                  String   @id @default(cuid())
+  userId              String
+  label               String
+  bankName            String
+  accountNumberLast4  String?
+  accountType         String   @default("savings") // "savings" | "current" | "credit"
+  disabled            Boolean  @default(false)
+  transactions        Transaction[]
+  imports             StatementImport[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model TransactionCategory {
+  id          String   @id @default(cuid())
+  userId      String?  // null = system preset visible to all users
+  name        String
+  kind        String   @default("expense") // "expense" | "income" | "transfer"
+  icon        String?
+  color       String?
+  sortOrder   Int      @default(100)
+  disabled    Boolean  @default(false)
+  transactions  Transaction[]
+  rules         MerchantRule[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Transaction {
+  id                      String   @id @default(cuid())
+  userId                  String
+  accountId               String
+  account                 BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  txnDate                 DateTime
+  valueDate               DateTime?
+  description             String
+  normalizedDescription   String
+  amount                  Float
+  direction               String   // "debit" | "credit"
+  runningBalance          Float?
+  bankRef                 String?
+  categoryId              String?
+  category                TransactionCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categorySource          String?  // "claude" | "rule" | "user" | "transfer-detect"
+  transferGroupId         String?
+  notes                   String?
+  importId                String
+  import                  StatementImport @relation(fields: [importId], references: [id], onDelete: Cascade)
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+
+  @@unique([userId, accountId, bankRef])
+  @@unique([userId, accountId, txnDate, amount, normalizedDescription])
+  @@index([userId, txnDate])
+  @@index([accountId, txnDate])
+  @@index([categoryId])
+  @@index([transferGroupId])
+}
+
+model MerchantRule {
+  id                          String   @id @default(cuid())
+  userId                      String
+  pattern                     String
+  categoryId                  String
+  category                    TransactionCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  matchCount                  Int      @default(0)
+  createdFromTransactionId    String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model StatementImport {
+  id                     String   @id @default(cuid())
+  userId                 String
+  accountId              String
+  account                BankAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  fileUrl                String
+  fileName               String
+  pageCount              Int?
+  statementPeriodStart   DateTime?
+  statementPeriodEnd     DateTime?
+  status                 String   @default("pending") // pending|extracting|preview|saved|failed|cancelled
+  extractedCount         Int      @default(0)
+  newCount               Int      @default(0)
+  duplicateCount         Int      @default(0)
+  claudeInputTokens      Int?
+  claudeOutputTokens     Int?
+  claudeCostUsd          Float?
+  errorMessage           String?
+  stagedTransactions     String?  // JSON string of preview rows (SQLite has no native JSON)
+  transactions           Transaction[]
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([accountId])
+}
