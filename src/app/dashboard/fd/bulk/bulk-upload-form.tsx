@@ -3,7 +3,7 @@
 import { useReducer, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
-import { bulkReducer, initialState } from "./bulk-state";
+import { bulkReducer, initialState, mergedFields } from "./bulk-state";
 import type { BulkRow, EditableFields, FdExtracted } from "./bulk-state";
 import { BulkDropZone, MAX_FILES, MAX_FILE_SIZE, MAX_ZIP_SIZE } from "./bulk-drop-zone";
 import { BulkRowTable } from "./bulk-row-table";
@@ -219,8 +219,9 @@ export function BulkUploadForm() {
   }
 
   function handleRetrySave(id: string) {
-    // Filled in Task 11
-    void id;
+    const row = rowsRef.current.find((r) => r.id === id);
+    if (!row) return;
+    saveRows([row]);
   }
 
   function handleCancelAll() {
@@ -246,13 +247,91 @@ export function BulkUploadForm() {
     dispatch({ type: "RESET" });
   }
 
+  async function uploadOneFile(file: File, signal: AbortSignal): Promise<string> {
+    const data = new FormData();
+    data.append("file", file);
+    const res = await fetch("/api/fd/upload", { method: "POST", body: data, signal });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "Upload failed");
+    return json.url as string;
+  }
+
+  async function createOneFd(
+    row: BulkRow,
+    url: string,
+    signal: AbortSignal,
+  ): Promise<void> {
+    const f = mergedFields(row);
+    const body: Record<string, unknown> = {
+      bankName: f.bankName,
+      fdNumber: f.fdNumber || null,
+      accountNumber: f.accountNumber || null,
+      principal: parseFloat(f.principal),
+      interestRate: parseFloat(f.interestRate),
+      tenureMonths: parseInt(f.tenureMonths || "0") || 0,
+      tenureDays: parseInt(f.tenureDays || "0") || 0,
+      tenureText: f.tenureText || null,
+      startDate: f.startDate,
+      maturityDate: f.maturityDate,
+      maturityAmount: f.maturityAmount ? parseFloat(f.maturityAmount) : null,
+      interestType: f.interestType || "compound",
+      compoundFreq: f.compoundFreq || "quarterly",
+      maturityInstruction: f.maturityInstruction || null,
+      payoutFrequency: f.payoutFrequency || null,
+      nomineeName: f.nomineeName || null,
+      nomineeRelation: f.nomineeRelation || null,
+      notes: null,
+      sourceImageUrl: row.kind === "image" ? url : null,
+      sourceImageBackUrl: null,
+      sourcePdfUrl: row.kind === "pdf" ? url : null,
+    };
+    const res = await fetch("/api/fd", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal,
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error ?? "Save failed");
+  }
+
+  async function saveRows(rows: BulkRow[]) {
+    if (rows.length === 0) return;
+    if (!abortRef.current || abortRef.current.signal.aborted) {
+      abortRef.current = new AbortController();
+    }
+    const signal = abortRef.current.signal;
+
+    await runWithConcurrency(
+      rows,
+      CONCURRENCY,
+      async (row) => {
+        dispatch({ type: "SET_STATUS", id: row.id, status: "saving" });
+        try {
+          const url = await uploadOneFile(row.file, signal);
+          // Re-read the latest row state to pick up edits made after queueing
+          const latest = rowsRef.current.find((r) => r.id === row.id) ?? row;
+          await createOneFd(latest, url, signal);
+          dispatch({ type: "SET_STATUS", id: row.id, status: "saved" });
+          dispatch({ type: "SET_SELECTED", id: row.id, selected: false });
+        } catch (err) {
+          const msg = err instanceof Error ? err.message : "Save failed";
+          dispatch({ type: "SET_STATUS", id: row.id, status: "save_failed", error: msg });
+        }
+      },
+      signal,
+    );
+
+    router.refresh();
+  }
+
   const selectedSavable = state.rows.filter(
     (r) => r.selected && (r.status === "extracted" || r.status === "save_failed"),
   );
 
   async function handleSaveSelected() {
-    // Filled in Task 11
-    alert(`Would save ${selectedSavable.length} rows (Task 11)`);
+    if (selectedSavable.length === 0) return;
+    await saveRows(selectedSavable);
   }
 
   const counts = {
@@ -261,8 +340,6 @@ export function BulkUploadForm() {
     failedSave: state.rows.filter((r) => r.status === "save_failed").length,
     failedExtract: state.rows.filter((r) => r.status === "extract_failed").length,
   };
-  void router;
-
   return (
     <div className="space-y-6 pb-24">
       {state.rows.length < MAX_FILES && (
