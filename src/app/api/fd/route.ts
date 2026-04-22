@@ -22,15 +22,21 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const {
     bankName, fdNumber, accountNumber, principal, interestRate,
-    tenureMonths, startDate, maturityDate, maturityAmount,
+    tenureMonths, tenureDays, tenureText, startDate, maturityDate, maturityAmount,
     interestType, compoundFreq,
     maturityInstruction, payoutFrequency, nomineeName, nomineeRelation,
     notes, sourceImageUrl, sourceImageBackUrl, sourcePdfUrl,
     renewals, // optional: [{ renewalNumber, startDate, maturityDate, principal, interestRate, tenureMonths, maturityAmount, maturityInstruction, payoutFrequency }]
   } = body;
 
-  if (!bankName || !principal || !interestRate || !tenureMonths || !startDate || !maturityDate) {
+  if (!bankName || !principal || !interestRate || !startDate || !maturityDate) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  const tenureMonthsNum = Number(tenureMonths) || 0;
+  const tenureDaysNum = Number(tenureDays) || 0;
+  if (tenureMonthsNum <= 0 && tenureDaysNum <= 0) {
+    return NextResponse.json({ error: "Tenure must be greater than 0 (months or days)" }, { status: 400 });
   }
 
   const duplicate = await prisma.fixedDeposit.findFirst({
@@ -58,7 +64,9 @@ export async function POST(req: NextRequest) {
         accountNumber: accountNumber || null,
         principal: Number(principal),
         interestRate: Number(interestRate),
-        tenureMonths: Number(tenureMonths),
+        tenureMonths: tenureMonthsNum,
+        tenureDays: tenureDaysNum,
+        tenureText: typeof tenureText === "string" && tenureText.trim() ? tenureText.trim().slice(0, 100) : null,
         startDate: new Date(startDate),
         maturityDate: new Date(maturityDate),
         maturityAmount: maturityAmount ? Number(maturityAmount) : null,
@@ -76,18 +84,20 @@ export async function POST(req: NextRequest) {
     });
 
     if (Array.isArray(renewals) && renewals.length > 0) {
-      const validRenewals = renewals.filter((r: { startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number }) =>
-        r.startDate && r.maturityDate && !isNaN(new Date(r.startDate).getTime()) && !isNaN(new Date(r.maturityDate).getTime()) && Number(r.principal) > 0 && Number(r.interestRate) > 0 && Number(r.tenureMonths) > 0
+      const validRenewals = renewals.filter((r: { startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; tenureDays?: number; tenureText?: string | null }) =>
+        r.startDate && r.maturityDate && !isNaN(new Date(r.startDate).getTime()) && !isNaN(new Date(r.maturityDate).getTime()) && Number(r.principal) > 0 && Number(r.interestRate) > 0 && ((Number(r.tenureMonths) || 0) > 0 || (Number(r.tenureDays) || 0) > 0)
       );
       if (validRenewals.length > 0) await tx.fDRenewal.createMany({
-        data: validRenewals.map((r: { renewalNumber: number; startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; maturityAmount?: number; maturityInstruction?: string; payoutFrequency?: string }) => ({
+        data: validRenewals.map((r: { renewalNumber: number; startDate: string; maturityDate: string; principal: number; interestRate: number; tenureMonths: number; tenureDays?: number; tenureText?: string | null; maturityAmount?: number; maturityInstruction?: string; payoutFrequency?: string }) => ({
           fdId: created.id,
           renewalNumber: r.renewalNumber,
           startDate: new Date(r.startDate),
           maturityDate: new Date(r.maturityDate),
           principal: Number(r.principal),
           interestRate: Number(r.interestRate),
-          tenureMonths: Number(r.tenureMonths),
+          tenureMonths: Number(r.tenureMonths) || 0,
+          tenureDays: Number(r.tenureDays) || 0,
+          tenureText: typeof r.tenureText === "string" && r.tenureText.trim() ? r.tenureText.trim().slice(0, 100) : null,
           maturityAmount: r.maturityAmount ? Number(r.maturityAmount) : null,
           maturityInstruction: r.maturityInstruction || null,
           payoutFrequency: r.payoutFrequency || null,
