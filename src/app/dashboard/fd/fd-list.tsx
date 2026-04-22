@@ -11,11 +11,14 @@ import { FDDisableButton } from "./fd-disable-button";
 type FD = FDDetailData & { disabled: boolean };
 
 type Filter = "all" | "active" | "matured" | "disabled";
+type SortCol = "principal" | "rate" | "tenure" | "atMaturity";
+type SortDir = "asc" | "desc";
 
 export function FDList({ fds }: { fds: FD[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [bankFilter, setBankFilter] = useState<string>("all");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
   const now = new Date();
 
   function normalizeBankName(name: string) {
@@ -62,6 +65,17 @@ export function FDList({ fds }: { fds: FD[] }) {
     return true;
   });
 
+  const sorted = sort === null ? filtered : [...filtered].sort((a, b) => {
+    const ca = resolveCurrent(a);
+    const cb = resolveCurrent(b);
+    let va: number, vb: number;
+    if (sort.col === "principal") { va = ca.principal; vb = cb.principal; }
+    else if (sort.col === "rate") { va = ca.interestRate; vb = cb.interestRate; }
+    else if (sort.col === "tenure") { va = ca.tenureMonths; vb = cb.tenureMonths; }
+    else { va = ca.maturityAmount ?? ca.principal; vb = cb.maturityAmount ?? cb.principal; }
+    return sort.dir === "asc" ? va - vb : vb - va;
+  });
+
   function toggleExpanded(id: string) {
     setExpandedIds((prev) => {
       const next = new Set(prev);
@@ -69,6 +83,14 @@ export function FDList({ fds }: { fds: FD[] }) {
       else next.add(id);
       return next;
     });
+  }
+
+  function handleSort(col: SortCol) {
+    setSort((prev) =>
+      prev?.col === col
+        ? { col, dir: prev.dir === "asc" ? "desc" : "asc" }
+        : { col, dir: "asc" }
+    );
   }
 
   if (fds.length === 0) {
@@ -152,7 +174,7 @@ export function FDList({ fds }: { fds: FD[] }) {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#2a2a2e]">
-              {filtered.map((fd) => {
+              {sorted.map((fd) => {
                 const current = resolveCurrent(fd);
                 const isMatured = current.maturityDate <= now;
                 const days = daysUntil(current.maturityDate);
