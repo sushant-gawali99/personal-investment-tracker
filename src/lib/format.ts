@@ -39,3 +39,20 @@ export function daysUntil(date: Date | string): number {
   target.setHours(0, 0, 0, 0);
   return Math.round((target.getTime() - now.getTime()) / 86400000);
 }
+
+export function formatTenure(t: {
+  tenureMonths: number | null | undefined;
+  tenureDays: number | null | undefined;
+  tenureText: string | null | undefined;
+}): string {
+  if (t.tenureText && t.tenureText.trim()) return t.tenureText.trim();
+
+  const m = t.tenureMonths ?? 0;
+  const d = t.tenureDays ?? 0;
+
+  if (m > 0 && d > 0) return `${m} months ${d} days`;
+  if (m > 0) return `${m} month${m === 1 ? "" : "s"}`;
+  if (d > 0) return `${d} day${d === 1 ? "" : "s"}`;
+  return "—";
+}
+
