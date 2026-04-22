@@ -37,7 +37,11 @@ async function getData(userId: string | null) {
 
   const summary = portfolioSummary(holdings, fdRecords, mfHoldings);
   const timeline = fdAccrualTimeline(fdRecords, 24);
-  const upcomingMaturities = fdRecords.filter((fd) => new Date(fd.maturityDate) > new Date()).slice(0, 5);
+  const now = new Date();
+  const upcomingMaturities = fdRecords.filter((fd) => {
+    const d = new Date(fd.maturityDate);
+    return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+  });
 
   return { summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected: !!kiteConfig?.accessToken };
 }
