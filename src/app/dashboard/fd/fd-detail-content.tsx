@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { FileText, Copy, Check } from "lucide-react";
-import { formatINR, formatDate, daysUntil } from "@/lib/format";
+import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface FDRenewalData {
@@ -14,6 +14,7 @@ export interface FDRenewalData {
   interestRate: number;
   tenureMonths: number;
   tenureDays: number;
+  tenureText: string | null;
   maturityAmount: number | null;
   maturityInstruction: string | null;
   payoutFrequency: string | null;
@@ -28,6 +29,7 @@ export interface FDDetailData {
   interestRate: number;
   tenureMonths: number;
   tenureDays: number;
+  tenureText: string | null;
   startDate: Date | string;
   maturityDate: Date | string;
   maturityAmount: number | null;
@@ -106,7 +108,11 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
   const activeRate = latest?.interestRate ?? fd.interestRate;
   const activeStart = new Date(latest?.startDate ?? fd.startDate);
   const activeMaturity = new Date(latest?.maturityDate ?? fd.maturityDate);
-  const activeTenure = latest?.tenureMonths ?? fd.tenureMonths;
+  const activeTenure = {
+    tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+    tenureDays: latest?.tenureDays ?? fd.tenureDays,
+    tenureText: latest?.tenureText ?? fd.tenureText,
+  };
   const activeMaturityAmount = latest?.maturityAmount ?? fd.maturityAmount;
   const activeInstruction = latest?.maturityInstruction ?? fd.maturityInstruction;
   const activeFrequency = latest?.payoutFrequency ?? fd.payoutFrequency;
@@ -137,7 +143,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
           />
         </div>
         <p className="text-[12px] text-[#6e6e73] text-center mt-3">
-          {activeTenure} months tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
+          {formatTenure(activeTenure)} tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
         </p>
       </div>
 
@@ -189,7 +195,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
             </div>
             <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
               <dt className="text-[#a0a0a5]">Tenure</dt>
-              <dd className="text-[#ededed] mono text-right">{activeTenure} months</dd>
+              <dd className="text-[#ededed] mono text-right">{formatTenure(activeTenure)}</dd>
             </div>
             <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
               <dt className="text-[#a0a0a5]">Start Date</dt>

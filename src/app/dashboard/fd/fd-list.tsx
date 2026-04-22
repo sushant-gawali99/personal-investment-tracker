@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, Fragment } from "react";
 import { AlertTriangle, CheckCircle2, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { formatINR, formatDate, daysUntil } from "@/lib/format";
+import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
 import { FDDisableButton } from "./fd-disable-button";
 
@@ -65,6 +65,8 @@ export function FDList({ fds }: { fds: FD[] }) {
       principal: latest?.principal ?? fd.principal,
       interestRate: latest?.interestRate ?? fd.interestRate,
       tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+      tenureDays: latest?.tenureDays ?? fd.tenureDays,
+      tenureText: latest?.tenureText ?? fd.tenureText,
       startDate: new Date(latest?.startDate ?? fd.startDate),
       maturityDate: new Date(latest?.maturityDate ?? fd.maturityDate),
       maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,
@@ -269,7 +271,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                       <td className="px-4 py-3 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
                       <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{formatINR(current.principal)}</td>
                       <td className="px-4 py-3 text-right mono text-[#ededed] font-medium">{current.interestRate}%</td>
-                      <td className="px-4 py-3 text-[#a0a0a5]">{current.tenureMonths}m</td>
+                      <td className="px-4 py-3 text-[#a0a0a5]">{formatTenure(current)}</td>
                       <td className="px-4 py-3 text-[#a0a0a5] text-[13px] whitespace-nowrap">
                         {formatDate(current.startDate)} <span className="text-[#6e6e73]">→</span> {formatDate(current.maturityDate)}
                       </td>

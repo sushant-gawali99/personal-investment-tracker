@@ -5,6 +5,7 @@ export interface FDRecord {
   interestRate: number;
   tenureMonths: number;
   tenureDays: number;
+  tenureText?: string | null;
   startDate: Date | string;
   maturityDate: Date | string;
   maturityAmount: number | null;
