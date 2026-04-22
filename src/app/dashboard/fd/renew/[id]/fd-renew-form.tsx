@@ -12,6 +12,8 @@ type Props = {
     principal: number;
     maturityDate: string;
     tenureMonths: number;
+    tenureDays: number;
+    tenureText: string | null;
     interestRate: number;
     nomineeName: string | null;
     nomineeRelation: string | null;
@@ -35,6 +37,7 @@ export function FDRenewForm({ fd }: Props) {
   const [principal, setPrincipal] = useState(fd.principal.toString());
   const [interestRate, setInterestRate] = useState(fd.interestRate.toString());
   const [tenureMonths, setTenureMonths] = useState(fd.tenureMonths.toString());
+  const [tenureDays, setTenureDays] = useState(fd.tenureDays.toString());
   const [maturityDate, setMaturityDate] = useState("");
 
   function handleStartDate(val: string) {
@@ -67,7 +70,9 @@ export function FDRenewForm({ fd }: Props) {
           maturityDate,
           principal: parseFloat(principal),
           interestRate: parseFloat(interestRate),
-          tenureMonths: parseInt(tenureMonths),
+          tenureMonths: parseInt(tenureMonths) || 0,
+          tenureDays: parseInt(tenureDays) || 0,
+          tenureText: null,
           maturityAmount: maturityAmount ? parseFloat(maturityAmount) : null,
           maturityInstruction: maturityInstruction || null,
           payoutFrequency: payoutFrequency || null,
@@ -112,8 +117,26 @@ export function FDRenewForm({ fd }: Props) {
             <input type="number" min="0.01" max="30" step="0.01" className="ab-input mono" value={interestRate} onChange={(e) => setInterestRate(e.target.value)} required />
           </div>
           <div>
-            <label className="ab-label">Period (months) *</label>
-            <input type="number" min="1" className="ab-input mono" value={tenureMonths} onChange={(e) => setTenureMonths(e.target.value)} required />
+            <label className="ab-label">Tenure *</label>
+            <p className="text-[11px] text-[#a0a0a5] mb-1">Months and/or days — at least one must be &gt; 0.</p>
+            <div className="grid grid-cols-2 gap-3">
+              <input
+                type="number"
+                min="0"
+                className="ab-input mono"
+                value={tenureMonths}
+                onChange={(e) => setTenureMonths(e.target.value)}
+                placeholder="Months"
+              />
+              <input
+                type="number"
+                min="0"
+                className="ab-input mono"
+                value={tenureDays}
+                onChange={(e) => setTenureDays(e.target.value)}
+                placeholder="Days"
+              />
+            </div>
           </div>
           <div>
             <label className="ab-label">Maturity Amount (₹)</label>
