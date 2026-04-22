@@ -42,7 +42,7 @@ export function FDList({ fds }: { fds: FD[] }) {
   const now = new Date();
 
   function normalizeBankName(name: string) {
-    return name.trim().toLowerCase().replace(/\s+/g, " ");
+    return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(" ");
   }
 
   // Group variations by normalized name; pick the first-seen variant as canonical display name.
