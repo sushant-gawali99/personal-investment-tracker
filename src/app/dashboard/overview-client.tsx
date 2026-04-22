@@ -75,6 +75,9 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
   const hasGold = goldTotals.count > 0;
   const hasAny = hasEquity || hasFD || hasMF || hasGold;
 
+  const allocationTotal = summary.totalValue + goldTotals.currentValue;
+  const allocationPct = (v: number) => (allocationTotal > 0 ? (v / allocationTotal) * 100 : 0);
+
   if (!hasAny) {
     return (
       <div className="ab-card p-10 text-center max-w-md mx-auto">
@@ -150,15 +153,17 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
                   equityValue={equity.currentValue}
                   fdValue={fd.totalMaturity}
                   mfValue={mf.currentValue}
+                  goldValue={goldTotals.currentValue}
                   centerLabel="Total"
-                  centerValue={formatINRCompact(summary.totalValue)}
+                  centerValue={formatINRCompact(allocationTotal)}
                 />
               </div>
               <div className="flex-1 min-w-[260px] space-y-4">
                 {[
-                  { label: "Equity", sub: "Zerodha stocks", value: formatINR(equity.currentValue), pct: summary.equityPct, color: "#ff385c" },
-                  { label: "Mutual Funds", sub: "Direct MF", value: formatINR(mf.currentValue), pct: summary.mfPct, color: "#5aa9ff" },
-                  { label: "Fixed Deposits", sub: "FDs + SGBs", value: formatINR(fd.totalMaturity), pct: summary.fdPct, color: "#5ee0a4" },
+                  { label: "Equity", sub: "Zerodha stocks", value: formatINR(equity.currentValue), pct: allocationPct(equity.currentValue), color: "#ff385c" },
+                  { label: "Mutual Funds", sub: "Direct MF", value: formatINR(mf.currentValue), pct: allocationPct(mf.currentValue), color: "#5aa9ff" },
+                  { label: "Fixed Deposits", sub: "FDs + SGBs", value: formatINR(fd.totalMaturity), pct: allocationPct(fd.totalMaturity), color: "#5ee0a4" },
+                  { label: "Gold", sub: "Jewellery (IBJA rate)", value: formatINR(goldTotals.currentValue), pct: allocationPct(goldTotals.currentValue), color: "#f5a524" },
                 ].filter((r) => r.pct > 0).map(({ label, sub, value, pct, color }) => (
                   <div key={label} className="space-y-1.5">
                     <div className="flex items-center gap-3">

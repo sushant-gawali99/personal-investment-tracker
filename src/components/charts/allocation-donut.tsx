@@ -6,21 +6,23 @@ interface Props {
   equityValue: number;
   fdValue: number;
   mfValue?: number;
+  goldValue?: number;
   centerLabel?: string;
   centerValue?: string;
 }
 
-const COLORS = ["#ff385c", "#5aa9ff", "#5ee0a4"];
+const COLORS = ["#ff385c", "#5aa9ff", "#5ee0a4", "#f5a524"];
 
 function fmt(v: number) {
   return `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
 }
 
-export function AllocationDonut({ equityValue, fdValue, mfValue = 0, centerLabel, centerValue }: Props) {
+export function AllocationDonut({ equityValue, fdValue, mfValue = 0, goldValue = 0, centerLabel, centerValue }: Props) {
   const data = [
     { name: "Equity", value: Math.round(equityValue) },
     { name: "Mutual Funds", value: Math.round(mfValue) },
     { name: "Fixed Deposits", value: Math.round(fdValue) },
+    { name: "Gold", value: Math.round(goldValue) },
   ].filter((d) => d.value > 0);
 
   if (data.length === 0) {
