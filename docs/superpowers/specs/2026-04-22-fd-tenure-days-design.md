@@ -58,7 +58,22 @@ ALTER TABLE FDRenewal    ADD COLUMN tenureDays INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE FDRenewal    ADD COLUMN tenureText TEXT;
 ```
 
-Existing rows: `tenureDays = 0`, `tenureText = NULL`. No data migration needed.
+## Handling Existing Data
+
+Every existing row in `FixedDeposit` and `FDRenewal` already has `tenureMonths` populated. After the DDL above runs:
+
+- `tenureDays` defaults to `0` for every existing row (enforced by the column default).
+- `tenureText` is `NULL` for every existing row.
+
+The rest of the system handles this cleanly — no backfill script is required:
+
+1. **Display (`formatTenure`)** — when `tenureText` is `NULL` and `tenureDays` is `0`, the helper falls through to `"${tenureMonths} months"`. This is byte-identical to the current display (today the list shows `"${fd.tenureMonths} months"`). Visual regression: none.
+2. **Interest math (`analytics.ts`)** — the additive formula `tenureMonths / 12 + tenureDays / 365` evaluates to exactly `tenureMonths / 12` when `tenureDays = 0`. Numeric regression: none.
+3. **Form pre-fill (renew / edit flows)** — when loading an existing FD into a form, the Days field pre-fills to `"0"` (or empty, rendering as `0`). Users can edit it if they want, but leaving it untouched preserves the original tenure. Behavior regression: none.
+4. **API payloads** — `tenureText` is optional (`string | null`); omitting it from a PATCH body keeps the stored value unchanged. `tenureDays` defaults to `0` if the client omits it on a POST (server coerces `undefined` → `0`). Clients built before this change continue to work.
+5. **Analytics aggregations** — weighted-average tenure, projected maturity, etc. all consume the `years` value derived above. Since `years` is unchanged for existing rows, every chart and summary renders the same number it does today.
+
+The only way an existing row's display or computed value can change is if a user opens the form and actively saves non-zero `tenureDays` / non-null `tenureText` — i.e., deliberate edit, not migration side-effect.
 
 ## Display Helper
 
@@ -136,13 +151,13 @@ All call `formatTenure(...)`:
 
 ## Interest Calculation
 
-Wherever `tenureMonths` feeds maturity math, replace with total days:
+Wherever `tenureMonths` currently feeds years-based math (confirmed usage: `src/lib/analytics.ts:35` uses `fd.tenureMonths / 12`, and `analytics.ts:126` uses `f.tenureMonths / 12`), extend with the days portion:
 
 ```ts
-const years = (fd.tenureMonths * 30 + fd.tenureDays) / 365;
+const years = fd.tenureMonths / 12 + fd.tenureDays / 365;
 ```
 
-This is the same approximation the current code uses, just extended to the days portion. Exact files will be identified during plan authoring.
+**Why this formula and not `(months*30 + days)/365`:** the existing code uses `tenureMonths / 12`; switching wholesale to a days-based divisor would shift every existing FD's computed years by ~1.4% (since 12·30 = 360, not 365) — a silent numeric regression across analytics. The additive form above is exact for the `tenureDays = 0` case (i.e., every pre-existing row), so analytics outputs for historical FDs remain identical to today.
 
 ## Validation & Error Handling
 
@@ -158,7 +173,8 @@ Manual verification via preview tools after implementation:
 2. Create FD manually with Months=6, Days=0 → list renders "6 months".
 3. Create FD manually with Months=0, Days=45 → list renders "45 days".
 4. Create FD manually with Months=0, Days=0 → submit blocked, error shown.
-5. Existing FDs (rows present before migration) render their `tenureMonths` as before, since `tenureDays = 0` and `tenureText = null`.
+5. Existing FDs (rows present before migration) render their `tenureMonths` as before, since `tenureDays = 0` and `tenureText = null`. Verify a specific pre-existing FD's detail page + list row visually matches pre-change screenshots.
+6. Analytics: open the dashboard page before and after migration (no form edits in between) — weighted-average tenure and projected-maturity values are identical.
 6. Renew form accepts Months + Days; renewal displays correctly on the detail page's renewal history.
 
 ## Affected Files
