@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Account { id: string; label: string; bankName: string; }
@@ -31,26 +31,71 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [summary, setSummary] = useState<{ new: number; dup: number } | null>(null);
+  const [status, setStatus] = useState<"idle" | "uploading" | "extracting" | "ready">("idle");
+  const [elapsedSec, setElapsedSec] = useState(0);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  function stopPolling() {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+    if (tickRef.current) { clearInterval(tickRef.current); tickRef.current = null; }
+  }
+
+  useEffect(() => () => stopPolling(), []);
+
+  async function checkStatus(id: string) {
+    try {
+      const r = await fetch(`/api/bank-accounts/import/${id}`);
+      if (!r.ok) return;
+      const data = await r.json() as {
+        status: string;
+        errorMessage: string | null;
+        stagedTransactions: StagedRow[];
+        newCount: number;
+        duplicateCount: number;
+      };
+      if (data.status === "preview") {
+        stopPolling();
+        setRows(data.stagedTransactions);
+        setSummary({ new: data.newCount, dup: data.duplicateCount });
+        setStatus("ready");
+        setBusy(false);
+        setStep(2);
+      } else if (data.status === "failed") {
+        stopPolling();
+        setError(data.errorMessage ?? "Extraction failed");
+        setStatus("idle");
+        setBusy(false);
+      }
+    } catch {
+      /* transient network error; keep polling */
+    }
+  }
 
   async function onUpload(e: React.FormEvent) {
     e.preventDefault();
     if (!file || !accountId) return;
-    setBusy(true); setError(null);
+    setBusy(true); setError(null); setStatus("uploading"); setElapsedSec(0);
+
     const fd = new FormData();
     fd.append("file", file);
     fd.append("accountId", accountId);
     const up = await fetch("/api/bank-accounts/import/upload", { method: "POST", body: fd });
-    if (!up.ok) { setError((await up.json()).error); setBusy(false); return; }
-    const { importId } = (await up.json()) as { importId: string };
-    setImportId(importId);
+    if (!up.ok) { setError((await up.json()).error); setBusy(false); setStatus("idle"); return; }
+    const { importId: newId } = (await up.json()) as { importId: string };
+    setImportId(newId);
 
-    const ex = await fetch(`/api/bank-accounts/import/${importId}/extract`, { method: "POST" });
-    setBusy(false);
-    if (!ex.ok) { setError((await ex.json()).error); return; }
-    const data = (await ex.json()) as { staged: StagedRow[]; newCount: number; duplicateCount: number };
-    setRows(data.staged);
-    setSummary({ new: data.newCount, dup: data.duplicateCount });
-    setStep(2);
+    // Kick off extraction — route returns 202 immediately, work runs in background.
+    setStatus("extracting");
+    const ex = await fetch(`/api/bank-accounts/import/${newId}/extract`, { method: "POST" });
+    if (!ex.ok) { setError((await ex.json()).error); setBusy(false); setStatus("idle"); return; }
+
+    // Poll status every 2s; tick the elapsed counter every 1s for UX.
+    const startedAt = Date.now();
+    tickRef.current = setInterval(() => setElapsedSec(Math.round((Date.now() - startedAt) / 1000)), 1000);
+    pollRef.current = setInterval(() => checkStatus(newId), 2000);
+    // Run one immediate check in case it already finished fast.
+    void checkStatus(newId);
   }
 
   function patchRow(i: number, patch: Partial<StagedRow>) {
@@ -83,7 +128,18 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
           <span className="block text-sm mb-1">PDF</span>
           <input type="file" accept="application/pdf" onChange={(e) => setFile(e.target.files?.[0] ?? null)} />
         </label>
-        <button disabled={busy || !file || !accountId} className="ab-btn ab-btn-accent">{busy ? "Extracting…" : "Upload & Extract"}</button>
+        <button disabled={busy || !file || !accountId} className="ab-btn ab-btn-accent">
+          {status === "uploading" && "Uploading…"}
+          {status === "extracting" && `Extracting… ${elapsedSec}s`}
+          {status === "idle" && "Upload & Extract"}
+          {status === "ready" && "Upload & Extract"}
+        </button>
+        {status === "extracting" && (
+          <p className="text-xs text-[#a0a0a5]">
+            Claude is reading your statement. This typically takes 20–45 seconds for a busy month.
+            You can leave this page open — progress is saved on the server.
+          </p>
+        )}
         {error && <p className="text-red-500 text-sm">{error}</p>}
       </form>
     );

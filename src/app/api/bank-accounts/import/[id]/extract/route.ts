@@ -16,16 +16,16 @@ function resolveLocalPath(fileUrl: string): string {
     : path.join(process.cwd(), "public", "uploads", "bank-statements", name);
 }
 
-export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
-  const { id } = await ctx.params;
-  const userId = await getSessionUserId();
-  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const imp = await prisma.statementImport.findFirst({ where: { id, userId } });
-  if (!imp) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-  await prisma.statementImport.update({ where: { id }, data: { status: "extracting", errorMessage: null } });
-
+/**
+ * Runs the full extract → categorize → dedup pipeline in the background.
+ * Must never throw — catches all errors and persists them as status=failed.
+ */
+async function runExtraction(importId: string, userId: string): Promise<void> {
+  const started = Date.now();
   try {
+    const imp = await prisma.statementImport.findFirst({ where: { id: importId, userId } });
+    if (!imp) return;
+
     const bytes = await readFile(resolveLocalPath(imp.fileUrl));
 
     const categories = await prisma.transactionCategory.findMany({
@@ -77,8 +77,8 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
     const dupCount = staged.filter((s) => s.isDuplicate).length;
     const newCount = staged.length - dupCount;
 
-    const updated = await prisma.statementImport.update({
-      where: { id },
+    await prisma.statementImport.update({
+      where: { id: importId },
       data: {
         status: "preview",
         statementPeriodStart: extraction.statementPeriodStart ? new Date(extraction.statementPeriodStart) : null,
@@ -92,13 +92,41 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
         stagedTransactions: JSON.stringify(staged),
       },
     });
-    return NextResponse.json({ importId: updated.id, staged, newCount, duplicateCount: dupCount });
+    console.log(`[extract] import ${importId} done in ${Date.now() - started}ms`);
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    await prisma.statementImport.update({
-      where: { id },
-      data: { status: "failed", errorMessage: msg },
-    });
-    return NextResponse.json({ error: msg }, { status: 500 });
+    console.log(`[extract] import ${importId} FAILED after ${Date.now() - started}ms: ${msg}`);
+    try {
+      await prisma.statementImport.update({
+        where: { id: importId },
+        data: { status: "failed", errorMessage: msg },
+      });
+    } catch {
+      /* DB write failed — nothing more we can do */
+    }
   }
+}
+
+export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+  const { id } = await ctx.params;
+  const userId = await getSessionUserId();
+  if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const imp = await prisma.statementImport.findFirst({ where: { id, userId } });
+  if (!imp) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  // Guard against double-starts: only kick off if pending or previously failed.
+  if (imp.status === "extracting") {
+    return NextResponse.json({ importId: id, status: "extracting", alreadyRunning: true }, { status: 202 });
+  }
+
+  await prisma.statementImport.update({
+    where: { id },
+    data: { status: "extracting", errorMessage: null },
+  });
+
+  // Fire-and-forget. Works in both `next dev` and long-running Node (Railway).
+  // Would need a queue (BullMQ, etc.) to work on serverless platforms.
+  void runExtraction(id, userId);
+
+  return NextResponse.json({ importId: id, status: "extracting" }, { status: 202 });
 }
