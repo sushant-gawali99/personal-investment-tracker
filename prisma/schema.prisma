@@ -33,6 +33,7 @@ model FixedDeposit {
   sourceImageBackUrl String?
   sourcePdfUrl       String?
   renewals       FDRenewal[]
+  statementTxns  FDStatementTxn[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -103,4 +104,39 @@ model GoldRate {
   fetchedAt    DateTime @default(now())
 
   @@unique([date, source])
+}
+
+model FDStatement {
+  id            String   @id @default(cuid())
+  userId        String
+  bankName      String
+  fileName      String
+  sourcePdfUrl  String
+  fromDate      DateTime?
+  toDate        DateTime?
+  txnCount      Int      @default(0)
+  matchedCount  Int      @default(0)
+  parseMethod   String
+  uploadedAt    DateTime @default(now())
+  transactions  FDStatementTxn[]
+
+  @@index([userId, bankName])
+}
+
+model FDStatementTxn {
+  id               String   @id @default(cuid())
+  statementId      String
+  statement        FDStatement   @relation(fields: [statementId], references: [id], onDelete: Cascade)
+  fdId             String?
+  fd               FixedDeposit? @relation(fields: [fdId], references: [id], onDelete: SetNull)
+  txnDate          DateTime
+  particulars      String
+  debit            Float    @default(0)
+  credit           Float    @default(0)
+  type             String
+  detectedFdNumber String?
+
+  @@index([fdId, txnDate])
+  @@index([statementId])
+  @@unique([statementId, txnDate, particulars, debit, credit])
 }
