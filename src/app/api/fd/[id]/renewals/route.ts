@@ -12,9 +12,11 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!fd) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   const body = await req.json();
-  const { startDate, maturityDate, principal, interestRate, tenureMonths, maturityAmount, maturityInstruction, payoutFrequency } = body;
+  const { startDate, maturityDate, principal, interestRate, tenureMonths, tenureDays, tenureText, maturityAmount, maturityInstruction, payoutFrequency } = body;
 
-  if (!startDate || !maturityDate || !principal || !interestRate || !tenureMonths) {
+  const tenureMonthsNum = Number(tenureMonths) || 0;
+  const tenureDaysNum = Number(tenureDays) || 0;
+  if (!startDate || !maturityDate || !principal || !interestRate || (tenureMonthsNum <= 0 && tenureDaysNum <= 0)) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
   }
 
@@ -28,7 +30,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       maturityDate: new Date(maturityDate),
       principal: Number(principal),
       interestRate: Number(interestRate),
-      tenureMonths: Number(tenureMonths),
+      tenureMonths: tenureMonthsNum,
+      tenureDays: tenureDaysNum,
+      tenureText: typeof tenureText === "string" && tenureText.trim() ? tenureText.trim().slice(0, 100) : null,
       maturityAmount: maturityAmount ? Number(maturityAmount) : null,
       maturityInstruction: maturityInstruction || null,
       payoutFrequency: payoutFrequency || null,
