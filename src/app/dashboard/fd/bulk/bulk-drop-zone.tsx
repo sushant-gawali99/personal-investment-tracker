@@ -6,8 +6,8 @@ import { Upload } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const MAX_FILES = 20;
-export const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
-export const MAX_ZIP_SIZE = 20 * 1024 * 1024; // 20 MB
+export const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50 MB
+export const MAX_ZIP_SIZE = 50 * 1024 * 1024; // 50 MB
 
 export function BulkDropZone({
   currentCount,

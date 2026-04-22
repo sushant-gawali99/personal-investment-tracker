@@ -107,8 +107,8 @@ export async function POST(req: NextRequest) {
     let contentBlocks: (ImageBlockParam | TextBlockParam | DocumentBlockParam)[];
 
     if (pdfFile) {
-      if (pdfFile.size > 5 * 1024 * 1024) {
-        return NextResponse.json({ error: `${pdfFile.name} exceeds 5 MB limit.` }, { status: 400 });
+      if (pdfFile.size > 50 * 1024 * 1024) {
+        return NextResponse.json({ error: `${pdfFile.name} exceeds 50 MB limit.` }, { status: 400 });
       }
       if (pdfFile.type !== "application/pdf") {
         return NextResponse.json({ error: "Expected a PDF file." }, { status: 400 });
@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     } else {
       const validTypes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
       for (const file of [front, back].filter(Boolean) as File[]) {
-        if (file.size > 5 * 1024 * 1024) return NextResponse.json({ error: `${file.name} exceeds 5 MB limit.` }, { status: 400 });
+        if (file.size > 50 * 1024 * 1024) return NextResponse.json({ error: `${file.name} exceeds 50 MB limit.` }, { status: 400 });
         if (!validTypes.includes(file.type)) return NextResponse.json({ error: "Unsupported file type. Use JPEG, PNG, or WebP." }, { status: 400 });
       }
       contentBlocks = [];
