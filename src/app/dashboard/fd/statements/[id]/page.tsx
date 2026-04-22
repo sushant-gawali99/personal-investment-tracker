@@ -3,10 +3,12 @@ import Link from "next/link";
 import {
   ArrowLeft, Download, Sparkles, Cpu,
   TrendingUp, CheckCircle2, XCircle, ArrowDownLeft, ArrowUpRight, Minus, Circle, ExternalLink,
+  AlertTriangle,
 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { formatDate, formatINR } from "@/lib/format";
+import { normalizeBankName } from "@/lib/fd-bank";
 
 const TYPE_META: Record<string, { label: string; icon: typeof TrendingUp; tone: string }> = {
   interest:        { label: "Interest",         icon: TrendingUp,   tone: "bg-[#0f2a1f] text-[#5ee0a4] border-[#1a3d2e]" },
@@ -34,6 +36,49 @@ export default async function StatementDetail({ params }: { params: Promise<{ id
   const totalInterest = s.transactions.filter((t) => t.type === "interest").reduce((a, t) => a + t.credit, 0);
   const totalTds = s.transactions.filter((t) => t.type === "tds").reduce((a, t) => a + t.debit, 0);
   const unmatched = s.transactions.filter((t) => !t.fdId).length;
+
+  // Flag FDs active during statement period that received no interest credit in this statement
+  const bankKey = normalizeBankName(s.bankName);
+  const userFds = await prisma.fixedDeposit.findMany({
+    where: { userId: userId ?? "" },
+    include: { renewals: { orderBy: { renewalNumber: "asc" } } },
+  });
+  const periodFrom = s.fromDate ?? new Date(0);
+  const periodTo = s.toDate ?? new Date();
+  const PERIODIC = new Set(["monthly", "quarterly", "half_yearly", "annually"]);
+
+  const fdsInBank = userFds.filter((f) => !f.disabled && normalizeBankName(f.bankName) === bankKey);
+  const fdIdsWithInterest = new Set(
+    s.transactions.filter((t) => t.type === "interest" && t.fdId).map((t) => t.fdId as string),
+  );
+
+  const missingFds = fdsInBank
+    .map((fd) => {
+      const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
+      const startDate = new Date(latest?.startDate ?? fd.startDate);
+      const maturityDate = new Date(latest?.maturityDate ?? fd.maturityDate);
+      const payoutFrequency = latest?.payoutFrequency ?? fd.payoutFrequency;
+      const principal = latest?.principal ?? fd.principal;
+      const interestRate = latest?.interestRate ?? fd.interestRate;
+      const wasActive = startDate <= periodTo && maturityDate >= periodFrom;
+      if (!wasActive) return null;
+      const isPeriodic = PERIODIC.has(payoutFrequency ?? "");
+      const maturesInPeriod = maturityDate >= periodFrom && maturityDate <= periodTo;
+      const expectsCredit = isPeriodic || maturesInPeriod;
+      if (!expectsCredit) return null;
+      if (fdIdsWithInterest.has(fd.id)) return null;
+      return {
+        id: fd.id,
+        fdNumber: fd.fdNumber,
+        accountNumber: fd.accountNumber,
+        principal,
+        interestRate,
+        payoutFrequency,
+        maturityDate,
+        maturesInPeriod,
+      };
+    })
+    .filter((x): x is NonNullable<typeof x> => x !== null);
 
   return (
     <div className="space-y-5">
@@ -73,6 +118,44 @@ export default async function StatementDetail({ params }: { params: Promise<{ id
           </a>
         </div>
       </div>
+
+      {/* Missing interest warning */}
+      {missingFds.length > 0 && (
+        <div className="ab-card-flat bg-[#2a1f0d] border-[#3a2d0f] px-5 py-4">
+          <div className="flex items-start gap-3 mb-3">
+            <AlertTriangle size={18} className="text-[#f5a524] shrink-0 mt-0.5" />
+            <div>
+              <p className="text-[14px] font-semibold text-[#f5a524]">
+                {missingFds.length} {missingFds.length === 1 ? "FD is" : "FDs are"} missing interest credits
+              </p>
+              <p className="text-[12px] text-[#a0a0a5] mt-1">
+                These FDs were active during the statement period but no interest credit was found for them in this statement.
+              </p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mt-3">
+            {missingFds.map((fd) => (
+              <Link
+                key={fd.id}
+                href={`/dashboard/fd/${fd.id}`}
+                className="flex items-center justify-between gap-3 bg-[#1a1306] border border-[#3a2d0f] rounded-lg px-3 py-2.5 hover:bg-[#221709] transition-colors group"
+              >
+                <div className="min-w-0">
+                  <p className="text-[13px] font-semibold text-[#ededed] mono truncate">
+                    {fd.fdNumber ?? fd.accountNumber ?? "FD"}
+                  </p>
+                  <p className="text-[11px] text-[#a0a0a5] mt-0.5">
+                    {formatINR(fd.principal)} @ {fd.interestRate}%
+                    {fd.payoutFrequency && <> · {fd.payoutFrequency.replace(/_/g, " ")}</>}
+                    {fd.maturesInPeriod && <> · matures {formatDate(fd.maturityDate)}</>}
+                  </p>
+                </div>
+                <ExternalLink size={13} className="text-[#6e6e73] group-hover:text-[#f5a524] shrink-0" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Summary tiles */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
