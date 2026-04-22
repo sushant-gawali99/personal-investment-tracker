@@ -4,6 +4,7 @@ export interface FDRecord {
   principal: number;
   interestRate: number;
   tenureMonths: number;
+  tenureDays: number;
   startDate: Date | string;
   maturityDate: Date | string;
   maturityAmount: number | null;
@@ -32,7 +33,7 @@ export interface MFHolding {
 export function fdMaturityValue(fd: FDRecord): number {
   if (fd.maturityAmount) return fd.maturityAmount;
   const rate = fd.interestRate / 100;
-  const years = fd.tenureMonths / 12;
+  const years = fd.tenureMonths / 12 + fd.tenureDays / 365;
   if (fd.interestType === "simple") {
     return fd.principal * (1 + rate * years);
   }
@@ -123,7 +124,7 @@ export function portfolioSummary(holdings: Holding[], fds: FDRecord[], mfHolding
 
   const fdWeightedYears =
     fd.totalPrincipal > 0
-      ? fds.reduce((s, f) => s + (f.tenureMonths / 12) * f.principal, 0) / fd.totalPrincipal
+      ? fds.reduce((s, f) => s + (f.tenureMonths / 12 + f.tenureDays / 365) * f.principal, 0) / fd.totalPrincipal
       : 0;
   const equityYears = 2;
   const avgYears =

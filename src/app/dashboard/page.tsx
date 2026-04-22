@@ -25,6 +25,7 @@ async function getData(userId: string | null) {
       principal: latest?.principal ?? fd.principal,
       interestRate: latest?.interestRate ?? fd.interestRate,
       tenureMonths: latest?.tenureMonths ?? fd.tenureMonths,
+      tenureDays: latest?.tenureDays ?? fd.tenureDays,
       startDate: latest?.startDate ?? fd.startDate,
       maturityDate: latest?.maturityDate ?? fd.maturityDate,
       maturityAmount: latest?.maturityAmount ?? fd.maturityAmount,

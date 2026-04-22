@@ -13,6 +13,7 @@ export interface FDRenewalData {
   principal: number;
   interestRate: number;
   tenureMonths: number;
+  tenureDays: number;
   maturityAmount: number | null;
   maturityInstruction: string | null;
   payoutFrequency: string | null;
@@ -26,6 +27,7 @@ export interface FDDetailData {
   principal: number;
   interestRate: number;
   tenureMonths: number;
+  tenureDays: number;
   startDate: Date | string;
   maturityDate: Date | string;
   maturityAmount: number | null;
