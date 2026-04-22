@@ -1,4 +1,4 @@
-import type { Holding, FDRecord } from './analytics'
+import type { Holding, MFHolding, FDRecord } from './analytics'
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -70,18 +70,23 @@ interface RawProps {
   }
   timeline: { month: string; accrued: number; projected: number }[]
   holdings: Holding[]
-  mfHoldings: unknown[]
+  mfHoldings: MFHolding[]
   goldTotals: { count: number; currentValue: number; invested: number; gainLoss: number | null; hasRate: boolean }
   upcomingMaturities: FDRecord[]
   fdsByBank: { bankName: string; total: number }[]
 }
 
+function firstTwoWords(s: string) {
+  return s.split(/\s+/).slice(0, 2).join(' ')
+}
+
 export function buildPdfData(props: RawProps, userEmail: string): PdfData {
-  const { summary, timeline, holdings, goldTotals, upcomingMaturities, fdsByBank } = props
-  const topHoldings = [...holdings]
-    .sort((a, b) => b.last_price * b.quantity - a.last_price * a.quantity)
+  const { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank } = props
+  const equityItems = holdings.map(h => ({ symbol: h.tradingsymbol, value: h.last_price * h.quantity }))
+  const mfItems = mfHoldings.map(h => ({ symbol: firstTwoWords(h.fund), value: h.last_price * h.quantity }))
+  const topHoldings = [...equityItems, ...mfItems]
+    .sort((a, b) => b.value - a.value)
     .slice(0, 5)
-    .map(h => ({ symbol: h.tradingsymbol, value: h.last_price * h.quantity }))
   const invested = goldTotals.invested
   const gainLossPct =
     goldTotals.gainLoss != null && invested > 0

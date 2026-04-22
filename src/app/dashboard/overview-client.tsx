@@ -121,11 +121,15 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Overview</h1>
+          <p className="text-[14px] text-[#a0a0a5] mt-1">Your complete investment portfolio at a glance.</p>
+        </div>
         <button
           onClick={handlePrint}
           disabled={printing}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0 mt-1"
         >
           {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
           {printing ? "Generating…" : "Print PDF"}

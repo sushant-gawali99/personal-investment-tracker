@@ -89,12 +89,7 @@ export default async function OverviewPage() {
     await Promise.all([getData(userId), getGoldTotals(userId)]);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Overview</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">Your complete investment portfolio at a glance.</p>
-      </div>
-      <OverviewClient
+    <OverviewClient
         summary={summary}
         timeline={timeline}
         holdings={holdings}
@@ -105,6 +100,5 @@ export default async function OverviewPage() {
         fdsByBank={fdsByBank}
         userEmail={userId ?? ""}
       />
-    </div>
   );
 }

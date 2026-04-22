@@ -6,8 +6,8 @@ interface Props {
   data: PdfData
 }
 
-function truncate(s: string, max: number) {
-  return s.length > max ? s.slice(0, max - 1) + '\u2026' : s
+function firstTwoWords(s: string) {
+  return s.split(/\s+/).slice(0, 2).join(' ')
 }
 
 export function FdByBankBars({ data }: Props) {
@@ -25,7 +25,7 @@ export function FdByBankBars({ data }: Props) {
         return (
           <View key={bank.bankName} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 6 }}>
             <Text style={{ fontSize: 8, color: '#444', width: 110 }}>
-              {truncate(bank.bankName, 22)}
+              {firstTwoWords(bank.bankName)}
             </Text>
             <View style={{ flex: 1, height: 8, backgroundColor: '#e8e8ea', borderRadius: 2, marginLeft: 6, marginRight: 8 }}>
               {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
