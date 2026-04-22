@@ -45,7 +45,7 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
         <KaratPill label="24K" value={rate?.rate24kPerG} highlight />
       </div>
 
-      <div className="flex items-center gap-1 ml-auto shrink-0">
+      <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={refresh}
           disabled={refreshing}
