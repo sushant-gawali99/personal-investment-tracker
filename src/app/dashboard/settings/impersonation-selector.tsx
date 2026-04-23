@@ -41,16 +41,18 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
   async function handleSelect(userId: string | null) {
     if (userId === null) return;
     if (userId === "__self__") return handleStop();
-    await fetch("/api/admin/impersonate", {
+    const res = await fetch("/api/admin/impersonate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId }),
     });
+    if (!res.ok) return;
     router.refresh();
   }
 
   async function handleStop() {
-    await fetch("/api/admin/impersonate", { method: "DELETE" });
+    const res = await fetch("/api/admin/impersonate", { method: "DELETE" });
+    if (!res.ok) return;
     router.refresh();
   }
 
