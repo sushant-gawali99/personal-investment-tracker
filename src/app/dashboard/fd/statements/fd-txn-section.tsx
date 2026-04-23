@@ -58,7 +58,7 @@ export function FdTxnSection({ rows }: { rows: FdTxnRow[] }) {
         )}
       </div>
 
-      <div className="overflow-x-auto -mx-6">
+      <div className="overflow-x-auto -mx-4 sm:-mx-6">
         <table className="w-full text-[13px]">
           <thead>
             <tr className="text-[11px] uppercase tracking-wider text-[#6e6e73]">
@@ -66,7 +66,7 @@ export function FdTxnSection({ rows }: { rows: FdTxnRow[] }) {
               <th className="text-left font-medium px-3 pb-3">Type</th>
               <th className="text-left font-medium px-3 pb-3">Particulars</th>
               <th className="text-right font-medium px-3 pb-3">Amount</th>
-              <th className="text-right font-medium px-6 pb-3 w-20"></th>
+              <th className="text-right font-medium px-6 pb-3 w-14 sm:w-20"></th>
             </tr>
           </thead>
           <tbody>
@@ -83,7 +83,7 @@ export function FdTxnSection({ rows }: { rows: FdTxnRow[] }) {
                       {meta.label}
                     </span>
                   </td>
-                  <td className="px-3 py-3 text-[#a0a0a5] max-w-md truncate" title={r.particulars}>{r.particulars}</td>
+                  <td className="px-3 py-3 text-[#a0a0a5] max-w-[160px] sm:max-w-md truncate" title={r.particulars}>{r.particulars}</td>
                   <td className={`px-3 py-3 text-right mono font-semibold whitespace-nowrap ${isCredit ? "text-[#5ee0a4]" : "text-[#ff7a8a]"}`}>
                     {isCredit ? "+" : "−"}{formatINR(isCredit ? r.credit : r.debit)}
                   </td>

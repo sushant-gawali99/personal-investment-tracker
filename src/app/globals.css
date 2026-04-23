@@ -152,58 +152,142 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-weight: 500;
-  font-size: 14px;
+  font-weight: 600;
+  font-size: 13.5px;
   letter-spacing: -0.01em;
-  border-radius: 8px;
+  border-radius: 10px;
   padding: 10px 16px;
-  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease, transform 120ms ease;
+  transition:
+    background 160ms ease,
+    color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 160ms ease,
+    transform 120ms ease;
   cursor: pointer;
   white-space: nowrap;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
 }
-.ab-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.ab-btn:focus-visible { outline: none; box-shadow: 0 0 0 2px #ededed; }
+.ab-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ab-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #0e0e11, 0 0 0 4px rgba(255,56,92,0.55);
+}
+.ab-btn:active:not(:disabled) { transform: translateY(1px); }
 
 .ab-btn-primary {
   background: #ededed;
   color: #0e0e11;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 1px 2px rgba(0,0,0,0.35);
 }
-.ab-btn-primary:hover:not(:disabled) { background: #ffffff; }
+.ab-btn-primary:hover:not(:disabled) {
+  background: #ffffff;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 4px 12px rgba(0,0,0,0.45);
+  transform: translateY(-1px);
+}
 
 .ab-btn-accent {
-  background: linear-gradient(90deg, #ff385c 0%, #e00b41 100%);
+  background: linear-gradient(180deg, #ff4d70 0%, #ff385c 55%, #e00b41 100%);
   color: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.18) inset,
+    0 -1px 0 rgba(0,0,0,0.25) inset,
+    0 2px 6px rgba(224,11,65,0.35);
 }
-.ab-btn-accent:hover:not(:disabled) { background: #e00b41; }
+.ab-btn-accent:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ff5c7c 0%, #ff3f64 55%, #d00a3b 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.22) inset,
+    0 -1px 0 rgba(0,0,0,0.25) inset,
+    0 6px 16px rgba(224,11,65,0.48);
+  transform: translateY(-1px);
+}
 
 .ab-btn-secondary {
-  background: transparent;
-  color: #ededed;
-  border: 1px solid #3a3a3f;
-}
-.ab-btn-secondary:hover:not(:disabled) { background: #1c1c20; border-color: #4a4a4f; }
-
-.ab-btn-ghost {
-  background: transparent;
-  color: #ededed;
-}
-.ab-btn-ghost:hover:not(:disabled) { background: #1c1c20; }
-
-.ab-input {
-  width: 100%;
   background: #17171a;
   color: #ededed;
   border: 1px solid #3a3a3f;
-  border-radius: 8px;
-  padding: 12px 14px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
+}
+.ab-btn-secondary:hover:not(:disabled) {
+  background: #1c1c20;
+  border-color: #4a4a4f;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 2px 8px rgba(0,0,0,0.35);
+}
+
+.ab-btn-ghost {
+  background: transparent;
+  color: #a0a0a5;
+}
+.ab-btn-ghost:hover:not(:disabled) {
+  background: #1c1c20;
+  color: #ededed;
+}
+
+.ab-btn-danger {
+  background: transparent;
+  color: #ff7a6e;
+  border: 1px solid rgba(255,122,110,0.3);
+}
+.ab-btn-danger:hover:not(:disabled) {
+  background: rgba(255,122,110,0.08);
+  border-color: rgba(255,122,110,0.5);
+}
+
+.ab-input {
+  width: 100%;
+  /* IMPORTANT: use background-color (longhand) not `background` shorthand.
+     Shorthand resets background-image/repeat/position — which would wipe
+     the custom chevron painted on <select> elements below. */
+  background-color: #17171a;
+  color: #ededed;
+  border: 1px solid #2a2a2e;
+  border-radius: 10px;
+  padding: 11px 14px;
   font-size: 14px;
-  transition: border-color 120ms ease, box-shadow 120ms ease;
+  transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 .ab-input::placeholder { color: #6e6e73; }
+.ab-input:hover:not(:focus):not(:disabled) { border-color: #3a3a3f; }
 .ab-input:focus {
   outline: none;
-  border-color: #ededed;
-  box-shadow: 0 0 0 1px #ededed;
+  background-color: #1a1a1e;
+  border-color: #ff385c;
+  box-shadow: 0 0 0 3px rgba(255,56,92,0.18);
+}
+.ab-input:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Custom chevron for native <select> — replaces the ugly browser default.
+   The caret is painted as an SVG background; padding-right reserves room.
+   Using individual longhands (not `background` shorthand) so we don't
+   clobber the base .ab-input background-color. */
+select.ab-input {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a0a0a5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 12px 12px;
+  padding-right: 34px;
+  cursor: pointer;
+}
+select.ab-input:hover:not(:disabled) {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ededed' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+/* Explicit :focus rule for selects — without this, `.ab-input:focus`
+   (specificity 0,2,0) would beat `select.ab-input` (specificity 0,1,1)
+   and even a single property leak could re-enable repeating. Re-assert
+   all three background longhands here to guarantee a single chevron. */
+select.ab-input:focus {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23ededed' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+}
+select.ab-input option {
+  background-color: #17171a;
+  color: #ededed;
+  padding: 8px;
 }
 
 .ab-label {
@@ -250,3 +334,16 @@
 
 /* React day picker overrides (dark theme) */
 .rdp-root { --rdp-accent-color: #ff385c; }
+
+/* Subtle dark scrollbar used on scrollable card interiors. */
+.ab-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a3f transparent;
+}
+.ab-scroll::-webkit-scrollbar { width: 6px; }
+.ab-scroll::-webkit-scrollbar-track { background: transparent; }
+.ab-scroll::-webkit-scrollbar-thumb {
+  background: #2a2a2e;
+  border-radius: 3px;
+}
+.ab-scroll::-webkit-scrollbar-thumb:hover { background: #3a3a3f; }

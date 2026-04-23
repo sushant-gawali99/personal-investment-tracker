@@ -134,7 +134,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
   return (
     <div className="space-y-5">
       {/* Progress block */}
-      <div className="ab-card p-5">
+      <div className="ab-card p-4 sm:p-5">
         <div className="flex justify-between text-[12px] flex-wrap gap-2">
           <span className="text-[#a0a0a5] mono">{formatDate(activeStart)}</span>
           <span className="text-[#ededed] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
@@ -152,7 +152,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {[
           { label: "Principal", value: formatINR(activePrincipal), cls: "text-[#ededed]" },
           { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[#5ee0a4]" },
@@ -168,7 +168,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
 
       {/* Two-column details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        <div className="ab-card p-5 space-y-3">
+        <div className="ab-card p-4 sm:p-5 space-y-3">
           <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Deposit Details</h3>
           <dl className="text-[13px] space-y-0">
             <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
@@ -225,7 +225,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
         </div>
 
         <div className="space-y-5">
-          <div className="ab-card p-5 space-y-3">
+          <div className="ab-card p-4 sm:p-5 space-y-3">
             <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Renewal &amp; Nominee</h3>
             <dl className="text-[13px] space-y-0">
               <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
@@ -247,7 +247,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
             </dl>
           </div>
 
-          <div className="ab-card p-5">
+          <div className="ab-card p-4 sm:p-5">
             <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold mb-3">Source Document</h3>
             {fd.sourcePdfUrl ? (
               <a
@@ -287,7 +287,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
 
       {/* Notes */}
       {fd.notes && (
-        <div className="ab-card p-5">
+        <div className="ab-card p-4 sm:p-5">
           <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold mb-3">Notes</h3>
           <p className="text-[13px] text-[#a0a0a5] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
         </div>
@@ -295,7 +295,7 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
 
       {/* Renewal history */}
       {fd.renewals.length > 0 && (
-        <div className="ab-card p-5 space-y-3">
+        <div className="ab-card p-4 sm:p-5 space-y-3">
           <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Renewal History</h3>
           <div>
             <div className="flex items-center justify-between text-[13px] py-3 border-b border-[#2a2a2e]">

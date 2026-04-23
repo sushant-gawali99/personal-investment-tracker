@@ -691,7 +691,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       <section
         id="receipt"
         ref={(el) => { sectionRefs.current.receipt = el; }}
-        className={cn(receiptCollapsed ? "ab-card-flat" : "ab-card p-6 space-y-5")}
+        className={cn(receiptCollapsed ? "ab-card-flat" : "ab-card p-4 sm:p-6 space-y-5")}
       >
         {receiptCollapsed ? (
           <div className="flex items-center justify-between gap-3 px-4 py-3">
@@ -905,7 +905,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       )}
 
       {/* Main fields */}
-      <section id="details" ref={(el) => { sectionRefs.current.details = el; }} className="ab-card p-6 space-y-5">
+      <section id="details" ref={(el) => { sectionRefs.current.details = el; }} className="ab-card p-4 sm:p-6 space-y-5">
         <div className="flex items-center gap-2 flex-wrap">
           {priorRenewals.length > 0 ? (
             <span className="ab-chip ab-chip-accent">Renewal #{priorRenewals.length} (Current)</span>
@@ -914,6 +914,14 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="depositorName" className="ab-label">Depositor Name</label>
+            <input id="depositorName" className="ab-input" value={form.depositorName} onChange={(e) => set("depositorName", e.target.value)} placeholder="First depositor's full name" />
+          </div>
+          <div>
+            <label htmlFor="depositorSecondName" className="ab-label">Second Depositor Name</label>
+            <input id="depositorSecondName" className="ab-input" value={form.depositorSecondName} onChange={(e) => set("depositorSecondName", e.target.value)} placeholder="Joint account holder (if any)" />
+          </div>
           <div className="sm:col-span-2 lg:col-span-3">
             <label htmlFor="bankName" className="ab-label">Bank Name *</label>
             <input id="bankName" className="ab-input" value={form.bankName} onChange={(e) => set("bankName", e.target.value)} placeholder="State Bank of India" required />
@@ -996,19 +1004,11 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             <label htmlFor="accountNumber" className="ab-label">Account Number</label>
             <input id="accountNumber" className="ab-input" value={form.accountNumber} onChange={(e) => set("accountNumber", e.target.value)} placeholder="XXXXXXXXXXXX" />
           </div>
-          <div>
-            <label htmlFor="depositorName" className="ab-label">Depositor Name</label>
-            <input id="depositorName" className="ab-input" value={form.depositorName} onChange={(e) => set("depositorName", e.target.value)} placeholder="First depositor's full name" />
-          </div>
-          <div>
-            <label htmlFor="depositorSecondName" className="ab-label">Second Depositor Name</label>
-            <input id="depositorSecondName" className="ab-input" value={form.depositorSecondName} onChange={(e) => set("depositorSecondName", e.target.value)} placeholder="Joint account holder (if any)" />
-          </div>
         </div>
       </section>
 
       {/* Renewal & nominee (from back of certificate) */}
-      <section id="renewal" ref={(el) => { sectionRefs.current.renewal = el; }} className="ab-card p-6 space-y-5">
+      <section id="renewal" ref={(el) => { sectionRefs.current.renewal = el; }} className="ab-card p-4 sm:p-6 space-y-5">
         <div>
           <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</p>
           <p className="text-[13px] text-[#a0a0a5] mt-0.5">Usually printed on the back of the FD receipt.</p>
@@ -1049,7 +1049,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       <section
         id="notes"
         ref={(el) => { sectionRefs.current.notes = el; }}
-        className="ab-card p-6 space-y-4"
+        className="ab-card p-4 sm:p-6 space-y-4"
       >
         <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Notes</p>
         <div>

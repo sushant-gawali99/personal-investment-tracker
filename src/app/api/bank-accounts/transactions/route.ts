@@ -16,6 +16,10 @@ export async function GET(req: NextRequest) {
   const maxAmount = url.searchParams.get("maxAmount");
   const page = Number(url.searchParams.get("page") ?? "1");
   const pageSize = Math.min(Number(url.searchParams.get("pageSize") ?? "50"), 200);
+  // Sort: allow list-header toggling on date / amount. Default matches prior
+  // behaviour (most-recent first, then insertion order).
+  const sortField = url.searchParams.get("sort") === "amount" ? "amount" : "txnDate";
+  const sortOrder = url.searchParams.get("order") === "asc" ? "asc" : "desc";
 
   const where: Record<string, unknown> = { userId };
   if (from || to) {
@@ -36,7 +40,10 @@ export async function GET(req: NextRequest) {
   const [items, total] = await Promise.all([
     prisma.transaction.findMany({
       where,
-      orderBy: [{ txnDate: "desc" }, { createdAt: "desc" }],
+      orderBy:
+        sortField === "amount"
+          ? [{ amount: sortOrder }, { txnDate: "desc" }]
+          : [{ txnDate: sortOrder }, { createdAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: { category: true, account: true },

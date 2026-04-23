@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { ImportWizard } from "./import-wizard";
+import { BackLink } from "@/components/bank-accounts/back-link";
 
 export default async function ImportPage() {
   const userId = await getSessionUserId();
@@ -15,9 +16,10 @@ export default async function ImportPage() {
   ]);
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-2">
+        <BackLink href="/dashboard/bank-accounts/imports" label="Imports" />
         <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Import Statement</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">Upload a PDF, review extracted rows, commit.</p>
+        <p className="text-[14px] text-[#a0a0a5]">Upload a PDF, review extracted rows, commit.</p>
       </div>
       <ImportWizard accounts={accounts} categories={categories.map((c) => ({ id: c.id, name: c.name, kind: c.kind }))} />
     </div>

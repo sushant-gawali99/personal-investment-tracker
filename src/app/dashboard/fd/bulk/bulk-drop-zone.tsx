@@ -45,7 +45,7 @@ export function BulkDropZone({
     <div
       {...getRootProps()}
       className={cn(
-        "rounded-xl border-2 border-dashed p-8 text-center cursor-pointer transition-colors bg-[#17171a]",
+        "rounded-xl border-2 border-dashed p-5 sm:p-8 text-center cursor-pointer transition-colors bg-[#17171a]",
         isDragActive
           ? "border-[#ff385c] bg-[#2a1218]"
           : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",

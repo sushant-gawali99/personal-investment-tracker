@@ -434,12 +434,12 @@ export function BulkUploadForm() {
               type="button"
               onClick={handleSaveSelected}
               disabled={selectedSavable.length === 0 || inFlight}
-              className="ab-btn ab-btn-accent"
+              className="ab-btn ab-btn-accent whitespace-nowrap"
             >
               {inFlight && selectedSavable.some((r) => r.status === "saving") ? (
                 <><Loader2 size={14} className="animate-spin" /> Saving...</>
               ) : (
-                <>Save selected ({selectedSavable.length})</>
+                <>Save selected <span>({selectedSavable.length})</span></>
               )}
             </button>
           </div>

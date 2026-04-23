@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { TransactionsTable } from "./transactions-table";
+import { BackLink } from "@/components/bank-accounts/back-link";
 
 export default async function ListPage() {
   const userId = await getSessionUserId();
@@ -15,9 +16,10 @@ export default async function ListPage() {
   ]);
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-2">
+        <BackLink />
         <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Transactions</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">All imported transactions across your accounts.</p>
+        <p className="text-[14px] text-[#a0a0a5]">All imported transactions across your accounts.</p>
       </div>
       <TransactionsTable
         accounts={accounts.map((a) => ({ id: a.id, label: a.label }))}

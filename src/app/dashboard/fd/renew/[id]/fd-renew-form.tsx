@@ -91,7 +91,7 @@ export function FDRenewForm({ fd }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
-      <section className="ab-card p-6 space-y-5">
+      <section className="ab-card p-4 sm:p-6 space-y-5">
         <div>
           <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal Details</p>
           <p className="text-[13px] text-[#a0a0a5] mt-0.5">
@@ -119,7 +119,7 @@ export function FDRenewForm({ fd }: Props) {
           <div>
             <label className="ab-label">Tenure *</label>
             <p className="text-[11px] text-[#a0a0a5] mb-1">Months and/or days — at least one must be &gt; 0.</p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <input
                 type="number"
                 min="0"

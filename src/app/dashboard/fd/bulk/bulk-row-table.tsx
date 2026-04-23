@@ -140,7 +140,7 @@ export function BulkRowTable({
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-[#a0a0a5] max-w-[180px]">
+                    <td className="px-3 py-2 text-[#a0a0a5] max-w-[120px] sm:max-w-[180px]">
                       <div className="flex items-center gap-1.5 truncate">
                         {row.kind === "pdf" ? <FileText size={12} /> : <ImageIcon size={12} />}
                         <span className="truncate" title={row.file.name}>{row.file.name}</span>
@@ -187,7 +187,7 @@ export function BulkRowTable({
                   </tr>
                   {isExpanded && canEdit && (
                     <tr className="border-b border-[#2a2a2e] bg-[#0e0e10]">
-                      <td colSpan={11} className="px-6 py-4">
+                      <td colSpan={11} className="px-3 sm:px-6 py-2 sm:py-4">
                         <BulkRowEditor
                           row={row}
                           onEditField={(field, value) => onEditField(row.id, field, value)}

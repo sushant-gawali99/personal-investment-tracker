@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { AccountsClient } from "./accounts-client";
+import { BackLink } from "@/components/bank-accounts/back-link";
 
 export default async function AccountsPage() {
   const userId = await getSessionUserId();
@@ -27,9 +28,10 @@ export default async function AccountsPage() {
   }));
   return (
     <div className="space-y-6">
-      <div>
+      <div className="space-y-2">
+        <BackLink />
         <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">Manage accounts linked to imported statements.</p>
+        <p className="text-[14px] text-[#a0a0a5]">Manage accounts linked to imported statements.</p>
       </div>
       <AccountsClient accounts={enriched} />
     </div>

@@ -11,6 +11,7 @@ const TABS = [
   { href: "/dashboard", label: "Overview" },
   { href: "/dashboard/zerodha", label: "Zerodha" },
   { href: "/dashboard/fd", label: "Fixed Deposits" },
+  { href: "/dashboard/bank-accounts", label: "Bank Accounts" },
   { href: "/dashboard/gold", label: "Gold" },
   { href: "/dashboard/settings", label: "Settings" },
 ];
