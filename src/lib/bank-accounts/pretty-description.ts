@@ -92,7 +92,7 @@ const HONORIFICS = /^(mr|mrs|ms|dr|shri|smt|mr\.|mrs\.)\s+/i;
 
 // ─── Bank-name normalisation ──────────────────────────────────────────────
 const BANK_CANON: Array<[RegExp, string]> = [
-  [/\baxis(\s*bank)?\b/i, "Axis Bank"],
+  [/\bax[iy]x(\s*bank)?\b/i, "Axis Bank"],  // also catches SBI's "axix" typo
   [/\bhdfc(\s*bank(\s*ltd)?)?\b/i, "HDFC Bank"],
   [/\bicici(\s*bank(\s*ltd)?)?\b/i, "ICICI Bank"],
   [/\bsbi\b|\bstate\s*bank(\s*of\s*india)?\b/i, "SBI"],
@@ -201,6 +201,55 @@ export function prettifyDescription(raw: string): PrettyDescription {
       subMethod: dir.toLowerCase() === "cr" ? "P2A" : "P2A",
       ref: ref || null,
       merchant: canonicalMerchant(nameRaw) || "UPI Transfer",
+    };
+  }
+
+  // ── SBI-style IMPS embedded mid-string ───────────────────────
+  // "Dep Tfr Imps/607694998379/axix-xx200-ravindra/othersrdd"
+  // Format: Imps/{ref}/{bank}-{masked_acct}-{name}/{category}
+  const sbiImpsMatch = trimmed.match(/\bIMPS\/(\d+)\/(.+)/i);
+  if (sbiImpsMatch) {
+    const [, ref, rest] = sbiImpsMatch;
+    // First slash-slot is "{bank}-{masked_acct}-{name}"; subsequent slots are
+    // SBI category codes (e.g. "othersrdd") — ignore them.
+    const firstSlot = rest.split("/")[0];
+    const subParts = firstSlot.split("-").map((p) => p.trim()).filter(
+      (p) =>
+        p &&
+        !/^\d+$/.test(p) &&          // not pure numbers
+        !/^[xX]{2,}\d*$/.test(p) &&  // not masked account like "xx200"
+        !/^others/i.test(p),         // not SBI category prefix "othersrdd"
+    );
+    // First sub-part tends to be the bank code; remaining is the name.
+    const [maybeBankCode, ...nameParts] = subParts;
+    const bankStr = maybeBankCode ?? "";
+    const resolvedBank = canonicalBank(bankStr);
+    // If it resolved to a known bank, keep it as counterBank; otherwise fold it into the name.
+    const nameRaw = (resolvedBank ? nameParts : [bankStr, ...nameParts]).join(" ");
+    return {
+      ...base,
+      method: "IMPS",
+      ref,
+      merchant: canonicalMerchant(nameRaw) || "IMPS Transfer",
+      counterBank: resolvedBank,
+    };
+  }
+
+  // ── SBI plain transfer "Of Mr./Ms." ──────────────────────────
+  // "Dep Tfr 00418160911146 Of Mr. Ravindra Diwakar D At 07339"
+  // "Wdl Tfr Inb E-tdr/e-stdr 00450417164971 Of Mr. Ravindra Diwakar D At 07339"
+  const ofPersonMatch = trimmed.match(/\bOf\s+(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+([A-Za-z][A-Za-z\s.]{1,40})(?:\s+(?:At|D\s+At)\s+\d+)?$/i);
+  if (ofPersonMatch) {
+    const name = ofPersonMatch[1].trim().replace(/\s+D\s*$/, "").trim();
+    // Determine transfer direction and method from prefix keywords.
+    const isDebit = /\bWdl\b|\bWithdraw/i.test(trimmed);
+    const methodHint = /\bNEFT\b/i.test(trimmed) ? "NEFT" :
+                       /\bRTGS\b/i.test(trimmed) ? "RTGS" :
+                       /\bIMPS\b/i.test(trimmed) ? "IMPS" : "Transfer";
+    return {
+      ...base,
+      method: methodHint as TxnMethod,
+      merchant: canonicalMerchant(name) || name,
     };
   }
 
