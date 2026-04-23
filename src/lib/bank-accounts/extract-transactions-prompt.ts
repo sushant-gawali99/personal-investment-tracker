@@ -37,6 +37,21 @@ Rules:
   If a value is genuinely ambiguous and neither form is an Indian date
   (e.g. month > 12 on the left), return null rather than guessing.
 - amount is always POSITIVE. Use "direction" to distinguish debit vs credit.
+- AMOUNT FORMAT: amounts use **Indian** number formatting, NOT US formatting.
+  Indian notation groups digits as 2-2-3 from the right (thousand, then lakh,
+  then crore), so comma placement is different from US "every 3 digits":
+    * "1,00,000"      → 100000       (one lakh, NOT one million)
+    * "10,00,000"     → 1000000      (ten lakh, NOT ten million)
+    * "1,00,00,000"   → 10000000     (one crore)
+    * "50,00,000.00"  → 5000000.00   (fifty lakh)
+    * "1,23,456.78"   → 123456.78
+    * "-1,00,000"     → use amount=100000, direction="debit"
+  To convert: **strip every comma**, then parse the remaining digits. Never
+  multiply by 10 to "normalize" — commas are separators only, never
+  multipliers. If you see two commas that would imply "millions" in US
+  format, it's almost certainly Indian lakh notation. When in doubt, cross-
+  check against the running balance column: the amounts should produce a
+  coherent balance trail.
 - bankRef: UPI reference id, cheque number, or bank's internal txn id when present; else null.
 - suggestedCategory MUST be exactly one of: ${inputs.categoryNames.join(", ")}, or null if none fits. No synonyms.
 - prettyDescription: a short, human-readable label for the transaction (max ~40 chars).
