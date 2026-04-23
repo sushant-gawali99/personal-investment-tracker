@@ -56,7 +56,8 @@ const MERCHANT_CANON: Array<[RegExp, string]> = [
   [/\bcred\b/i, "CRED"],
   [/\bgoogle\s*asia\s*pacific/i, "Google Play"],
   [/\bgoogle\s*(play|india)\b/i, "Google"],
-  [/\bgoogle\s+p\b/i, "Google Pay"],        // SBI truncates "Google Pay" to "Google P"
+  [/\bgoogle\s*pay/i, "Google Pay"],         // also catches "Google Payuti" (bank code fused)
+  [/\bgoogle\s+p\b/i, "Google Pay"],         // SBI truncates "Google Pay" to "Google P"
   [/\bikea\s*india/i, "IKEA"],
   [/\bbarbeque\s*nation/i, "Barbeque Nation"],
   [/\bstar\s*bazaar/i, "Star Bazaar"],
@@ -191,20 +192,24 @@ export function prettifyDescription(raw: string): PrettyDescription {
   // "Dep Tfr Upi/cr/420831234567/Sushant Gawali/sushant@upi/SBI"
   // UPI sits inside a longer prefix (Wdl Tfr / Dep Tfr etc.).
   // Direction codes seen in the wild: dr, cr, idr (immediate debit), icr, p2p, etc.
-  const sbiUpiMatch = trimmed.match(/\bUPI\/([a-z]{1,4})\/(\d*)\/(.+)/i);
+  // Separator after the ref can be "/" (normal) or " " (some SBI PDFs run ref+name together).
+  const sbiUpiMatch = trimmed.match(/\bUPI\/([a-z]{1,4})\/(\d*)(?:\/|\s+)(.+)/i);
   if (sbiUpiMatch) {
     const [, dir, ref, rest] = sbiUpiMatch;
+    // Strip trailing branch address: "At 07339 University Road (pune)" or "mand 009769... At 07339..."
+    const cleanRest = rest.replace(/\s+At\s+\d[\w\s,.()\-]*$/i, "").trim();
     // Split remaining slots; discard:
     //   • pure-numeric tokens (phone/account numbers)
     //   • near-numeric tokens — 8+ chars where ≥80% are digits (OCR noise like "73879932t3")
+    //   • short mandate/noise tokens ("mand", single letters used as bank codes)
     //   • VPA handles (contain @)
     function isNumericish(s: string): boolean {
       if (/^\d+$/.test(s)) return true;
       if (s.length >= 8 && (s.replace(/\D/g, "").length / s.length) >= 0.8) return true;
       return false;
     }
-    const parts = rest.split("/").map((p) => p.trim()).filter(
-      (p) => p && !isNumericish(p) && !p.includes("@"),
+    const parts = cleanRest.split("/").map((p) => p.trim()).filter(
+      (p) => p && !isNumericish(p) && !p.includes("@") && !/^mand\b/i.test(p) && p.length > 1,
     );
     const nameRaw = parts.join(" ");
     return {
