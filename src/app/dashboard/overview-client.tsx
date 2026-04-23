@@ -89,7 +89,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
     setPrinting(true);
     try {
       const data = buildPdfData(
-        { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank },
+        { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances },
         userEmail,
       );
       await generateOverviewPdf(data);

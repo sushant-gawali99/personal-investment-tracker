@@ -6,38 +6,36 @@ import { fmtINRPdf } from '@/lib/pdf-data'
 import type { PdfData } from '@/lib/pdf-data'
 
 const styles = StyleSheet.create({
-  page: { padding: 36, fontFamily: 'Helvetica', backgroundColor: '#ffffff', fontSize: 10, color: '#111' },
+  page: { padding: 32, fontFamily: 'Helvetica', backgroundColor: '#ffffff', fontSize: 10, color: '#111' },
   // Header
-  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', borderBottomWidth: 2, borderBottomColor: '#ff385c', paddingBottom: 10, marginBottom: 16 },
-  headerTitle: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#111' },
-  headerSub: { fontSize: 9, color: '#666', marginTop: 3 },
+  headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', borderBottomWidth: 2, borderBottomColor: '#ff385c', paddingBottom: 8, marginBottom: 12 },
+  headerTitle: { fontSize: 18, fontFamily: 'Helvetica-Bold', color: '#111' },
+  headerSub: { fontSize: 8, color: '#666', marginTop: 2 },
   headerRight: { alignItems: 'flex-end' },
-  headerValueLabel: { fontSize: 9, color: '#999' },
-  headerValue: { fontSize: 20, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
+  headerValueLabel: { fontSize: 8, color: '#999' },
+  headerValue: { fontSize: 18, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
   // Stat cards
-  cardsRow: { flexDirection: 'row', marginBottom: 16 },
-  card: { flex: 1, backgroundColor: '#f7f7f8', borderRadius: 4, padding: 8 },
-  cardLabel: { fontSize: 8, color: '#888' },
-  cardValue: { fontSize: 13, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
-  cardSub: { fontSize: 9, marginTop: 2 },
-  cardSubPos: { fontSize: 9, marginTop: 2, color: '#16a34a' },
-  cardSubNeg: { fontSize: 9, marginTop: 2, color: '#dc2626' },
-  cardSubNeu: { fontSize: 9, marginTop: 2, color: '#888' },
+  cardsRow: { flexDirection: 'row', marginBottom: 12 },
+  card: { flex: 1, backgroundColor: '#f7f7f8', borderRadius: 4, padding: 7 },
+  cardLabel: { fontSize: 7, color: '#888' },
+  cardValue: { fontSize: 12, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
+  cardSub: { fontSize: 8, marginTop: 2 },
+  cardSubPos: { fontSize: 8, marginTop: 2, color: '#16a34a' },
+  cardSubNeg: { fontSize: 8, marginTop: 2, color: '#dc2626' },
+  cardSubNeu: { fontSize: 8, marginTop: 2, color: '#888' },
   // Sections
-  twoCol: { flexDirection: 'row', marginBottom: 14 },
-  section: { backgroundColor: '#f7f7f8', borderRadius: 4, padding: 10 },
-  sectionLabel: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#555', marginBottom: 8 },
-  // MF table
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3, borderBottomWidth: 0.5, borderBottomColor: '#e0e0e0' },
-  rowLabel: { fontSize: 9, color: '#666' },
-  rowValue: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#111' },
-  rowValuePos: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#16a34a' },
-  rowValueNeg: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#dc2626' },
-  // Maturities
-  maturityItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 3 },
+  twoCol: { flexDirection: 'row', marginBottom: 10 },
+  section: { backgroundColor: '#f7f7f8', borderRadius: 4, padding: 8 },
+  sectionLabel: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#555', marginBottom: 6 },
+  // Table rows
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 2, borderBottomWidth: 0.5, borderBottomColor: '#e0e0e0' },
+  rowLabel: { fontSize: 8, color: '#666' },
+  rowValue: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#111' },
+  rowValuePos: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#16a34a' },
+  rowValueNeg: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#dc2626' },
   // Footer
-  footer: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: '#e0e0e0', paddingTop: 8, marginTop: 14 },
-  footerText: { fontSize: 8, color: '#aaa' },
+  footer: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: '#e0e0e0', paddingTop: 6, marginTop: 10 },
+  footerText: { fontSize: 7, color: '#aaa' },
 })
 
 interface Props {
@@ -116,7 +114,7 @@ export function OverviewPdf({ data }: Props) {
             <Text style={styles.sectionLabel}>Asset Allocation</Text>
             <AllocationDonut data={data} />
           </View>
-          <View style={{ flex: 1, gap: 8 }}>
+          <View style={{ flex: 1, gap: 6 }}>
             {data.equity.currentValue > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionLabel}>Equity</Text>
@@ -156,9 +154,32 @@ export function OverviewPdf({ data }: Props) {
           </View>
         </View>
 
+        {/* Bank Balances */}
+        {data.bankBalances.length > 0 && (
+          <View style={[styles.section, { marginBottom: 10 }]}>
+            <Text style={styles.sectionLabel}>Bank Balances</Text>
+            <View style={{ flexDirection: 'row', paddingBottom: 3, marginBottom: 2, borderBottomWidth: 0.5, borderBottomColor: '#d0d0d0' }}>
+              <Text style={{ flex: 2, fontSize: 7, color: '#999' }}>Account</Text>
+              <Text style={{ flex: 1, fontSize: 7, color: '#999', textAlign: 'right' }}>Balance</Text>
+              <Text style={{ flex: 1, fontSize: 7, color: '#999', textAlign: 'right' }}>As of</Text>
+            </View>
+            {data.bankBalances.map((b, i) => (
+              <View key={i} style={{ flexDirection: 'row', paddingVertical: 2, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' }}>
+                <Text style={{ flex: 2, fontSize: 8, color: '#333' }}>{b.label}</Text>
+                <Text style={{ flex: 1, fontSize: 8, fontFamily: 'Helvetica-Bold', color: b.closingBalance != null && b.closingBalance < 0 ? '#dc2626' : '#111', textAlign: 'right' }}>
+                  {b.closingBalance != null ? fmtINRPdf(b.closingBalance) : '—'}
+                </Text>
+                <Text style={{ flex: 1, fontSize: 7, color: '#888', textAlign: 'right' }}>
+                  {b.asOf ? new Date(b.asOf).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—'}
+                </Text>
+              </View>
+            ))}
+          </View>
+        )}
+
         {/* FD by Bank */}
         {data.fdsByBank.length > 0 && (
-          <View style={[styles.section, { marginBottom: 14 }]}>
+          <View style={[styles.section, { marginBottom: 10 }]}>
             <Text style={styles.sectionLabel}>FD Corpus by Bank</Text>
             <FdByBankBars data={data} />
           </View>
@@ -166,7 +187,7 @@ export function OverviewPdf({ data }: Props) {
 
         {/* Top Holdings */}
         {data.holdings.length > 0 && (
-          <View style={[styles.section, { marginBottom: 14 }]}>
+          <View style={[styles.section, { marginBottom: 10 }]}>
             <Text style={styles.sectionLabel}>Top Holdings</Text>
             <TopHoldingsBars data={data} />
           </View>

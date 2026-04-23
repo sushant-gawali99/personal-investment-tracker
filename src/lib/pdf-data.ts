@@ -15,6 +15,7 @@ export interface PdfData {
   holdings: { symbol: string; value: number }[]
   timeline: { month: string; accrued: number; projected: number }[]
   upcomingMaturities: { bankName: string; maturityDate: string; amount: number; daysRemaining: number }[]
+  bankBalances: { label: string; bankName: string; closingBalance: number | null; asOf: string | null }[]
 }
 
 // ── Formatting ────────────────────────────────────────────────────────────────
@@ -74,6 +75,7 @@ interface RawProps {
   goldTotals: { count: number; currentValue: number; invested: number; gainLoss: number | null; hasRate: boolean }
   upcomingMaturities: FDRecord[]
   fdsByBank: { bankName: string; total: number }[]
+  bankBalances: { label: string; bankName: string; closingBalance: number | null; asOf: string | null }[]
 }
 
 function firstTwoWords(s: string) {
@@ -81,7 +83,7 @@ function firstTwoWords(s: string) {
 }
 
 export function buildPdfData(props: RawProps, userEmail: string): PdfData {
-  const { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank } = props
+  const { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances } = props
   const equityItems = holdings.map(h => ({ symbol: h.tradingsymbol, value: h.last_price * h.quantity }))
   const mfItems = mfHoldings.map(h => ({ symbol: firstTwoWords(h.fund), value: h.last_price * h.quantity }))
   const topHoldings = [...equityItems, ...mfItems]
@@ -124,6 +126,12 @@ export function buildPdfData(props: RawProps, userEmail: string): PdfData {
       daysRemaining: Math.round(
         (new Date(fd.maturityDate).getTime() - Date.now()) / 86_400_000,
       ),
+    })),
+    bankBalances: bankBalances.map(b => ({
+      label: b.label,
+      bankName: b.bankName,
+      closingBalance: b.closingBalance,
+      asOf: b.asOf,
     })),
   }
 }

@@ -10,9 +10,9 @@ export function TopHoldingsBars({ data }: Props) {
   const { holdings } = data
   if (holdings.length === 0) return null
 
-  const MAX_BAR_W = 230
-  const ROW_H = 18
-  const GAP = 8
+  const MAX_BAR_W = 220
+  const ROW_H = 12
+  const GAP = 4
   const maxVal = holdings[0].value  // already sorted desc
   const svgH = holdings.length * (ROW_H + GAP)
 
