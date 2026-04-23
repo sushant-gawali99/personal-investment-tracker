@@ -33,7 +33,7 @@ export function TopNav({ impersonatedUser }: Props) {
       setStopping(false);
       return;
     }
-    router.refresh();
+    router.push("/dashboard");
   }
 
   return (

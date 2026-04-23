@@ -53,7 +53,7 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
   async function handleStop() {
     const res = await fetch("/api/admin/impersonate", { method: "DELETE" });
     if (!res.ok) return;
-    router.refresh();
+    router.push("/dashboard");
   }
 
   const selectValue = activeUserId ?? "__self__";
