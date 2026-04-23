@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUserId();
@@ -29,6 +30,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       maturityDate: body.maturityDate ? new Date(body.maturityDate) : undefined,
     },
   });
+
+  // Re-link only when identifying fields changed — otherwise (e.g. just
+  // toggling `disabled` or editing notes) the existing links stay correct.
+  const identityChanged =
+    (body.fdNumber !== undefined && body.fdNumber !== existing.fdNumber) ||
+    (body.accountNumber !== undefined && body.accountNumber !== existing.accountNumber);
+  if (identityChanged) {
+    try {
+      await linkTransactionsForFd(userId, fd.id);
+    } catch (err) {
+      console.error("fd-link: linkTransactionsForFd failed", err);
+    }
+  }
+
   return NextResponse.json({ fd });
 }
 

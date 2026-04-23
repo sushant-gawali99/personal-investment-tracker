@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
+import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
 
 export async function GET() {
   const result = await requireUserId();
@@ -112,6 +113,11 @@ export async function POST(req: NextRequest) {
       });
       return [updated];
     });
+    try {
+      await linkTransactionsForFd(userId, fd.id);
+    } catch (err) {
+      console.error("fd-link: linkTransactionsForFd failed", err);
+    }
     return NextResponse.json({ fd }, { status: 200 });
   }
 
@@ -138,5 +144,10 @@ export async function POST(req: NextRequest) {
     return [created];
   });
 
+  try {
+    await linkTransactionsForFd(userId, fd.id);
+  } catch (err) {
+    console.error("fd-link: linkTransactionsForFd failed", err);
+  }
   return NextResponse.json({ fd }, { status: 201 });
 }
