@@ -211,13 +211,27 @@ export function prettifyDescription(raw: string): PrettyDescription {
     const parts = cleanRest.split("/").map((p) => p.trim()).filter(
       (p) => p && !isNumericish(p) && !p.includes("@") && !/^mand\b/i.test(p) && p.length > 1,
     );
-    const nameRaw = parts.join(" ");
+    // Try each slot for a known-merchant canon hit (e.g. "uber", "zomato" in later slots).
+    // If nothing hits, fall back to the FIRST slot only — joining all slots pulls in bank
+    // codes like "uti", "arup", "upi" that appear as junk in SBI's middle slots.
+    let merchant = "UPI Transfer";
+    let canonHit = false;
+    for (const part of parts) {
+      for (const [rx, name] of MERCHANT_CANON) {
+        if (rx.test(part)) { merchant = name; canonHit = true; break; }
+      }
+      if (canonHit) break;
+    }
+    if (!canonHit) {
+      const first = parts[0] ?? "";
+      merchant = canonicalMerchant(first) || titleCase(first) || "UPI Transfer";
+    }
     return {
       ...base,
       method: "UPI",
       subMethod: dir.toLowerCase() === "cr" ? "P2A" : "P2A",
       ref: ref || null,
-      merchant: canonicalMerchant(nameRaw) || "UPI Transfer",
+      merchant,
     };
   }
 
@@ -252,10 +266,11 @@ export function prettifyDescription(raw: string): PrettyDescription {
     };
   }
 
-  // ── SBI internal transfer "Frm {acct} To {acct} {code}/{name}" ──
+  // ── SBI internal transfer "Frm {acct} To {acct} [{code}/]{name}" ──
   // "Dep Tfr Int Trf Frm 4381609104 To 10198755734 Dcpf/ravindra Diwakar D At 07339"
-  // The payment-mode code (Dcpf, Neft, etc.) precedes the name after a slash.
-  const sbiInternalMatch = trimmed.match(/\bFrm\s+\d+\s+To\s+\d+\s+[A-Za-z]+\/([A-Za-z][A-Za-z\s]{1,50})/i);
+  // "Dep Tfr Int Trf Frm 4480023697 To 10198755734 Ravindra Diwakar D At 07339 ..."
+  // The payment-mode code (Dcpf, Neft, etc.) before the slash is optional.
+  const sbiInternalMatch = trimmed.match(/\bFrm\s+\d+\s+To\s+\d+\s+(?:[A-Za-z]+\/)?([A-Za-z][A-Za-z\s]{1,50})/i);
   if (sbiInternalMatch) {
     let name = sbiInternalMatch[1].trim();
     name = name.replace(/\s+D\s+At\b.*/i, "").replace(/\s+[A-Z]\s*$/, "").trim();
