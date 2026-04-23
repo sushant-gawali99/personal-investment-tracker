@@ -35,6 +35,8 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [file, setFile] = useState<File | null>(null);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [importId, setImportId] = useState<string | null>(null);
   const [rows, setRows] = useState<StagedRow[]>([]);
   const [busy, setBusy] = useState(false);
@@ -96,7 +98,11 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
     setImportId(newId);
 
     setStatus("extracting");
-    const ex = await fetch(`/api/bank-accounts/import/${newId}/extract`, { method: "POST" });
+    const ex = await fetch(`/api/bank-accounts/import/${newId}/extract`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ password: password.trim() || undefined }),
+    });
     if (!ex.ok) { setError((await ex.json()).error); setBusy(false); setStatus("idle"); return; }
 
     const startedAt = Date.now();
@@ -130,6 +136,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   function resetForAnother() {
     setStep(1);
     setFile(null);
+    setPassword("");
     setImportId(null);
     setRows([]);
     setSummary(null);
@@ -239,11 +246,41 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                     Drop your PDF here or click to browse
                   </p>
                   <p className="text-[12px] text-[#a0a0a5]">
-                    Password-protected PDFs are not supported
+                    Password-protected PDFs supported — enter password below
                   </p>
                 </div>
               )}
             </label>
+          </div>
+
+          <div>
+            <label className="ab-label">
+              PDF password <span className="text-[#6e6e73] font-normal">(optional)</span>
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="ab-input pr-16"
+                placeholder="Leave blank if not protected"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={status !== "idle"}
+                autoComplete="off"
+              />
+              {password && (
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[#a0a0a5] hover:text-[#ededed] px-2 py-1"
+                  tabIndex={-1}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              )}
+            </div>
+            <p className="text-[11px] text-[#6e6e73] mt-1">
+              Used once to decrypt this statement — not stored.
+            </p>
           </div>
 
           <button

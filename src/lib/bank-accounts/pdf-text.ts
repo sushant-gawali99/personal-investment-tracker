@@ -3,9 +3,9 @@ export interface PdfTextResult {
   pageCount: number;
 }
 
-export async function extractPdfText(pdfBytes: Buffer): Promise<PdfTextResult> {
+export async function extractPdfText(pdfBytes: Buffer, password?: string): Promise<PdfTextResult> {
   const { PDFParse } = await import("pdf-parse");
-  const parser = new PDFParse({ data: new Uint8Array(pdfBytes) });
+  const parser = new PDFParse({ data: new Uint8Array(pdfBytes), password: password || undefined });
   try {
     const result = await parser.getText();
     return { text: result.text ?? "", pageCount: result.total ?? 0 };

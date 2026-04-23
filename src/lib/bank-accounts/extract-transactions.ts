@@ -69,13 +69,14 @@ function parseJsonResponse(raw: string): unknown {
 export async function extractTransactions(
   pdfBytes: Buffer,
   categoryNames: string[],
+  pdfPassword?: string,
 ): Promise<ExtractionResult> {
   // Try text-first: much faster (~5-15s vs 30-60s for vision) and cheaper.
   // Fall back to vision mode only if the PDF has no extractable text (scanned).
   let extractedText: string | null = null;
   const tPdf = Date.now();
   try {
-    const result = await extractPdfText(pdfBytes);
+    const result = await extractPdfText(pdfBytes, pdfPassword);
     if (result.text.trim().length > TEXT_VISION_FALLBACK_THRESHOLD) {
       extractedText = result.text;
     }
@@ -83,8 +84,17 @@ export async function extractTransactions(
       `[extract] pdf-parse ${Date.now() - tPdf}ms, textLen=${result.text.length}, pages=${result.pageCount}, mode=${extractedText ? "text" : "vision-fallback"}`,
     );
   } catch (e) {
-    console.log(`[extract] pdf-parse FAILED after ${Date.now() - tPdf}ms:`, e instanceof Error ? e.message : e);
-    // pdf-parse failed (e.g. encrypted PDF); fall through to vision
+    const msg = e instanceof Error ? e.message : String(e);
+    console.log(`[extract] pdf-parse FAILED after ${Date.now() - tPdf}ms:`, msg);
+    // Surface password errors clearly — Claude vision can't decrypt PDFs either.
+    if (e instanceof Error && (e.name === "PasswordException" || /password/i.test(msg))) {
+      throw new Error(
+        pdfPassword
+          ? "The password is incorrect for this PDF."
+          : "This PDF is password-protected. Re-upload and provide the password.",
+      );
+    }
+    // pdf-parse failed for other reasons (e.g. scanned PDF); fall through to vision
   }
 
   // JS-first: try deterministic regex parsers for known bank formats. If

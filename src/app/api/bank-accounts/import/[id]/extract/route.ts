@@ -21,7 +21,7 @@ function resolveLocalPath(fileUrl: string): string {
  * Runs the full extract → categorize → dedup pipeline in the background.
  * Must never throw — catches all errors and persists them as status=failed.
  */
-async function runExtraction(importId: string, userId: string): Promise<void> {
+async function runExtraction(importId: string, userId: string, pdfPassword?: string): Promise<void> {
   const started = Date.now();
   try {
     const imp = await prisma.statementImport.findFirst({ where: { id: importId, userId } });
@@ -37,7 +37,7 @@ async function runExtraction(importId: string, userId: string): Promise<void> {
       categories.map((c) => [c.name, { id: c.id, name: c.name, kind: c.kind as CategoryLite["kind"], userId: c.userId }]),
     );
 
-    const extraction = await extractTransactions(Buffer.from(bytes), categoryNames);
+    const extraction = await extractTransactions(Buffer.from(bytes), categoryNames, pdfPassword);
 
     const rules = await prisma.merchantRule.findMany({
       // Include system-wide rules (userId=null) so newly-seeded users
@@ -118,12 +118,21 @@ async function runExtraction(importId: string, userId: string): Promise<void> {
   }
 }
 
-export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
   const userId = await getSessionUserId();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const imp = await prisma.statementImport.findFirst({ where: { id, userId } });
   if (!imp) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+  let pdfPassword: string | undefined;
+  try {
+    const body = (await req.json().catch(() => null)) as { password?: string } | null;
+    const pw = body?.password?.trim();
+    if (pw) pdfPassword = pw;
+  } catch {
+    /* no body — extraction proceeds without a password */
+  }
 
   // Guard against double-starts: only kick off if pending or previously failed.
   if (imp.status === "extracting") {
@@ -137,7 +146,7 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
 
   // Fire-and-forget. Works in both `next dev` and long-running Node (Railway).
   // Would need a queue (BullMQ, etc.) to work on serverless platforms.
-  void runExtraction(id, userId);
+  void runExtraction(id, userId, pdfPassword);
 
   return NextResponse.json({ importId: id, status: "extracting" }, { status: 202 });
 }
