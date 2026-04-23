@@ -24,9 +24,15 @@ export function TopNav({ impersonatedUser }: Props) {
   const pathname = usePathname();
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [stopping, setStopping] = useState(false);
 
   async function stopImpersonating() {
-    await fetch("/api/admin/impersonate", { method: "DELETE" });
+    setStopping(true);
+    const res = await fetch("/api/admin/impersonate", { method: "DELETE" });
+    if (!res.ok) {
+      setStopping(false);
+      return;
+    }
     router.refresh();
   }
 
@@ -40,7 +46,9 @@ export function TopNav({ impersonatedUser }: Props) {
           </div>
           <button
             onClick={stopImpersonating}
-            className="text-amber-400 hover:text-amber-300 text-[12px] font-medium transition-colors flex items-center gap-1"
+            disabled={stopping}
+            aria-label="Stop impersonating"
+            className="text-amber-400 hover:text-amber-300 text-[12px] font-medium transition-colors flex items-center gap-1 disabled:opacity-50"
           >
             <X size={12} />
             Stop
