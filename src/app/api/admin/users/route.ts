@@ -15,7 +15,7 @@ export async function GET() {
     prisma.fixedDeposit.findMany({ select: { userId: true }, distinct: ["userId"] }),
     prisma.goldItem.findMany({ select: { userId: true }, distinct: ["userId"] }),
     prisma.bankAccount.findMany({ select: { userId: true }, distinct: ["userId"] }),
-    prisma.kiteConfig.findMany({ select: { userId: true } }),
+    prisma.kiteConfig.findMany({ select: { userId: true }, distinct: ["userId"] }),
   ]);
 
   const users = [
