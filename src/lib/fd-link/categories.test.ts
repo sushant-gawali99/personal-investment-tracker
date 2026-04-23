@@ -9,9 +9,10 @@ function makeFakeDb(initial: Row[]) {
   return {
     rows,
     transactionCategory: {
-      findMany: vi.fn(async (args: { where: { userId: { in: (string | null)[] }; name: { in: string[] } } }) => {
-        const { userId, name } = args.where;
-        return rows.filter((r) => userId.in.includes(r.userId) && name.in.includes(r.name));
+      findMany: vi.fn(async (args: { where: { OR: Array<{ userId?: string | null }>; name: { in: string[] } } }) => {
+        const { OR, name } = args.where;
+        const allowedUserIds = OR.map((clause) => clause.userId);
+        return rows.filter((r) => allowedUserIds.includes(r.userId) && name.in.includes(r.name));
       }),
       create: vi.fn(async (args: { data: Omit<Row, "id"> }) => {
         const row = { ...args.data, id: `new-${nextId++}` };

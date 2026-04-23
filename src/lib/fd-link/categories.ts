@@ -39,7 +39,7 @@ export async function resolveFdCategories(
 
   const existing = await db.transactionCategory.findMany({
     where: {
-      userId: { in: [userId, null] },
+      OR: [{ userId }, { userId: null }],
       name: { in: names },
     },
   });
