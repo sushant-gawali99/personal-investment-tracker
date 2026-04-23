@@ -59,6 +59,7 @@ const MERCHANT_CANON: Array<[RegExp, string]> = [
   [/\bgoogle\s*asia\s*pacific/i, "Google Play"],
   [/\bgoogle\s*(play|india)\b/i, "Google"],
   [/\bgoogle\s*pay/i, "Google Pay"],         // also catches "Google Payuti" (bank code fused)
+  [/\bgoogle\s+p[il]\b/i, "Google Play"],   // "Google PI"/"Google Pl"/"Google PL" — OCR/truncated Play
   [/\bgoogle\s+p\b/i, "Google Pay"],         // SBI truncates "Google Pay" to "Google P"
   [/\bikea\s*india/i, "IKEA"],
   [/\bbarbeque\s*nation/i, "Barbeque Nation"],
@@ -98,6 +99,7 @@ const HONORIFICS = /^(mr|mrs|ms|dr|shri|smt|mr\.|mrs\.)\s+/i;
 const BANK_CANON: Array<[RegExp, string]> = [
   [/\bax[iy]x(\s*bank)?\b/i, "Axis Bank"],  // SBI's "axix"/"axiyx" typo
   [/\baxb\b/i, "Axis Bank"],               // SBI's "axb" abbreviation
+  [/\baxk\b/i, "Axis Bank"],               // SBI's "axk" OCR variant
   [/\butib\b/i, "Axis Bank"],              // Axis Bank IFSC prefix used in UPI slot
   [/\bhdfc(\s*bank(\s*ltd)?)?\b/i, "HDFC Bank"],
   [/\bicici(\s*bank(\s*ltd)?)?\b/i, "ICICI Bank"],
@@ -212,7 +214,7 @@ export function prettifyDescription(raw: string): PrettyDescription {
   // UPI sits inside a longer prefix (Wdl Tfr / Dep Tfr etc.).
   // Direction codes seen in the wild: dr, cr, idr (immediate debit), icr, p2p, etc.
   // Separator after the ref can be "/" (normal) or " " (some SBI PDFs run ref+name together).
-  const sbiUpiMatch = trimmed.match(/\bUPI\/([a-z]{1,4})\/(\d*)(?:\/|\s+)(.+)/i);
+  const sbiUpiMatch = trimmed.match(/\bUPI\/([a-z]{1,4})\/(\d*)[^\w/\s]{0,4}(?:\/|\s+)(.+)/i);
   if (sbiUpiMatch) {
     const [, dir, ref, rest] = sbiUpiMatch;
     // Strip trailing branch address: "At 07339 University Road (pune)" or "mand 009769... At 07339..."
@@ -289,7 +291,7 @@ export function prettifyDescription(raw: string): PrettyDescription {
   // "Dep Tfr Int Trf Frm 4381609104 To 10198755734 Dcpf/ravindra Diwakar D At 07339"
   // "Dep Tfr Int Trf Frm 4480023697 To 10198755734 Ravindra Diwakar D At 07339 ..."
   // The payment-mode code (Dcpf, Neft, etc.) before the slash is optional.
-  const sbiInternalMatch = trimmed.match(/\bFrm\s+\d+\s+To\s+\d+\s+(?:[A-Za-z]+\/)?([A-Za-z][A-Za-z\s]{1,50})/i);
+  const sbiInternalMatch = trimmed.match(/\bFrm\s+\d+[^\w/\s]{0,4}\s+To\s+\d+[^\w/\s]{0,4}\s+(?:[A-Za-z]+\/)?([A-Za-z][A-Za-z\s]{1,50})/i);
   if (sbiInternalMatch) {
     let name = sbiInternalMatch[1].trim();
     name = name.replace(/\s+D\s+At\b.*/i, "").replace(/\s+[A-Z]\s*$/, "").trim();
