@@ -227,24 +227,22 @@ export function FDList({ fds }: { fds: FD[] }) {
 
       {/* Filters */}
       <div className="space-y-3">
-        {/* Status pills — scrollable, no visible scrollbar */}
-        <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-          <div className="inline-flex items-center gap-1 p-1 bg-[#1c1c20] rounded-full">
-            {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={cn(
-                  "px-4 py-1.5 rounded-full text-[13px] font-semibold transition-all capitalize whitespace-nowrap",
-                  filter === f
-                    ? "bg-[#17171a] text-[#ededed] shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                    : "text-[#a0a0a5] hover:text-[#ededed]"
-                )}
-              >
-                {f} ({counts[f]})
-              </button>
-            ))}
-          </div>
+        {/* Status pills — equal-width on mobile, natural-width on desktop */}
+        <div className="flex gap-1 p-1 bg-[#1c1c20] rounded-xl sm:rounded-full sm:inline-flex">
+          {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                "flex-1 sm:flex-none text-center px-2 sm:px-4 py-1.5 rounded-lg sm:rounded-full text-[12px] sm:text-[13px] font-semibold transition-all capitalize",
+                filter === f
+                  ? "bg-[#17171a] text-[#ededed] shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
+                  : "text-[#a0a0a5] hover:text-[#ededed]"
+              )}
+            >
+              {f} ({counts[f]})
+            </button>
+          ))}
         </div>
 
         {/* Bank select + search */}
