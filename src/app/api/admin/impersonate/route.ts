@@ -18,7 +18,13 @@ export async function POST(req: NextRequest) {
   const guard = await assertSuperAdmin();
   if (guard) return guard;
 
-  const { userId } = await req.json() as { userId: string };
+  let body: { userId?: unknown };
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+  const { userId } = body;
   if (!userId || typeof userId !== "string") {
     return NextResponse.json({ error: "userId required" }, { status: 400 });
   }
