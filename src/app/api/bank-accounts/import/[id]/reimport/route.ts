@@ -19,6 +19,10 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
   const imp = await prisma.statementImport.findFirst({ where: { id, userId } });
   if (!imp) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
+  if (imp.status === "extracting") {
+    return NextResponse.json({ importId: id, status: "extracting", alreadyRunning: true }, { status: 202 });
+  }
+
   await prisma.transaction.deleteMany({ where: { importId: id, userId } });
 
   await prisma.statementImport.update({
