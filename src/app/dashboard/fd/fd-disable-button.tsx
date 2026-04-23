@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Archive, RotateCcw, Loader2, Trash2, AlertTriangle, X } from "lucide-react";
 
-export function FDDisableButton({ id, disabled }: { id: string; disabled: boolean }) {
+export function FDDisableButton({ id, disabled, showDelete = false }: { id: string; disabled: boolean; showDelete?: boolean }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -59,7 +59,7 @@ export function FDDisableButton({ id, disabled }: { id: string; disabled: boolea
         {busy ? (disabled ? "Enabling…" : "Disabling…") : label}
       </button>
 
-      {disabled && (
+      {disabled && showDelete && (
         <button
           type="button"
           onClick={() => setShowDeleteConfirm(true)}

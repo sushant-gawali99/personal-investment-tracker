@@ -485,7 +485,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                                 <RefreshCw size={13} /> Renew
                               </Link>
                             )}
-                            <FDDisableButton id={fd.id} disabled={fd.disabled} />
+                            <FDDisableButton id={fd.id} disabled={fd.disabled} showDelete={fd.disabled} />
                           </div>
                         </div>
                       </td>
