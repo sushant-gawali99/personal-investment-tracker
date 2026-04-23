@@ -2,7 +2,7 @@
 import { prisma } from "@/lib/prisma";
 import type { Citation } from "./types";
 
-type ToolResult = { records: unknown[]; citations: Citation[] };
+type ToolResult = { records: Record<string, unknown>[]; citations: Citation[] };
 
 // ── search_transactions ────────────────────────────────────────────────────
 
@@ -186,7 +186,12 @@ export async function runGetEquityHoldings(userId: string): Promise<ToolResult> 
     average_price: number;
   };
 
-  const holdings: KiteHolding[] = JSON.parse(snapshot.holdingsJson);
+  let holdings: KiteHolding[];
+  try {
+    holdings = JSON.parse(snapshot.holdingsJson);
+  } catch {
+    return { records: [], citations: [] };
+  }
 
   const records = holdings.map((h) => ({
     symbol: h.tradingsymbol,
