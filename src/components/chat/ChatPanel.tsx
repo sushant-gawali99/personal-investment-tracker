@@ -59,7 +59,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       }
 
       const reader = response.body.getReader();
-      const decoder = new TextDecoder();
+      const decoder = new TextDecoder("utf-8", { fatal: false });
       let citations: Citation[] = [];
 
       while (true) {
@@ -82,7 +82,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
               return next;
             });
           } else if (chunk.type === "citations") {
-            citations = chunk.records;
+            citations = [...citations, ...chunk.records];
           } else if (chunk.type === "error") {
             setMessages((prev) => {
               const next = [...prev];
