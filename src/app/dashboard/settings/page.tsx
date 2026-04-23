@@ -2,6 +2,7 @@ import { headers, cookies } from "next/headers";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { KiteSettingsForm } from "./kite-settings-form";
+import { NotificationSettingsForm } from "./notification-settings-form";
 import { CopyableUrl } from "./copyable-url";
 import { ImpersonationSelector } from "./impersonation-selector";
 import { prisma } from "@/lib/prisma";
@@ -28,6 +29,10 @@ export default async function SettingsPage() {
     !!config?.accessToken &&
     !!config?.tokenExpiry &&
     new Date(config.tokenExpiry) > new Date();
+
+  const profile = userId
+    ? await prisma.userProfile.findUnique({ where: { userId } })
+    : null;
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -59,6 +64,16 @@ export default async function SettingsPage() {
           savedApiKey={config?.apiKey ?? ""}
           isConnected={isConnected}
         />
+      </section>
+
+      <section className="ab-card p-6 space-y-5">
+        <div>
+          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Notifications</p>
+          <p className="text-[13px] text-[#a0a0a5] mt-2 leading-relaxed">
+            FD maturity reminders are sent by email automatically. Add a phone number to also receive WhatsApp reminders.
+          </p>
+        </div>
+        <NotificationSettingsForm savedPhone={profile?.phone ?? null} />
       </section>
     </div>
   );
