@@ -146,7 +146,12 @@ export function FDList({ fds }: { fds: FD[] }) {
       if (filter === "matured" && !matured) return false;
     }
     if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
-    if (fdSearch.trim() && !(fd.fdNumber ?? "").toLowerCase().includes(fdSearch.trim().toLowerCase())) return false;
+    if (fdSearch.trim()) {
+      const q = fdSearch.trim().toLowerCase();
+      const matchesFd = (fd.fdNumber ?? "").toLowerCase().includes(q);
+      const matchesAcc = (fd.accountNumber ?? "").toLowerCase().includes(q);
+      if (!matchesFd && !matchesAcc) return false;
+    }
     return true;
   });
 
