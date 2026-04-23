@@ -95,4 +95,18 @@ describe("POST /api/bank-accounts/import/[id]/reimport", () => {
     });
     expect(runExtraction).toHaveBeenCalledWith("imp1", "sushant.gawali@gmail.com");
   });
+
+  it("returns 202 with alreadyRunning when already extracting", async () => {
+    vi.mocked(getServerSession).mockResolvedValue({ user: { email: "sushant.gawali@gmail.com" } } as never);
+    vi.mocked(isSupAdmin).mockReturnValue(true);
+    vi.mocked(getSessionUserId).mockResolvedValue("sushant.gawali@gmail.com");
+    vi.mocked(prisma.statementImport.findFirst).mockResolvedValue({
+      id: "imp1", userId: "sushant.gawali@gmail.com", status: "extracting",
+    } as never);
+    const res = await POST(makeReq("imp1"), { params: Promise.resolve({ id: "imp1" }) });
+    expect(res.status).toBe(202);
+    const body = await res.json();
+    expect(body.alreadyRunning).toBe(true);
+    expect(prisma.transaction.deleteMany).not.toHaveBeenCalled();
+  });
 });

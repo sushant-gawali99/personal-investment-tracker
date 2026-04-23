@@ -37,6 +37,8 @@ export async function POST(_req: NextRequest, ctx: { params: Promise<{ id: strin
     },
   });
 
+  // PDF password is not forwarded: statements originally imported with a password will fail
+  // extraction and land in status="failed". Re-import those via the normal import wizard.
   void runExtraction(id, userId);
 
   return NextResponse.json({ importId: id, status: "extracting" }, { status: 202 });
