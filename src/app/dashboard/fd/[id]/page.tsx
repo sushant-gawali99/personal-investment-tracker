@@ -29,23 +29,31 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
   if (!fd) notFound();
   if (fd.userId && fd.userId !== "" && fd.userId !== userId) notFound();
 
-  const statementTxns = await prisma.fDStatementTxn.findMany({
+  const linkedTxns = await prisma.transaction.findMany({
     where: { fdId: fd.id },
     orderBy: { txnDate: "desc" },
     select: {
       id: true,
       txnDate: true,
-      particulars: true,
-      debit: true,
-      credit: true,
-      type: true,
-      statementId: true,
+      description: true,
+      amount: true,
+      direction: true,
+      fdTxnType: true,
+      account: { select: { label: true } },
     },
   });
-  const serializedTxns = statementTxns.map((t) => ({
-    ...t,
-    txnDate: t.txnDate.toISOString(),
-  }));
+  const serializedTxns = linkedTxns.map((t) => {
+    const isCredit = t.direction === "credit";
+    return {
+      id: t.id,
+      txnDate: t.txnDate.toISOString(),
+      particulars: t.description,
+      debit: isCredit ? 0 : t.amount,
+      credit: isCredit ? t.amount : 0,
+      type: t.fdTxnType ?? "other",
+      accountLabel: t.account.label,
+    };
+  });
 
   const now = new Date();
   const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
