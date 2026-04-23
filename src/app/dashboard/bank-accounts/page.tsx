@@ -19,12 +19,27 @@ export default async function BankAccountsOverview() {
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
           <p className="text-[14px] text-[#a0a0a5] mt-1">Import statements and analyse spending.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/bank-accounts/list" className="ab-btn ab-btn-ghost">Transactions</Link>
-          <Link href="/dashboard/bank-accounts/accounts" className="ab-btn ab-btn-ghost">Accounts</Link>
-          <Link href="/dashboard/bank-accounts/categories" className="ab-btn ab-btn-ghost">Categories</Link>
-          <Link href="/dashboard/bank-accounts/imports" className="ab-btn ab-btn-ghost">Imports</Link>
-          <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          {/* Nav links — scrollable pill row on mobile */}
+          <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+            <div className="inline-flex gap-1 p-1 bg-[#1c1c20] rounded-full">
+              {[
+                { href: "/dashboard/bank-accounts/list", label: "Transactions" },
+                { href: "/dashboard/bank-accounts/accounts", label: "Accounts" },
+                { href: "/dashboard/bank-accounts/categories", label: "Categories" },
+                { href: "/dashboard/bank-accounts/imports", label: "Imports" },
+              ].map(({ href, label }) => (
+                <Link
+                  key={href}
+                  href={href}
+                  className="px-4 py-1.5 rounded-full text-[13px] font-semibold text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#17171a] transition-colors whitespace-nowrap"
+                >
+                  {label}
+                </Link>
+              ))}
+            </div>
+          </div>
+          <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent justify-center">
             <Upload size={15} /> Import Statement
           </Link>
         </div>

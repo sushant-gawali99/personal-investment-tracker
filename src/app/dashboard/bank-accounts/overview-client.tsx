@@ -190,7 +190,7 @@ function Toolbar({
   onAccountChange: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+    <div className="flex flex-col items-start sm:flex-row sm:items-center gap-3">
       <MonthPicker year={year} month={month} onChange={onMonthChange} />
       <select
         className="ab-input w-full sm:w-auto sm:max-w-[220px]"
