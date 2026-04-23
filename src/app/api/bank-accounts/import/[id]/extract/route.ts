@@ -40,7 +40,9 @@ async function runExtraction(importId: string, userId: string): Promise<void> {
     const extraction = await extractTransactions(Buffer.from(bytes), categoryNames);
 
     const rules = await prisma.merchantRule.findMany({
-      where: { userId },
+      // Include system-wide rules (userId=null) so newly-seeded users
+      // benefit from the shared starter set on their very first import.
+      where: { OR: [{ userId: null }, { userId }] },
       select: { id: true, pattern: true, categoryId: true },
     });
 

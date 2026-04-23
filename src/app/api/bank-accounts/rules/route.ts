@@ -6,8 +6,9 @@ import { isPatternTooBroad } from "@/lib/bank-accounts/merchant-rules";
 export async function GET() {
   const userId = await getSessionUserId();
   if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Include system-wide rules (userId=null) alongside the user's own.
   const items = await prisma.merchantRule.findMany({
-    where: { userId },
+    where: { OR: [{ userId: null }, { userId }] },
     orderBy: { matchCount: "desc" },
     include: { category: true },
   });

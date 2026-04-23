@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import {
   ArrowLeftRight,
   CheckCircle2,
+  Globe,
   MinusCircle,
   PlusCircle,
   Sparkles,
@@ -19,6 +20,7 @@ interface Cat {
 }
 interface Rule {
   id: string; pattern: string; matchCount: number;
+  userId: string | null; // null = shared/system rule
   category: Cat;
 }
 
@@ -334,11 +336,21 @@ export function CategoriesClient({ categories, rules }: { categories: Cat[]; rul
               </div>
             )}
             <ul className="divide-y divide-[#2a2a2e] overflow-y-auto ab-scroll">
-              {rules.map((r) => (
+              {rules.map((r) => {
+                const isGlobal = r.userId === null;
+                return (
                 <li key={r.id} className="flex items-center gap-3 px-3 py-2 hover:bg-[#1c1c20]/60 transition-colors">
                   {/* Pattern + category on one compact row */}
                   <div className="min-w-0 flex-1 flex items-center gap-2 flex-wrap">
                     <p className="font-mono text-[12px] text-[#ededed] truncate">{r.pattern}</p>
+                    {isGlobal && (
+                      <span
+                        className="inline-flex items-center gap-1 rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#5aa9ff] bg-[rgba(90,169,255,0.1)] border border-[rgba(90,169,255,0.25)]"
+                        title="Shared across all users"
+                      >
+                        <Globe size={9} /> shared
+                      </span>
+                    )}
                     <span className="text-[10px] text-[#6e6e73]">→</span>
                     <span className={`ab-chip ${kindChipClass(r.category.kind)}`} style={{ fontSize: 10, padding: "1px 7px" }}>
                       {kindIcon(r.category.kind)} {r.category.name}
@@ -347,15 +359,25 @@ export function CategoriesClient({ categories, rules }: { categories: Cat[]; rul
                       {r.matchCount} match{r.matchCount === 1 ? "" : "es"}
                     </span>
                   </div>
-                  <button
-                    onClick={() => delRule(r.id)}
-                    className="p-1.5 rounded-md text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
-                    title="Delete rule"
-                  >
-                    <Trash2 size={13} />
-                  </button>
+                  {isGlobal ? (
+                    <span
+                      className="p-1.5 text-[#3a3a3e] shrink-0"
+                      title="Shared rules can't be deleted from here"
+                    >
+                      <Globe size={13} />
+                    </span>
+                  ) : (
+                    <button
+                      onClick={() => delRule(r.id)}
+                      className="p-1.5 rounded-md text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
+                      title="Delete rule"
+                    >
+                      <Trash2 size={13} />
+                    </button>
+                  )}
                 </li>
-              ))}
+                );
+              })}
             </ul>
           </div>
         )}

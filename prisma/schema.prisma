@@ -209,7 +209,9 @@ model Transaction {
 
 model MerchantRule {
   id                          String   @id @default(cuid())
-  userId                      String
+  // null = global/system rule, visible to every user. Matches the
+  // TransactionCategory.userId convention.
+  userId                      String?
   pattern                     String
   categoryId                  String
   category                    TransactionCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)

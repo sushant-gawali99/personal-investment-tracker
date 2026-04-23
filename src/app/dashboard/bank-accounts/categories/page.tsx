@@ -14,7 +14,8 @@ export default async function CategoriesPage() {
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
     }),
     prisma.merchantRule.findMany({
-      where: { userId },
+      // Include system-wide rules (userId=null) alongside the user's own.
+      where: { OR: [{ userId: null }, { userId }] },
       orderBy: { matchCount: "desc" },
       include: { category: true },
     }),
