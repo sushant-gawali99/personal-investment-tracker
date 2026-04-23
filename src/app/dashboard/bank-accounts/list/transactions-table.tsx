@@ -212,7 +212,7 @@ export function TransactionsTable({
           3. Inline custom date pickers (only when Custom is toggled or dates set manually).
           4. Active-filter chips row, each with its own remove-X.
        */}
-      <div className="ab-card p-4 space-y-3">
+      <div className="ab-card p-5 space-y-4">
         {/* Layer 1: Search (full-width, prominent).
             NOTE: `.ab-input` declares `padding: 12px 14px` (shorthand) in
             globals.css, which can beat Tailwind's `pl-11`/`pr-10` utilities
@@ -323,7 +323,7 @@ export function TransactionsTable({
 
         {/* Layer 4: Active filter chips + totals summary */}
         {hasActiveFilters && (
-          <div className="pt-2 border-t border-[#2a2a2e] space-y-2">
+          <div className="pt-3 border-t border-[#2a2a2e] space-y-3">
             {/* Chips row */}
             <div className="flex items-center gap-1.5 flex-wrap">
               {from && <ActiveChip label={`From ${formatDate(from)}`} onRemove={() => updateFilter("from", "")} />}
@@ -354,40 +354,31 @@ export function TransactionsTable({
 
             {/* Totals summary — only shown once data has loaded */}
             {!loading && total > 0 && (
-              <div className="flex items-center gap-3 flex-wrap text-[12px]">
-                <span className="text-[#6e6e73]">
+              <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap text-[12px] bg-[#1c1c20] rounded-lg px-3 py-2">
+                <span className="text-[#a0a0a5]">
                   <span className="text-[#ededed] font-semibold">{total}</span> transaction{total === 1 ? "" : "s"}
                 </span>
                 {totalDebit > 0 && (
-                  <>
-                    <span className="text-[#2a2a2e]">&middot;</span>
-                    <span className="flex items-center gap-1">
-                      <ArrowUpRight size={11} className="text-[#ff7a6e]" />
-                      <span className="text-[#ff7a6e] font-semibold mono">{formatINR(totalDebit)}</span>
-                      <span className="text-[#6e6e73]">spent</span>
-                    </span>
-                  </>
+                  <span className="flex items-center gap-1">
+                    <ArrowUpRight size={11} className="text-[#ff7a6e]" />
+                    <span className="text-[#ff7a6e] font-semibold mono">{formatINR(totalDebit)}</span>
+                    <span className="text-[#6e6e73]">spent</span>
+                  </span>
                 )}
                 {totalCredit > 0 && (
-                  <>
-                    <span className="text-[#2a2a2e]">&middot;</span>
-                    <span className="flex items-center gap-1">
-                      <ArrowDownLeft size={11} className="text-[#5ee0a4]" />
-                      <span className="text-[#5ee0a4] font-semibold mono">{formatINR(totalCredit)}</span>
-                      <span className="text-[#6e6e73]">received</span>
-                    </span>
-                  </>
+                  <span className="flex items-center gap-1">
+                    <ArrowDownLeft size={11} className="text-[#5ee0a4]" />
+                    <span className="text-[#5ee0a4] font-semibold mono">{formatINR(totalCredit)}</span>
+                    <span className="text-[#6e6e73]">received</span>
+                  </span>
                 )}
                 {totalDebit > 0 && totalCredit > 0 && (
-                  <>
-                    <span className="text-[#2a2a2e]">&middot;</span>
-                    <span className="text-[#6e6e73]">
-                      net{" "}
-                      <span className={`font-semibold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
-                        {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
-                      </span>
+                  <span className="text-[#6e6e73]">
+                    net{" "}
+                    <span className={`font-semibold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+                      {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
                     </span>
-                  </>
+                  </span>
                 )}
               </div>
             )}
