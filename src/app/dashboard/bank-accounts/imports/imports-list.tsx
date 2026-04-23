@@ -11,6 +11,7 @@ import {
   Loader2,
   Trash2,
 } from "lucide-react";
+
 import { formatDate } from "@/lib/format";
 
 interface Item {
@@ -75,23 +76,21 @@ export function ImportsList({ items }: { items: Item[] }) {
             return `/dashboard/bank-accounts/list?${p}`;
           })();
           return (
-            <li key={i.id} className="p-4 hover:bg-[#1c1c20]/50 transition-colors">
-              <div className="flex items-start gap-4 flex-wrap">
-                <span className="w-10 h-10 rounded-[10px] bg-[rgba(255,56,92,0.1)] flex items-center justify-center shrink-0">
-                  <FileText size={16} className="text-[#ff385c]" />
-                </span>
+            <li key={i.id} className="px-4 py-2.5 hover:bg-[#1c1c20]/50 transition-colors">
+              <div className="flex items-center gap-3">
+                <FileText size={14} className="text-[#ff385c] shrink-0" />
 
+                {/* Main info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-[14px] font-semibold text-[#ededed] truncate max-w-[200px] sm:max-w-[340px]">
+                    <span className="text-[13px] font-medium text-[#ededed] truncate max-w-[180px] sm:max-w-[320px]">
                       {i.fileName}
-                    </p>
-                    <span className={`ab-chip ${badge.chip}`}>
+                    </span>
+                    <span className={`ab-chip ${badge.chip}`} style={{ fontSize: 10, padding: "1px 7px" }}>
                       {badge.icon} {badge.label}
                     </span>
                   </div>
-
-                  <div className="flex items-center gap-3 mt-1.5 flex-wrap text-[12px] text-[#a0a0a5]">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[11px] text-[#6e6e73]">
                     <span>{i.account.label}</span>
                     <span>·</span>
                     <span>
@@ -102,41 +101,40 @@ export function ImportsList({ items }: { items: Item[] }) {
                     <span>·</span>
                     <span>Uploaded {formatDate(i.createdAt)}</span>
                   </div>
-
                   {i.errorMessage && (
-                    <p className="text-[12px] text-[#ff7a6e] mt-1.5 break-words">
+                    <p className="text-[11px] text-[#ff7a6e] mt-1 break-words line-clamp-2">
                       {i.errorMessage}
                     </p>
                   )}
                 </div>
 
-                <div className="flex items-center gap-3 sm:gap-6 shrink-0">
-                  <div className="text-right">
-                    <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold">Txns</p>
-                    <p className="mono text-[14px] font-semibold text-[#ededed]">
-                      {i.newCount}
-                      {i.extractedCount > 0 && (
-                        <span className="text-[#6e6e73] font-normal text-[12px]"> / {i.extractedCount}</span>
-                      )}
-                    </p>
+                {/* Txn count + view link */}
+                <div className="text-right shrink-0">
+                  <p className="mono text-[13px] font-semibold text-[#ededed] leading-none">
+                    {i.newCount}
+                    {i.extractedCount > 0 && (
+                      <span className="text-[#6e6e73] font-normal text-[11px]"> / {i.extractedCount}</span>
+                    )}
+                  </p>
+                  <div className="flex items-center justify-end gap-2 mt-0.5">
                     {i.duplicateCount > 0 && (
-                      <p className="text-[10px] text-[#a0a0a5] mt-0.5">{i.duplicateCount} dup</p>
+                      <span className="text-[10px] text-[#6e6e73]">{i.duplicateCount} dup</span>
                     )}
                     {txnsHref && (
-                      <Link href={txnsHref} className="text-[10px] text-[#ff385c] hover:underline mt-0.5 inline-block">
+                      <Link href={txnsHref} className="text-[10px] text-[#ff385c] hover:underline">
                         View →
                       </Link>
                     )}
                   </div>
-
-                  <button
-                    onClick={() => remove(i.id)}
-                    className="p-2 rounded-lg text-[#a0a0a5] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors"
-                    title="Delete import"
-                  >
-                    <Trash2 size={14} />
-                  </button>
                 </div>
+
+                <button
+                  onClick={() => remove(i.id)}
+                  className="p-1.5 rounded-lg text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
+                  title="Delete import"
+                >
+                  <Trash2 size={13} />
+                </button>
               </div>
             </li>
           );
