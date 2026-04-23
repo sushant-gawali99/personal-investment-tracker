@@ -61,14 +61,14 @@ export default async function FDPage() {
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Fixed Deposits</h1>
           <p className="text-[14px] text-[#a0a0a5] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/fd/statements" className="ab-btn ab-btn-ghost">
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+          <Link href="/dashboard/fd/statements" className="ab-btn ab-btn-ghost flex-1 sm:flex-none justify-center">
             <FileText size={15} />
             Statements
           </Link>
           <Link
             href="/dashboard/fd/bulk"
-            className="ab-btn ab-btn-ghost relative"
+            className="ab-btn ab-btn-ghost relative flex-1 sm:flex-none justify-center"
             style={{ borderColor: "#ff385c", border: "1px solid #ff385c", color: "#ff385c" }}
           >
             <Upload size={15} />
@@ -82,7 +82,7 @@ export default async function FDPage() {
           </Link>
           <Link
             href="/dashboard/fd/new"
-            className="ab-btn ab-btn-accent"
+            className="ab-btn ab-btn-accent w-full sm:w-auto justify-center"
           >
             <Plus size={15} />
             Add FD
