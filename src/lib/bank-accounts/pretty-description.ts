@@ -164,7 +164,7 @@ export function prettifyDescription(raw: string): PrettyDescription {
 
   const trimmed = raw.trim();
 
-  // ── UPI / IMPS slot-separated format ─────────────────────────
+  // ── UPI / IMPS slot-separated format (Axis) ──────────────────
   // UPI/P2M/237794180606/Google Asia Pacific P/Sold b/AXIS BANK
   // (\d*) — tolerates empty ref slot for pre-normalised inputs where
   // the 10+ digit reference has been stripped by normalizeDescription.
@@ -180,6 +180,27 @@ export function prettifyDescription(raw: string): PrettyDescription {
       ref,
       merchant: canonicalMerchant(merchantRaw) || "Unknown",
       counterBank: canonicalBank(bankRaw),
+    };
+  }
+
+  // ── SBI-style UPI embedded mid-string ────────────────────────
+  // "Wdl Tfr Upi/dr/608386283125/jyotiram/ Sury/7387993273/uber"
+  // "Dep Tfr Upi/cr/420831234567/Sushant Gawali/sushant@upi/SBI"
+  // UPI sits inside a longer prefix (Wdl Tfr / Dep Tfr etc.).
+  const sbiUpiMatch = trimmed.match(/\bUPI\/(dr|cr)\/(\d*)\/(.+)/i);
+  if (sbiUpiMatch) {
+    const [, dir, ref, rest] = sbiUpiMatch;
+    // Split remaining slots; discard pure-numeric (phone/account) and VPA handles (@).
+    const parts = rest.split("/").map((p) => p.trim()).filter(
+      (p) => p && !/^\d+$/.test(p) && !p.includes("@"),
+    );
+    const nameRaw = parts.join(" ");
+    return {
+      ...base,
+      method: "UPI",
+      subMethod: dir.toLowerCase() === "cr" ? "P2A" : "P2A",
+      ref: ref || null,
+      merchant: canonicalMerchant(nameRaw) || "UPI Transfer",
     };
   }
 
