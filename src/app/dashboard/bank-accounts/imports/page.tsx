@@ -26,7 +26,9 @@ export default async function ImportsPage() {
           <BackLink />
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Imports</h1>
           <p className="text-[14px] text-[#a0a0a5]">
-            Rules cover {coverage}% of transactions
+            {total > 0
+              ? <>{coverage}% of {total} transactions auto-categorized by merchant rules</>
+              : "No transactions imported yet"}
           </p>
         </div>
         <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent shrink-0">
