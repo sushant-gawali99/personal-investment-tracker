@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { findTransferPairs } from "./transfer-detect";
+import { linkTransactionsAfterImport } from "@/lib/fd-link/link-batch";
 import type { StagedTxn } from "./types";
 
 export interface CommitResult {
@@ -121,6 +122,15 @@ export async function commitImport(
         },
       }),
     ]);
+  }
+
+  // FD auto-link pass. Never throw outward — this mirrors the transfer
+  // detector: a failure here shouldn't fail the commit, which is already
+  // persisted by the time we get here.
+  try {
+    await linkTransactionsAfterImport(userId);
+  } catch (err) {
+    console.error("fd-link: linkTransactionsAfterImport failed", err);
   }
 
   return { inserted, transfersDetected: pairs.length };
