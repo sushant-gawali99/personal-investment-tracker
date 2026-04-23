@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import type { ChatMessage as ChatMessageType, Citation } from "@/lib/chat/types";
 
 function CitationBlock({ records }: { records: Citation[] }) {
@@ -53,7 +54,37 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
               : "rounded-bl-sm bg-[#f1f5f9] text-[#1e293b]"
           }`}
         >
-          {message.content}
+          {isUser ? (
+            message.content
+          ) : (
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                ul: ({ children }) => <ul className="mb-2 space-y-1 pl-4 list-disc">{children}</ul>,
+                ol: ({ children }) => <ol className="mb-2 space-y-1 pl-4 list-decimal">{children}</ol>,
+                li: ({ children }) => <li>{children}</li>,
+                table: ({ children }) => (
+                  <div className="my-2 overflow-x-auto rounded-lg border border-[#e2e8f0]">
+                    <table className="w-full text-xs">{children}</table>
+                  </div>
+                ),
+                thead: ({ children }) => <thead className="bg-[#e8edf4] text-[#475569]">{children}</thead>,
+                tbody: ({ children }) => <tbody className="divide-y divide-[#e2e8f0]">{children}</tbody>,
+                tr: ({ children }) => <tr>{children}</tr>,
+                th: ({ children }) => <th className="px-3 py-2 text-left font-semibold">{children}</th>,
+                td: ({ children }) => <td className="px-3 py-2">{children}</td>,
+                code: ({ children }) => (
+                  <code className="rounded bg-[#e2e8f0] px-1 py-0.5 font-mono text-xs">{children}</code>
+                ),
+                h1: ({ children }) => <h1 className="mb-1 text-base font-bold">{children}</h1>,
+                h2: ({ children }) => <h2 className="mb-1 text-sm font-bold">{children}</h2>,
+                h3: ({ children }) => <h3 className="mb-1 text-sm font-semibold">{children}</h3>,
+              }}
+            >
+              {message.content}
+            </ReactMarkdown>
+          )}
         </div>
         {!isUser && message.citations && message.citations.length > 0 && (
           <CitationBlock records={message.citations} />
