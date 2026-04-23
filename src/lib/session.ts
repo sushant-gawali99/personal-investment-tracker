@@ -4,6 +4,7 @@ import { authOptions } from "./auth";
 import { NextResponse } from "next/server";
 
 export const SUPER_ADMIN_EMAIL = "sushant.gawali@gmail.com";
+export const IMPERSONATE_COOKIE = "x-impersonate-user";
 
 export function isSupAdmin(email: string | null): boolean {
   return email === SUPER_ADMIN_EMAIL;
@@ -14,7 +15,7 @@ export async function getSessionUserId(): Promise<string | null> {
   const realEmail = session?.user?.email ?? null;
   if (isSupAdmin(realEmail)) {
     const cookieStore = await cookies();
-    const impersonated = cookieStore.get("x-impersonate-user")?.value;
+    const impersonated = cookieStore.get(IMPERSONATE_COOKIE)?.value;
     if (impersonated) return impersonated;
   }
   return realEmail;
