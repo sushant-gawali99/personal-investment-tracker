@@ -141,16 +141,29 @@ export function GoldFormDialog({
 
           <div className="space-y-2">
             <div className="text-[12px] text-[#a0a0a5]">Photo</div>
-            {input.photoUrl && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={input.photoUrl} alt="" className="h-24 rounded object-cover" />
-            )}
-            <label className="ab-btn ab-btn-ghost inline-flex cursor-pointer">
-              <Upload size={14} /> {input.photoUrl ? "Replace photo" : "Upload photo"}
-              <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
-            </label>
-            {input.photoUrl && (
-              <button type="button" className="ab-btn ab-btn-ghost ml-2" onClick={() => update("photoUrl", null)}>Remove photo</button>
+            {input.photoUrl ? (
+              <div className="rounded-xl overflow-hidden border border-[#2a2a2e]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={input.photoUrl} alt="" className="w-full h-48 object-cover" />
+                <div className="flex gap-2 p-3 bg-[#17171a]">
+                  <label className="ab-btn ab-btn-ghost flex-1 justify-center cursor-pointer">
+                    <Upload size={14} /> Replace photo
+                    <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
+                  </label>
+                  <button
+                    type="button"
+                    className="ab-btn ab-btn-danger flex-1 justify-center"
+                    onClick={() => update("photoUrl", null)}
+                  >
+                    Remove photo
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <label className="ab-btn ab-btn-ghost inline-flex cursor-pointer">
+                <Upload size={14} /> Upload photo
+                <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
+              </label>
             )}
             {uploading && <p className="text-[12px] text-[#a0a0a5]">Uploading…</p>}
           </div>
