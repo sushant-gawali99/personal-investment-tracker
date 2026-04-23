@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { ChatMessage as ChatMessageType, Citation } from "@/lib/chat/types";
 
 function CitationBlock({ records }: { records: Citation[] }) {
@@ -58,6 +59,7 @@ export function ChatMessage({ message }: { message: ChatMessageType }) {
             message.content
           ) : (
             <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
               components={{
                 p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
                 strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
