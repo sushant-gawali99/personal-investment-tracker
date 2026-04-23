@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Menu, X, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Menu, X, LogOut, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
@@ -16,12 +16,38 @@ const TABS = [
   { href: "/dashboard/settings", label: "Settings" },
 ];
 
-export function TopNav() {
+interface Props {
+  impersonatedUser?: string;
+}
+
+export function TopNav({ impersonatedUser }: Props) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+
+  async function stopImpersonating() {
+    await fetch("/api/admin/impersonate", { method: "DELETE" });
+    router.refresh();
+  }
 
   return (
     <header className="sticky top-0 z-50 bg-[#17171a] border-b border-[#2a2a2e]">
+      {impersonatedUser && (
+        <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-1.5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-amber-400 text-[13px] font-medium">
+            <Eye size={14} />
+            <span>Viewing as <span className="font-semibold">{impersonatedUser}</span></span>
+          </div>
+          <button
+            onClick={stopImpersonating}
+            className="text-amber-400 hover:text-amber-300 text-[12px] font-medium transition-colors flex items-center gap-1"
+          >
+            <X size={12} />
+            Stop
+          </button>
+        </div>
+      )}
+
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-10">
           <Link href="/dashboard" className="flex items-center gap-2">
