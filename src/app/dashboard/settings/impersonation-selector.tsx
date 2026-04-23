@@ -22,6 +22,10 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
+    if (!isSuperAdmin) {
+      setLoading(false);
+      return;
+    }
     fetch("/api/admin/users")
       .then((r) => {
         if (!r.ok) throw new Error();
@@ -30,7 +34,7 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
       .then(({ users }) => setUsers(users))
       .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
-  }, []);
+  }, [isSuperAdmin]);
 
   if (!isSuperAdmin) return null;
 
