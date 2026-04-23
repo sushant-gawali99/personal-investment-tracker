@@ -45,6 +45,7 @@ export function TransactionsTable({
   const [total, setTotal] = useState(0);
   const [totalDebit, setTotalDebit] = useState(0);
   const [totalCredit, setTotalCredit] = useState(0);
+  const [transferCount, setTransferCount] = useState(0);
   const [page, setPage] = useState(Number(sp.get("page") ?? "1"));
   const [loading, setLoading] = useState(true);
   // Which row's category is in edit mode. Default: none — categories are
@@ -114,11 +115,12 @@ export function TransactionsTable({
     params.set("pageSize", "20");
     const r = await fetch(`/api/bank-accounts/transactions?${params}`);
     if (!r.ok) { setLoading(false); return; }
-    const data = await r.json() as { items: Row[]; total: number; totalDebit: number; totalCredit: number };
+    const data = await r.json() as { items: Row[]; total: number; totalDebit: number; totalCredit: number; transferCount?: number };
     setRows(data.items);
     setTotal(data.total);
     setTotalDebit(data.totalDebit);
     setTotalCredit(data.totalCredit);
+    setTransferCount(data.transferCount ?? 0);
     setLoading(false);
   }, [from, to, accountId, categoryId, direction, q, sort, order, page]);
 
@@ -381,6 +383,11 @@ export function TransactionsTable({
                     <span className={`font-semibold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
                       {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
                     </span>
+                  </span>
+                )}
+                {transferCount > 0 && (
+                  <span className="text-[#6e6e73]" title="Transfers between your own accounts don't count as income or spending.">
+                    · excl. {transferCount} transfer{transferCount === 1 ? "" : "s"}
                   </span>
                 )}
               </div>

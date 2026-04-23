@@ -37,7 +37,17 @@ export async function GET(req: NextRequest) {
     if (maxAmount) (where.amount as Record<string, number>).lte = Number(maxAmount);
   }
 
-  const [items, total, debitAgg, creditAgg] = await Promise.all([
+  // Header totals exclude transfer-kind categories so they line up with the
+  // analytics overview page (which also excludes transfers from its
+  // spending/income/net stats — transfers are money moving between the
+  // user's own accounts, not real income/expense).
+  // Only applied when the user hasn't filtered by a specific category —
+  // if they explicitly asked for the Transfer category, show its totals.
+  const excludeTransfers = categoryIds.length === 0
+    ? { NOT: { category: { is: { kind: "transfer" } } } }
+    : {};
+
+  const [items, total, debitAgg, creditAgg, excludedCount] = await Promise.all([
     prisma.transaction.findMany({
       where,
       orderBy:
@@ -53,12 +63,19 @@ export async function GET(req: NextRequest) {
       },
     }),
     prisma.transaction.count({ where }),
-    prisma.transaction.aggregate({ where: { ...where, direction: "debit" },  _sum: { amount: true } }),
-    prisma.transaction.aggregate({ where: { ...where, direction: "credit" }, _sum: { amount: true } }),
+    prisma.transaction.aggregate({ where: { ...where, direction: "debit",  ...excludeTransfers }, _sum: { amount: true } }),
+    prisma.transaction.aggregate({ where: { ...where, direction: "credit", ...excludeTransfers }, _sum: { amount: true } }),
+    categoryIds.length === 0
+      ? prisma.transaction.count({ where: { ...where, category: { is: { kind: "transfer" } } } })
+      : Promise.resolve(0),
   ]);
   return NextResponse.json({
     items, total, page, pageSize,
     totalDebit:  debitAgg._sum.amount  ?? 0,
     totalCredit: creditAgg._sum.amount ?? 0,
+    // Number of rows in the current filter that are transfers (and therefore
+    // excluded from totalDebit/totalCredit). The UI uses this to show
+    // "excl. N transfers" next to the summary.
+    transferCount: excludedCount,
   });
 }
