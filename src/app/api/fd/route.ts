@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json();
   const {
-    bankName, fdNumber, accountNumber, depositorName, depositorSecondName, principal, interestRate,
+    bankName, branchName, fdNumber, accountNumber, depositorName, depositorSecondName, principal, interestRate,
     tenureMonths, tenureDays, tenureText, startDate, maturityDate, maturityAmount,
     interestType, compoundFreq,
     maturityInstruction, payoutFrequency, nomineeName, nomineeRelation,
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
   const fdData = {
     userId,
     bankName,
+    branchName: branchName || null,
     fdNumber: fdNumber || null,
     accountNumber: accountNumber || null,
     depositorName: depositorName || null,

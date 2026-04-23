@@ -11,6 +11,7 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
 
 {
   "bankName": string,
+  "branchName": string | null,
   "fdNumber": string | null,
   "accountNumber": string | null,
   "depositorName": string | null,
@@ -34,6 +35,7 @@ const PROMPT = `These images show the front and back of a Fixed Deposit certific
 }
 
 Rules:
+- branchName is the bank branch name printed on the certificate; preserve original script (e.g. Devanagari: "मुंबई मुख्य शाखा"); null if not found
 - depositorName is the primary account holder's name as printed on the certificate
 - depositorSecondName is the joint/second holder's name if present; null for single-holder FDs
 - interestRate must be per annum percentage (e.g. 7.5 not 0.075)
