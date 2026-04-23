@@ -1,15 +1,21 @@
 // src/app/dashboard/bank-accounts/imports/page.tsx
 import Link from "next/link";
 import { UploadCloud } from "lucide-react";
+import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
-import { getSessionUserId } from "@/lib/session";
+import { getSessionUserId, isSupAdmin } from "@/lib/session";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { ImportsList } from "./imports-list";
 import { BackLink } from "@/components/bank-accounts/back-link";
 
 export default async function ImportsPage() {
-  const userId = await getSessionUserId();
+  const [session, userId] = await Promise.all([
+    getServerSession(authOptions),
+    getSessionUserId(),
+  ]);
   if (!userId) redirect("/");
+  const superAdmin = isSupAdmin(session?.user?.email ?? null);
   const [imports, ruleCovered, total] = await Promise.all([
     prisma.statementImport.findMany({
       where: { userId }, orderBy: { createdAt: "desc" },
@@ -35,16 +41,19 @@ export default async function ImportsPage() {
           <UploadCloud size={15} /> Import new statement
         </Link>
       </div>
-      <ImportsList items={imports.map((i) => ({
-        ...i,
-        createdAt: i.createdAt.toISOString(),
-        updatedAt: i.updatedAt.toISOString(),
-        statementPeriodStart: i.statementPeriodStart?.toISOString() ?? null,
-        statementPeriodEnd: i.statementPeriodEnd?.toISOString() ?? null,
-        openingBalance: i.openingBalance,
-        closingBalance: i.closingBalance,
-        account: { id: i.account.id, label: i.account.label },
-      }))} />
+      <ImportsList
+        isSuperAdmin={superAdmin}
+        items={imports.map((i) => ({
+          ...i,
+          createdAt: i.createdAt.toISOString(),
+          updatedAt: i.updatedAt.toISOString(),
+          statementPeriodStart: i.statementPeriodStart?.toISOString() ?? null,
+          statementPeriodEnd: i.statementPeriodEnd?.toISOString() ?? null,
+          openingBalance: i.openingBalance,
+          closingBalance: i.closingBalance,
+          account: { id: i.account.id, label: i.account.label },
+        }))}
+      />
     </div>
   );
 }
