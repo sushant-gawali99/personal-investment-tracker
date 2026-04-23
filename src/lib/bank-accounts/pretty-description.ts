@@ -244,6 +244,20 @@ export function prettifyDescription(raw: string): PrettyDescription {
     };
   }
 
+  // ── SBI internal transfer "Frm {acct} To {acct} {code}/{name}" ──
+  // "Dep Tfr Int Trf Frm 4381609104 To 10198755734 Dcpf/ravindra Diwakar D At 07339"
+  // The payment-mode code (Dcpf, Neft, etc.) precedes the name after a slash.
+  const sbiInternalMatch = trimmed.match(/\bFrm\s+\d+\s+To\s+\d+\s+[A-Za-z]+\/([A-Za-z][A-Za-z\s]{1,50})/i);
+  if (sbiInternalMatch) {
+    let name = sbiInternalMatch[1].trim();
+    name = name.replace(/\s+D\s+At\b.*/i, "").replace(/\s+[A-Z]\s*$/, "").trim();
+    return {
+      ...base,
+      method: "Transfer",
+      merchant: canonicalMerchant(name) || name,
+    };
+  }
+
   // ── SBI plain transfer "Of Mr./Ms." ──────────────────────────
   // "Dep Tfr 00418160911146 Of Mr. Ravindra Diwakar D At 07339"
   // "Dep Tfr Int Trf Frm 43930368794 Of Mr. Ravindra Diwakar D At 07339 University Road (pune)"
