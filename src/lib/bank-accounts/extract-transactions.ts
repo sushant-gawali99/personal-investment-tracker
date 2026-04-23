@@ -23,6 +23,7 @@ interface RawTxn {
   txnDate: string;
   valueDate: string | null;
   description: string;
+  prettyDescription: string | null;
   amount: number;
   direction: "debit" | "credit";
   runningBalance: number | null;
@@ -172,6 +173,7 @@ export async function extractTransactions(
     txnDate: r.txnDate,
     valueDate: r.valueDate,
     description: r.description,
+    prettyDescription: r.prettyDescription?.trim() || null,
     amount: Number(r.amount) || 0,
     direction: r.direction,
     runningBalance: r.runningBalance ?? null,

@@ -36,6 +36,7 @@ export async function commitImport(
     valueDate: t.valueDate ? new Date(t.valueDate) : null,
     description: t.description,
     normalizedDescription: t.normalizedDescription,
+    prettyDescription: t.prettyDescription ?? null,
     amount: t.amount,
     direction: t.direction,
     runningBalance: t.runningBalance,

@@ -185,6 +185,7 @@ model Transaction {
   valueDate               DateTime?
   description             String
   normalizedDescription   String
+  prettyDescription       String?  // AI-generated human-readable label (populated at import time)
   amount                  Float
   direction               String   // "debit" | "credit"
   runningBalance          Float?

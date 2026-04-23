@@ -23,6 +23,7 @@ interface Row {
   id: string;
   txnDate: string;
   description: string;
+  prettyDescription: string | null;
   amount: number;
   direction: "debit" | "credit";
   categoryId: string | null;
@@ -427,7 +428,10 @@ export function TransactionsTable({
                   )}
                 </td></tr>
               ) : rows.map((r) => {
+                // Use AI-generated prettyDescription when available (non-Axis banks);
+                // fall back to regex-based prettifyDescription for Axis/JS-parsed txns.
                 const pretty = prettifyDescription(r.description);
+                const displayLabel = r.prettyDescription ?? pretty.merchant;
                 const isCredit = r.direction === "credit";
                 const isEditingCategory = editingCategoryId === r.id;
                 const catName = r.category?.name ?? null;
@@ -438,13 +442,13 @@ export function TransactionsTable({
                   </td>
                   <td className="px-3 py-2.5 max-w-[160px] sm:max-w-[280px] md:max-w-[380px] align-middle" title={r.description}>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="text-[#ededed] font-medium truncate">{pretty.merchant}</span>
+                      <span className="text-[#ededed] font-medium truncate">{displayLabel}</span>
                       {pretty.method && (
                         <span className={`ab-chip ${methodChipClass(pretty.method)}`} style={{ fontSize: 10, padding: "1px 7px", lineHeight: 1.5 }}>
                           {pretty.method}
                         </span>
                       )}
-                      {pretty.counterBank && (
+                      {pretty.counterBank && !r.prettyDescription && (
                         <span className="text-[11px] text-[#6e6e73]">. {pretty.counterBank}</span>
                       )}
                     </div>

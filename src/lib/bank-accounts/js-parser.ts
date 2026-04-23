@@ -145,6 +145,7 @@ export function parseAxis(text: string): JsParseResult {
         txnDate: isoDate(dateStr),
         valueDate: null,
         description,
+        prettyDescription: null, // JS parser skips Claude; client-side prettifyDescription() handles Axis format
         amount,
         direction,
         runningBalance: balance,
