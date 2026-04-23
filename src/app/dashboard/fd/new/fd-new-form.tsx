@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
-import { Upload, Loader2, Sparkles, ChevronDown, X, Camera, RefreshCw } from "lucide-react";
+import { Upload, Loader2, Sparkles, ChevronDown, X, Camera, RefreshCw, AlertTriangle } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { cn } from "@/lib/utils";
 
@@ -347,6 +347,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   const [extractError, setExtractError] = useState("");
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState("");
+  const [pendingOverrideBody, setPendingOverrideBody] = useState<Record<string, unknown> | null>(null);
   const [renewalNumber, setRenewalNumber] = useState<number | null>(null);
   const [priorRenewals, setPriorRenewals] = useState<PriorRenewal[]>([]);
   const [uploadMode, setUploadMode] = useState<"image" | "pdf">("image");
@@ -538,6 +539,32 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     return json.url ?? null;
   }
 
+  async function doOverride() {
+    if (!pendingOverrideBody) return;
+    setPendingOverrideBody(null);
+    setSaving(true);
+    try {
+      const res = await fetch("/api/fd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...pendingOverrideBody, overwrite: true }),
+      });
+      const json = await res.json();
+      if (!res.ok) { setSaveError(json.error ?? "Failed to save."); return; }
+      const newId = json.fd.id;
+      if (renewalNumber && renewalNumber > 0 && !renewedFrom) {
+        router.push(`/dashboard/fd/${newId}?addPrevious=1`);
+      } else {
+        router.push("/dashboard/fd");
+      }
+      router.refresh();
+    } catch {
+      setSaveError("Failed to save. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
@@ -593,58 +620,61 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         ]);
       }
 
+      const fdBody: Record<string, unknown> = {
+        ...form,
+        // If prior renewals exist, FD record stores the ORIGINAL data (priorRenewals[0])
+        // otherwise stores AI-extracted data as-is
+        principal: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].principal) : parseFloat(form.principal),
+        interestRate: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].interestRate) : parseFloat(form.interestRate),
+        tenureMonths: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureMonths) || 0) : (parseInt(form.tenureMonths) || 0),
+        tenureDays: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureDays) || 0) : (parseInt(form.tenureDays) || 0),
+        tenureText: priorRenewals.length > 0 ? (priorRenewals[0].tenureText || null) : (form.tenureText || null),
+        startDate: priorRenewals.length > 0 ? priorRenewals[0].startDate : form.startDate,
+        maturityDate: priorRenewals.length > 0 ? priorRenewals[0].maturityDate : form.maturityDate,
+        maturityAmount: priorRenewals.length > 0
+          ? (priorRenewals[0].maturityAmount ? parseFloat(priorRenewals[0].maturityAmount) : null)
+          : (form.maturityAmount ? parseFloat(form.maturityAmount) : null),
+        sourceImageUrl,
+        sourceImageBackUrl,
+        sourcePdfUrl,
+        // Renewals: intermediate priors (R1..Rn-1) + current AI data as last renewal
+        ...(priorRenewals.length > 0 ? {
+          renewals: [
+            ...priorRenewals.slice(1).map((r, i) => ({
+              renewalNumber: i + 1,
+              startDate: r.startDate,
+              maturityDate: r.maturityDate,
+              principal: parseFloat(r.principal),
+              interestRate: parseFloat(r.interestRate),
+              tenureMonths: parseInt(r.tenureMonths) || 0,
+              tenureDays: parseInt(r.tenureDays) || 0,
+              tenureText: r.tenureText || null,
+              maturityAmount: r.maturityAmount ? parseFloat(r.maturityAmount) : null,
+            })),
+            {
+              renewalNumber: priorRenewals.length,
+              startDate: form.startDate,
+              maturityDate: form.maturityDate,
+              principal: parseFloat(form.principal),
+              interestRate: parseFloat(form.interestRate),
+              tenureMonths: parseInt(form.tenureMonths) || 0,
+              tenureDays: parseInt(form.tenureDays) || 0,
+              tenureText: form.tenureText || null,
+              maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
+              maturityInstruction: form.maturityInstruction || null,
+              payoutFrequency: form.payoutFrequency || null,
+            },
+          ],
+        } : {}),
+      };
+
       const res = await fetch("/api/fd", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...form,
-          // If prior renewals exist, FD record stores the ORIGINAL data (priorRenewals[0])
-          // otherwise stores AI-extracted data as-is
-          principal: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].principal) : parseFloat(form.principal),
-          interestRate: priorRenewals.length > 0 ? parseFloat(priorRenewals[0].interestRate) : parseFloat(form.interestRate),
-          tenureMonths: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureMonths) || 0) : (parseInt(form.tenureMonths) || 0),
-          tenureDays: priorRenewals.length > 0 ? (parseInt(priorRenewals[0].tenureDays) || 0) : (parseInt(form.tenureDays) || 0),
-          tenureText: priorRenewals.length > 0 ? (priorRenewals[0].tenureText || null) : (form.tenureText || null),
-          startDate: priorRenewals.length > 0 ? priorRenewals[0].startDate : form.startDate,
-          maturityDate: priorRenewals.length > 0 ? priorRenewals[0].maturityDate : form.maturityDate,
-          maturityAmount: priorRenewals.length > 0
-            ? (priorRenewals[0].maturityAmount ? parseFloat(priorRenewals[0].maturityAmount) : null)
-            : (form.maturityAmount ? parseFloat(form.maturityAmount) : null),
-          sourceImageUrl,
-          sourceImageBackUrl,
-          sourcePdfUrl,
-          // Renewals: intermediate priors (R1..Rn-1) + current AI data as last renewal
-          ...(priorRenewals.length > 0 ? {
-            renewals: [
-              ...priorRenewals.slice(1).map((r, i) => ({
-                renewalNumber: i + 1,
-                startDate: r.startDate,
-                maturityDate: r.maturityDate,
-                principal: parseFloat(r.principal),
-                interestRate: parseFloat(r.interestRate),
-                tenureMonths: parseInt(r.tenureMonths) || 0,
-                tenureDays: parseInt(r.tenureDays) || 0,
-                tenureText: r.tenureText || null,
-                maturityAmount: r.maturityAmount ? parseFloat(r.maturityAmount) : null,
-              })),
-              {
-                renewalNumber: priorRenewals.length,
-                startDate: form.startDate,
-                maturityDate: form.maturityDate,
-                principal: parseFloat(form.principal),
-                interestRate: parseFloat(form.interestRate),
-                tenureMonths: parseInt(form.tenureMonths) || 0,
-                tenureDays: parseInt(form.tenureDays) || 0,
-                tenureText: form.tenureText || null,
-                maturityAmount: form.maturityAmount ? parseFloat(form.maturityAmount) : null,
-                maturityInstruction: form.maturityInstruction || null,
-                payoutFrequency: form.payoutFrequency || null,
-              },
-            ],
-          } : {}),
-        }),
+        body: JSON.stringify(fdBody),
       });
       const json = await res.json();
+      if (res.status === 409) { setPendingOverrideBody(fdBody); return; }
       if (!res.ok) { setSaveError(json.error ?? "Failed to save."); return; }
       const newId = json.fd.id;
       if (renewalNumber && renewalNumber > 0 && !renewedFrom) {
@@ -661,6 +691,41 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
   }
 
   return (
+    <>
+    {pendingOverrideBody && (
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4">
+        <div
+          className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-[#2a2a2e] overflow-hidden"
+          style={{ background: "#131316" }}
+        >
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-[#2a2a2e]">
+            <AlertTriangle size={16} style={{ color: "#f5a524" }} />
+            <p className="text-[15px] font-semibold text-[#ededed] tracking-tight">FD already exists</p>
+          </div>
+          <div className="px-5 py-4">
+            <p className="text-[13px] text-[#a0a0a5]">
+              A Fixed Deposit with the same details already exists in your account. Do you want to override it with this new data?
+            </p>
+          </div>
+          <div className="px-5 pb-5 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+            <button
+              type="button"
+              onClick={() => setPendingOverrideBody(null)}
+              className="ab-btn ab-btn-ghost w-full sm:w-auto"
+            >
+              Skip
+            </button>
+            <button
+              type="button"
+              onClick={doOverride}
+              className="ab-btn ab-btn-accent w-full sm:w-auto"
+            >
+              Override
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     <form noValidate onSubmit={handleSubmit} className="max-w-7xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
       <FormStepper
         items={[
@@ -1094,5 +1159,6 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         </div>
       </div>
     </form>
+    </>
   );
 }

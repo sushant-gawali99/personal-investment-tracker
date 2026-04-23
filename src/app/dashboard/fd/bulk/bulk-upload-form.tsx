@@ -8,8 +8,13 @@ import { bulkReducer, initialState, mergedFields } from "./bulk-state";
 import type { BulkRow, EditableFields, FdExtracted } from "./bulk-state";
 import { BulkDropZone, MAX_FILES, MAX_FILE_SIZE, MAX_ZIP_SIZE } from "./bulk-drop-zone";
 import { BulkRowTable } from "./bulk-row-table";
+import { BulkConfirmModal } from "./bulk-confirm-modal";
 import { expandZip, isZipFile } from "@/lib/zip";
 import { runWithConcurrency } from "@/lib/bulk-queue";
+
+class DuplicateFdError extends Error {
+  constructor() { super("duplicate"); }
+}
 
 const CONCURRENCY = 5;
 const SUPPORTED_MIMES = new Set([
@@ -261,6 +266,7 @@ export function BulkUploadForm() {
     row: BulkRow,
     url: string,
     signal: AbortSignal,
+    overwrite = false,
   ): Promise<void> {
     const f = mergedFields(row);
     const body: Record<string, unknown> = {
@@ -285,6 +291,7 @@ export function BulkUploadForm() {
       sourceImageUrl: row.kind === "image" ? url : null,
       sourceImageBackUrl: null,
       sourcePdfUrl: row.kind === "pdf" ? url : null,
+      overwrite,
     };
     const res = await fetch("/api/fd", {
       method: "POST",
@@ -293,10 +300,11 @@ export function BulkUploadForm() {
       signal,
     });
     const json = await res.json();
+    if (res.status === 409) throw new DuplicateFdError();
     if (!res.ok) throw new Error(json.error ?? "Save failed");
   }
 
-  async function saveRows(rows: BulkRow[]) {
+  async function saveRows(rows: BulkRow[], overwrite = false) {
     if (rows.length === 0) return;
     if (!abortRef.current || abortRef.current.signal.aborted) {
       abortRef.current = new AbortController();
@@ -310,12 +318,15 @@ export function BulkUploadForm() {
         dispatch({ type: "SET_STATUS", id: row.id, status: "saving" });
         try {
           const url = await uploadOneFile(row.file, signal);
-          // Re-read the latest row state to pick up edits made after queueing
           const latest = rowsRef.current.find((r) => r.id === row.id) ?? row;
-          await createOneFd(latest, url, signal);
+          await createOneFd(latest, url, signal, overwrite);
           dispatch({ type: "SET_STATUS", id: row.id, status: "saved" });
           dispatch({ type: "SET_SELECTED", id: row.id, selected: false });
         } catch (err) {
+          if (err instanceof DuplicateFdError) {
+            dispatch({ type: "SET_STATUS", id: row.id, status: "duplicate_confirm" });
+            return;
+          }
           const msg = err instanceof Error ? err.message : "Save failed";
           dispatch({ type: "SET_STATUS", id: row.id, status: "save_failed", error: msg });
         }
@@ -326,8 +337,19 @@ export function BulkUploadForm() {
     router.refresh();
   }
 
+  function handleOverride(ids: string[]) {
+    const rows = rowsRef.current.filter((r) => ids.includes(r.id));
+    saveRows(rows, true);
+  }
+
+  function handleSkipDuplicates(ids: string[]) {
+    ids.forEach((id) =>
+      dispatch({ type: "SET_STATUS", id, status: "save_failed", error: "Skipped (already exists)" }),
+    );
+  }
+
   const selectedSavable = state.rows.filter(
-    (r) => r.selected && (r.status === "extracted" || r.status === "save_failed"),
+    (r) => r.selected && (r.status === "extracted" || r.status === "save_failed" || r.status === "duplicate_confirm"),
   );
 
   async function handleSaveSelected() {
@@ -341,8 +363,15 @@ export function BulkUploadForm() {
     failedSave: state.rows.filter((r) => r.status === "save_failed").length,
     failedExtract: state.rows.filter((r) => r.status === "extract_failed").length,
   };
+  const duplicateConfirmRows = state.rows.filter((r) => r.status === "duplicate_confirm");
+
   return (
     <div className="space-y-6 pb-24">
+      <BulkConfirmModal
+        rows={duplicateConfirmRows}
+        onOverride={handleOverride}
+        onSkip={handleSkipDuplicates}
+      />
       {state.rows.length < MAX_FILES && (
         <BulkDropZone
           currentCount={state.rows.length}

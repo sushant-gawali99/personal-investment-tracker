@@ -32,6 +32,17 @@ function StatusPill({ status, error }: { status: RowStatus; error?: string }) {
       </span>
     );
   }
+  if (status === "duplicate_confirm") {
+    return (
+      <span
+        className="ab-chip"
+        title="Already exists — confirm override"
+        style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
+      >
+        <AlertTriangle size={12} /> Already exists
+      </span>
+    );
+  }
   return (
     <span
       className="ab-chip"
@@ -96,7 +107,7 @@ export function BulkRowTable({
                 row.status === "save_failed" ||
                 row.status === "extract_failed";
               const canSelect =
-                row.status === "extracted" || row.status === "save_failed";
+                row.status === "extracted" || row.status === "save_failed" || row.status === "duplicate_confirm";
               const f = row.edited;
               return (
                 <Fragment key={row.id}>

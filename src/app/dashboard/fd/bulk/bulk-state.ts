@@ -5,7 +5,8 @@ export type RowStatus =
   | "extract_failed"
   | "saving"
   | "saved"
-  | "save_failed";
+  | "save_failed"
+  | "duplicate_confirm";
 
 export type FdExtracted = {
   bankName: string | null;
