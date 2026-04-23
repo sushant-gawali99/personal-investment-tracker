@@ -1,6 +1,7 @@
 // src/app/dashboard/bank-accounts/imports/imports-list.tsx
 "use client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   AlertCircle,
   CheckCircle2,
@@ -66,6 +67,13 @@ export function ImportsList({ items }: { items: Item[] }) {
       <ul className="divide-y divide-[#2a2a2e]">
         {items.map((i) => {
           const badge = statusBadge(i.status);
+          const txnsHref = (() => {
+            if (i.status !== "saved" || i.newCount === 0) return null;
+            const p = new URLSearchParams({ accountId: i.account.id });
+            if (i.statementPeriodStart) p.set("from", i.statementPeriodStart.slice(0, 10));
+            if (i.statementPeriodEnd)   p.set("to",   i.statementPeriodEnd.slice(0, 10));
+            return `/dashboard/bank-accounts/list?${p}`;
+          })();
           return (
             <li key={i.id} className="p-4 hover:bg-[#1c1c20]/50 transition-colors">
               <div className="flex items-start gap-4 flex-wrap">
@@ -113,6 +121,11 @@ export function ImportsList({ items }: { items: Item[] }) {
                     </p>
                     {i.duplicateCount > 0 && (
                       <p className="text-[10px] text-[#a0a0a5] mt-0.5">{i.duplicateCount} dup</p>
+                    )}
+                    {txnsHref && (
+                      <Link href={txnsHref} className="text-[10px] text-[#ff385c] hover:underline mt-0.5 inline-block">
+                        View →
+                      </Link>
                     )}
                   </div>
 
