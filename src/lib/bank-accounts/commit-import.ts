@@ -25,37 +25,44 @@ export async function commitImport(
     where: { userId: null, kind: "transfer" },
   });
 
-  const { inserted } = await prisma.$transaction(async (tx) => {
-    let n = 0;
-    for (const t of kept) {
-      try {
-        await tx.transaction.create({
-          data: {
-            userId,
-            accountId: imp.accountId,
-            txnDate: new Date(t.txnDate),
-            valueDate: t.valueDate ? new Date(t.valueDate) : null,
-            description: t.description,
-            normalizedDescription: t.normalizedDescription,
-            amount: t.amount,
-            direction: t.direction,
-            runningBalance: t.runningBalance,
-            bankRef: t.bankRef,
-            categoryId: t.categoryId,
-            categorySource: t.categorySource,
-            importId: imp.id,
-          },
-        });
-        n++;
-      } catch {
-        // unique-index collision — dedup race; skip silently
-      }
+  // Batch-insert outside an interactive transaction. Against Turso, each
+  // round-trip is ~50–100ms, so the old per-row loop inside $transaction
+  // blew the default 5s timeout on even modest statements. createMany sends
+  // a single statement, and skipDuplicates handles the rare dedup race.
+  const rows = kept.map((t) => ({
+    userId,
+    accountId: imp.accountId,
+    txnDate: new Date(t.txnDate),
+    valueDate: t.valueDate ? new Date(t.valueDate) : null,
+    description: t.description,
+    normalizedDescription: t.normalizedDescription,
+    amount: t.amount,
+    direction: t.direction,
+    runningBalance: t.runningBalance,
+    bankRef: t.bankRef,
+    categoryId: t.categoryId,
+    categorySource: t.categorySource,
+    importId: imp.id,
+  }));
+
+  let inserted = 0;
+  if (rows.length > 0) {
+    // Chunk to stay well under libsql's parameter limit (default ~1000).
+    // With ~14 columns per row, 500 rows = ~7000 params — safe.
+    const CHUNK = 500;
+    for (let i = 0; i < rows.length; i += CHUNK) {
+      const slice = rows.slice(i, i + CHUNK);
+      const res = await prisma.transaction.createMany({
+        data: slice,
+        skipDuplicates: true,
+      });
+      inserted += res.count;
     }
-    await tx.statementImport.update({
-      where: { id: imp.id },
-      data: { status: "saved", newCount: n },
-    });
-    return { inserted: n };
+  }
+
+  await prisma.statementImport.update({
+    where: { id: imp.id },
+    data: { status: "saved", newCount: inserted },
   });
 
   // Cross-account transfer detection across the full ledger (post-insert).
@@ -78,7 +85,10 @@ export async function commitImport(
   }));
   const pairs = findTransferPairs(lite);
   for (const p of pairs) {
-    await prisma.$transaction([
+    // Two parallel updates per pair. Not wrapped in $transaction — if one
+    // succeeds and the other fails the worst case is a half-tagged pair,
+    // which the next import run will re-detect and fix.
+    await Promise.all([
       prisma.transaction.update({
         where: { id: p.debitId },
         data: {
