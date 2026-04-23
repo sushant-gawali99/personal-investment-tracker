@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     if (maxAmount) (where.amount as Record<string, number>).lte = Number(maxAmount);
   }
 
-  const [items, total] = await Promise.all([
+  const [items, total, debitAgg, creditAgg] = await Promise.all([
     prisma.transaction.findMany({
       where,
       orderBy:
@@ -49,6 +49,12 @@ export async function GET(req: NextRequest) {
       include: { category: true, account: true },
     }),
     prisma.transaction.count({ where }),
+    prisma.transaction.aggregate({ where: { ...where, direction: "debit" },  _sum: { amount: true } }),
+    prisma.transaction.aggregate({ where: { ...where, direction: "credit" }, _sum: { amount: true } }),
   ]);
-  return NextResponse.json({ items, total, page, pageSize });
+  return NextResponse.json({
+    items, total, page, pageSize,
+    totalDebit:  debitAgg._sum.amount  ?? 0,
+    totalCredit: creditAgg._sum.amount ?? 0,
+  });
 }

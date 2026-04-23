@@ -38,6 +38,8 @@ export function TransactionsTable({
   const sp = useSearchParams();
   const [rows, setRows] = useState<Row[]>([]);
   const [total, setTotal] = useState(0);
+  const [totalDebit, setTotalDebit] = useState(0);
+  const [totalCredit, setTotalCredit] = useState(0);
   const [page, setPage] = useState(Number(sp.get("page") ?? "1"));
   const [loading, setLoading] = useState(true);
   // Which row's category is in edit mode. Default: none — categories are
@@ -107,9 +109,11 @@ export function TransactionsTable({
     params.set("pageSize", "20");
     const r = await fetch(`/api/bank-accounts/transactions?${params}`);
     if (!r.ok) { setLoading(false); return; }
-    const data = await r.json() as { items: Row[]; total: number };
+    const data = await r.json() as { items: Row[]; total: number; totalDebit: number; totalCredit: number };
     setRows(data.items);
     setTotal(data.total);
+    setTotalDebit(data.totalDebit);
+    setTotalCredit(data.totalCredit);
     setLoading(false);
   }, [from, to, accountId, categoryId, direction, q, sort, order, page]);
 
@@ -317,45 +321,75 @@ export function TransactionsTable({
           </div>
         )}
 
-        {/* Layer 4: Active filter chips (individual removal) */}
+        {/* Layer 4: Active filter chips + totals summary */}
         {hasActiveFilters && (
-          <div className="flex items-center gap-1.5 flex-wrap pt-1 border-t border-[#2a2a2e]">
-            <span className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold mr-1">Active:</span>
-            {from && (
-              <ActiveChip
-                label={`From ${formatDate(from)}`}
-                onRemove={() => updateFilter("from", "")}
-              />
-            )}
-            {to && (
-              <ActiveChip
-                label={`To ${formatDate(to)}`}
-                onRemove={() => updateFilter("to", "")}
-              />
-            )}
-            {accountId && (
-              <ActiveChip
-                label={`Account: ${accounts.find((a) => a.id === accountId)?.label ?? accountId}`}
-                onRemove={() => updateFilter("accountId", "")}
-              />
-            )}
-            {categoryId && (
-              <ActiveChip
-                label={`Category: ${categories.find((c) => c.id === categoryId)?.name ?? categoryId}`}
-                onRemove={() => updateFilter("categoryId", "")}
-              />
-            )}
-            {direction && (
-              <ActiveChip
-                label={direction === "debit" ? "Debits only" : "Credits only"}
-                onRemove={() => updateFilter("direction", "")}
-              />
-            )}
-            {q && (
-              <ActiveChip
-                label={`“${q}”`}
-                onRemove={() => updateFilter("q", "")}
-              />
+          <div className="pt-2 border-t border-[#2a2a2e] space-y-2">
+            {/* Chips row */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {from && <ActiveChip label={`From ${formatDate(from)}`} onRemove={() => updateFilter("from", "")} />}
+              {to && <ActiveChip label={`To ${formatDate(to)}`} onRemove={() => updateFilter("to", "")} />}
+              {accountId && (
+                <ActiveChip
+                  label={accounts.find((a) => a.id === accountId)?.label ?? accountId}
+                  icon="account"
+                  onRemove={() => updateFilter("accountId", "")}
+                />
+              )}
+              {categoryId && (
+                <ActiveChip
+                  label={categories.find((c) => c.id === categoryId)?.name ?? categoryId}
+                  icon="category"
+                  onRemove={() => updateFilter("categoryId", "")}
+                />
+              )}
+              {direction && (
+                <ActiveChip
+                  label={direction === "debit" ? "Debits only" : "Credits only"}
+                  icon={direction as "debit" | "credit"}
+                  onRemove={() => updateFilter("direction", "")}
+                />
+              )}
+              {q && <ActiveChip label={`"${q}"`} icon="search" onRemove={() => updateFilter("q", "")} />}
+            </div>
+
+            {/* Totals summary — only shown once data has loaded */}
+            {!loading && total > 0 && (
+              <div className="flex items-center gap-3 flex-wrap text-[12px]">
+                <span className="text-[#6e6e73]">
+                  <span className="text-[#ededed] font-semibold">{total}</span> transaction{total === 1 ? "" : "s"}
+                </span>
+                {totalDebit > 0 && (
+                  <>
+                    <span className="text-[#2a2a2e]">&middot;</span>
+                    <span className="flex items-center gap-1">
+                      <ArrowUpRight size={11} className="text-[#ff7a6e]" />
+                      <span className="text-[#ff7a6e] font-semibold mono">{formatINR(totalDebit)}</span>
+                      <span className="text-[#6e6e73]">spent</span>
+                    </span>
+                  </>
+                )}
+                {totalCredit > 0 && (
+                  <>
+                    <span className="text-[#2a2a2e]">&middot;</span>
+                    <span className="flex items-center gap-1">
+                      <ArrowDownLeft size={11} className="text-[#5ee0a4]" />
+                      <span className="text-[#5ee0a4] font-semibold mono">{formatINR(totalCredit)}</span>
+                      <span className="text-[#6e6e73]">received</span>
+                    </span>
+                  </>
+                )}
+                {totalDebit > 0 && totalCredit > 0 && (
+                  <>
+                    <span className="text-[#2a2a2e]">&middot;</span>
+                    <span className="text-[#6e6e73]">
+                      net{" "}
+                      <span className={`font-semibold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+                        {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
+                      </span>
+                    </span>
+                  </>
+                )}
+              </div>
             )}
           </div>
         )}
@@ -420,7 +454,7 @@ export function TransactionsTable({
                         </span>
                       )}
                       {pretty.counterBank && (
-                        <span className="text-[11px] text-[#6e6e73]">· {pretty.counterBank}</span>
+                        <span className="text-[11px] text-[#6e6e73]">. {pretty.counterBank}</span>
                       )}
                     </div>
                   </td>
@@ -467,7 +501,7 @@ export function TransactionsTable({
                       className={`inline-flex items-center gap-1 mono font-semibold ${isCredit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}
                     >
                       {isCredit ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
-                      {isCredit ? "+" : "−"}{formatINR(r.amount)}
+                      {isCredit ? "+" : "-"}{formatINR(r.amount)}
                     </div>
                   </td>
                 </tr>
@@ -567,14 +601,31 @@ function FacetSelect({
 }
 
 /** Small dismissible chip used in the "Active filters" row. */
-function ActiveChip({ label, onRemove }: { label: string; onRemove: () => void }) {
+function ActiveChip({
+  label,
+  onRemove,
+  icon,
+}: {
+  label: string;
+  onRemove: () => void;
+  icon?: "account" | "category" | "search" | "debit" | "credit";
+}) {
+  // Colour by semantic meaning: debit = red, credit = green, rest = accent
+  const isDebit = icon === "debit";
+  const isCredit = icon === "credit";
+  const bg   = isDebit  ? "bg-[rgba(255,122,110,0.12)] border-[rgba(255,122,110,0.3)] text-[#ff7a6e]"
+             : isCredit ? "bg-[rgba(94,224,164,0.12)] border-[rgba(94,224,164,0.3)] text-[#5ee0a4]"
+             :            "bg-[rgba(255,56,92,0.1)] border-[rgba(255,56,92,0.25)] text-[#ff6b85]";
+  const hover = isDebit  ? "hover:bg-[rgba(255,122,110,0.22)]"
+              : isCredit ? "hover:bg-[rgba(94,224,164,0.22)]"
+              :            "hover:bg-[rgba(255,56,92,0.2)]";
   return (
-    <span className="inline-flex items-center gap-1 pl-2.5 pr-1 py-1 rounded-full text-[11px] font-medium bg-[rgba(90,169,255,0.12)] text-[#5aa9ff] border border-[rgba(90,169,255,0.25)]">
+    <span className={`inline-flex items-center gap-1 pl-2.5 pr-1 py-1 rounded-full text-[11px] font-semibold border transition-colors ${bg}`}>
       {label}
       <button
         onClick={onRemove}
-        className="p-0.5 rounded-full hover:bg-[rgba(90,169,255,0.2)] transition-colors"
-        aria-label={`Remove ${label}`}
+        className={`p-0.5 rounded-full transition-colors ${hover}`}
+        aria-label={`Remove ${label} filter`}
       >
         <X size={10} />
       </button>
