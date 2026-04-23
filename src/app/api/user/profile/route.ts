@@ -4,7 +4,7 @@ import { requireUserId } from "@/lib/session";
 
 export async function PATCH(req: NextRequest) {
   const result = await requireUserId();
-  if (result instanceof Response) return result;
+  if (result instanceof NextResponse) return result;
   const userId = result;
 
   const { phone } = await req.json();
