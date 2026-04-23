@@ -222,3 +222,8 @@ model StatementImport {
   @@index([userId, createdAt])
   @@index([accountId])
 }
+
+model UserProfile {
+  userId  String  @id
+  phone   String?
+}
