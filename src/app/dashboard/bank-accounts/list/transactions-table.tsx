@@ -52,6 +52,9 @@ export function TransactionsTable({
   // read-only until the user explicitly clicks the pencil to avoid
   // accidental re-categorisation of large lists.
   const [editingCategoryId, setEditingCategoryId] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState(sp.get("q") ?? "");
+  // Sync searchInput when q changes externally (e.g. "Clear all filters").
+  useEffect(() => { setSearchInput(sp.get("q") ?? ""); }, [sp]);
 
   const from = sp.get("from") ?? "";
   const to = sp.get("to") ?? "";
@@ -231,12 +234,16 @@ export function TransactionsTable({
             className="ab-input text-[14px]"
             style={{ paddingLeft: 44, paddingRight: 40 }}
             placeholder="Search transactions by description…"
-            value={q}
-            onChange={(e) => updateFilter("q", e.target.value)}
+            value={searchInput}
+            onChange={(e) => {
+              const v = e.target.value;
+              setSearchInput(v);
+              if (v.length === 0 || v.length >= 3) updateFilter("q", v);
+            }}
           />
-          {q && (
+          {searchInput && (
             <button
-              onClick={() => updateFilter("q", "")}
+              onClick={() => { setSearchInput(""); updateFilter("q", ""); }}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-[#2a2a2e] text-[#a0a0a5] hover:text-[#ededed] transition-colors"
               aria-label="Clear search"
             >
