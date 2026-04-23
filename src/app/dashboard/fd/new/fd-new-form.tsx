@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef, useEffect, useMemo } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useDropzone } from "react-dropzone";
 import { Upload, Loader2, Sparkles, ChevronDown, X, Camera, RefreshCw, AlertTriangle } from "lucide-react";
@@ -235,95 +235,6 @@ const emptyPrior = (): PriorRenewal => ({ startDate: "", maturityDate: "", princ
 type RenewedFrom = { id: string; bankName: string; fdNumber: string | null; principal: number; maturityDate: Date | string; interestRate: number; tenureMonths: number; tenureDays: number; tenureText: string | null; nomineeName: string | null; nomineeRelation: string | null } | null;
 
 type SectionId = "receipt" | "prior" | "details" | "renewal" | "notes";
-type SectionStatus = "empty" | "partial" | "complete" | "error";
-
-type StepperItem = { id: SectionId; label: string; status: SectionStatus };
-
-function StepperDot({ status }: { status: SectionStatus }) {
-  const srLabel =
-    status === "complete" ? "complete"
-    : status === "error" ? "has errors"
-    : status === "partial" ? "in progress"
-    : "empty";
-
-  const base = "w-4 h-4 rounded-full flex items-center justify-center shrink-0";
-  if (status === "complete") {
-    return (
-      <span className={cn(base, "bg-[#ff385c] text-white")} aria-hidden>
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
-        <span className="sr-only">{srLabel}</span>
-      </span>
-    );
-  }
-  if (status === "error") {
-    return <span className={cn(base, "bg-[#ff7a6e]")} aria-label={srLabel} />;
-  }
-  if (status === "partial") {
-    return <span className={cn(base, "bg-[#a0a0a5]")} aria-label={srLabel} />;
-  }
-  return <span className={cn(base, "border border-[#3a3a3f]")} aria-label={srLabel} />;
-}
-
-function FormStepper({
-  items, activeId, onSelect,
-}: {
-  items: StepperItem[];
-  activeId: SectionId | null;
-  onSelect: (id: SectionId) => void;
-}) {
-  return (
-    <>
-      {/* Desktop: vertical sticky sidebar */}
-      <aside className="hidden lg:block w-[220px] shrink-0">
-        <div className="sticky top-6 ab-card p-3 space-y-1">
-          {items.map((it) => (
-            <button
-              key={it.id}
-              type="button"
-              onClick={() => onSelect(it.id)}
-              aria-current={activeId === it.id ? "true" : undefined}
-              className={cn(
-                "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-left text-[13px] transition-colors",
-                activeId === it.id
-                  ? "bg-[#1c1c20] text-[#ededed]"
-                  : "text-[#a0a0a5] hover:bg-[#17171a] hover:text-[#ededed]"
-              )}
-            >
-              <StepperDot status={it.status} />
-              <span className="truncate">{it.label}</span>
-            </button>
-          ))}
-        </div>
-      </aside>
-
-      {/* Mobile: sticky horizontal chip bar */}
-      <div className="lg:hidden sticky top-0 z-30 -mx-4 px-4 py-2 bg-[#0e0e10]/95 backdrop-blur border-b border-[#2a2a2e]">
-        <div
-          className="flex gap-2 overflow-x-auto"
-          style={{ scrollbarWidth: "none" }}
-        >
-          {items.map((it) => (
-            <button
-              key={it.id}
-              type="button"
-              onClick={() => onSelect(it.id)}
-              aria-current={activeId === it.id ? "true" : undefined}
-              className={cn(
-                "shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-full text-[12px] font-medium border transition-colors",
-                activeId === it.id
-                  ? "bg-[#1c1c20] border-[#3a3a3f] text-[#ededed]"
-                  : "bg-[#17171a] border-[#2a2a2e] text-[#a0a0a5]"
-              )}
-            >
-              <StepperDot status={it.status} />
-              <span>{it.label}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
-  );
-}
 
 export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom; linkToId?: string }) {
   const router = useRouter();
@@ -364,80 +275,9 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
 
   const [invalidSections, setInvalidSections] = useState<Set<SectionId>>(new Set());
 
-  const sectionStatus = useMemo<Record<SectionId, SectionStatus>>(() => {
-    const detailsRequired = [
-      form.bankName,
-      form.principal,
-      form.interestRate,
-      form.startDate,
-      form.maturityDate,
-      form.interestType,
-    ];
-    const hasTenure = (form.tenureMonths && form.tenureMonths.trim() !== "" && parseInt(form.tenureMonths) > 0)
-      || (form.tenureDays && form.tenureDays.trim() !== "" && parseInt(form.tenureDays) > 0);
-    const detailsFilled = detailsRequired.filter((v) => v && v.trim() !== "").length + (hasTenure ? 1 : 0);
-
-    const priorAllComplete = priorRenewals.every((r) =>
-      r.startDate && r.maturityDate && r.principal && r.interestRate && (r.tenureMonths || r.tenureDays)
-    );
-    const priorAnyFilled = priorRenewals.some((r) =>
-      r.startDate || r.maturityDate || r.principal || r.interestRate || r.tenureMonths || r.tenureDays
-    );
-
-    const receiptHasFile = !!frontFile || !!pdfFile;
-    const renewalAnyFilled = !!(form.maturityInstruction || form.payoutFrequency || form.nomineeName || form.nomineeRelation);
-    const notesAnyFilled = !!form.notes;
-
-    const statusFor = (id: SectionId, raw: SectionStatus): SectionStatus =>
-      invalidSections.has(id) ? "error" : raw;
-
-    return {
-      receipt: statusFor("receipt", receiptHasFile ? (extracted ? "complete" : "partial") : "empty"),
-      prior: statusFor("prior", priorRenewals.length === 0 ? "empty" : priorAllComplete ? "complete" : priorAnyFilled ? "partial" : "empty"),
-      details: statusFor(
-        "details",
-        detailsFilled === detailsRequired.length + 1 ? "complete" : detailsFilled === 0 ? "empty" : "partial"
-      ),
-      renewal: statusFor("renewal", renewalAnyFilled ? "complete" : "empty"),
-      notes: statusFor("notes", notesAnyFilled ? "complete" : "empty"),
-    };
-  }, [form, priorRenewals, frontFile, pdfFile, extracted, invalidSections]);
-
-  const [activeId, setActiveId] = useState<SectionId | null>("receipt");
-
-  function scrollToSection(id: SectionId) {
-    const el = sectionRefs.current[id];
-    if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
   useEffect(() => {
     if (extracted) setReceiptCollapsed(true);
   }, [extracted]);
-
-  useEffect(() => {
-    const entries = (Object.keys(sectionRefs.current) as SectionId[])
-      .map((id) => ({ id, el: sectionRefs.current[id] }))
-      .filter((e): e is { id: SectionId; el: HTMLElement } => !!e.el);
-
-    if (entries.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (obs) => {
-        const visible = obs
-          .filter((o) => o.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) {
-          const match = entries.find((e) => e.el === visible[0].target);
-          if (match) setActiveId(match.id);
-        }
-      },
-      { rootMargin: "-20% 0px -60% 0px", threshold: [0, 0.25, 0.5, 0.75, 1] }
-    );
-
-    entries.forEach((e) => observer.observe(e.el));
-    return () => observer.disconnect();
-  }, [priorRenewals.length]);
 
   const set = (key: keyof FDForm, value: string) => setForm((f) => ({ ...f, [key]: value }));
 
@@ -726,19 +566,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         </div>
       </div>
     )}
-    <form noValidate onSubmit={handleSubmit} className="max-w-7xl mx-auto lg:flex lg:gap-6 lg:items-start pb-24">
-      <FormStepper
-        items={[
-          { id: "receipt", label: "Receipt", status: sectionStatus.receipt },
-          ...(priorRenewals.length > 0 ? [{ id: "prior" as SectionId, label: "Prior Periods", status: sectionStatus.prior }] : []),
-          { id: "details", label: "FD Details", status: sectionStatus.details },
-          { id: "renewal", label: "Renewal & Nominee", status: sectionStatus.renewal },
-          { id: "notes", label: "Notes", status: sectionStatus.notes },
-        ]}
-        activeId={activeId}
-        onSelect={scrollToSection}
-      />
-      <div className="flex-1 min-w-0 space-y-6">
+    <form noValidate onSubmit={handleSubmit} className="max-w-3xl mx-auto pb-24">
+      <div className="space-y-6">
       {renewedFrom && (
         <div
           className="ab-card-flat flex items-center gap-2 px-4 py-3 text-[13px]"
