@@ -110,31 +110,52 @@ export function OverviewPdf({ data }: Props) {
           />
         </View>
 
-        {/* Allocation + MF/Maturities */}
+        {/* Allocation + Equity & MF */}
         <View style={styles.twoCol}>
           <View style={[styles.section, { flex: 1 }]}>
             <Text style={styles.sectionLabel}>Asset Allocation</Text>
             <AllocationDonut data={data} />
           </View>
-          <View style={[styles.section, { flex: 1 }]}>
-            <Text style={styles.sectionLabel}>Mutual Funds</Text>
-            <View style={styles.row}>
-              <Text style={styles.rowLabel}>Invested</Text>
-              <Text style={styles.rowValue}>{fmtINRPdf(data.mf.totalInvested)}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.rowLabel}>Current Value</Text>
-              <Text style={styles.rowValue}>{fmtINRPdf(data.mf.currentValue)}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.rowLabel}>P&L</Text>
-              <Text style={data.mf.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
-                {data.mf.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.mf.totalPnL)}
-              </Text>
+          <View style={{ flex: 1, gap: 8 }}>
+            {data.equity.currentValue > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Equity</Text>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Invested</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.equity.totalInvested)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Current Value</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.equity.currentValue)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>P&L</Text>
+                  <Text style={data.equity.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
+                    {data.equity.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.equity.totalPnL)}
+                  </Text>
+                </View>
+              </View>
+            )}
+            <View style={styles.section}>
+              <Text style={styles.sectionLabel}>Mutual Funds</Text>
+              <View style={styles.row}>
+                <Text style={styles.rowLabel}>Invested</Text>
+                <Text style={styles.rowValue}>{fmtINRPdf(data.mf.totalInvested)}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.rowLabel}>Current Value</Text>
+                <Text style={styles.rowValue}>{fmtINRPdf(data.mf.currentValue)}</Text>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.rowLabel}>P&L</Text>
+                <Text style={data.mf.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
+                  {data.mf.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.mf.totalPnL)}
+                </Text>
+              </View>
             </View>
             {data.upcomingMaturities.length > 0 && (
-              <View style={{ marginTop: 10 }}>
-                <Text style={[styles.sectionLabel, { marginBottom: 4 }]}>Upcoming Maturities</Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Upcoming Maturities</Text>
                 {data.upcomingMaturities.map((m, i) => (
                   <View key={i} style={styles.maturityItem}>
                     <Text style={{ fontSize: 8, color: '#444' }}>{m.bankName}</Text>

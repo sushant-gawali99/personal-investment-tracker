@@ -6,7 +6,7 @@ export interface PdfData {
   userEmail: string
   generatedAt: Date
   totalValue: number
-  equity: { currentValue: number; pnlPct: number }
+  equity: { totalInvested: number; currentValue: number; totalPnL: number; pnlPct: number }
   fd: { totalMaturity: number; totalPrincipal: number; weightedRate: number }
   gold: { currentValue: number; gainLossPct: number | null }
   mf: { totalInvested: number; currentValue: number; totalPnL: number }
@@ -97,7 +97,7 @@ export function buildPdfData(props: RawProps, userEmail: string): PdfData {
     userEmail,
     generatedAt: new Date(),
     totalValue: summary.totalValue,
-    equity: { currentValue: summary.equity.currentValue, pnlPct: summary.equity.totalPnLPct },
+    equity: { totalInvested: summary.equity.totalInvested, currentValue: summary.equity.currentValue, totalPnL: summary.equity.totalPnL, pnlPct: summary.equity.totalPnLPct },
     fd: {
       totalMaturity: summary.fd.totalMaturity,
       totalPrincipal: summary.fd.totalPrincipal,
