@@ -246,18 +246,22 @@ export function prettifyDescription(raw: string): PrettyDescription {
 
   // ── SBI plain transfer "Of Mr./Ms." ──────────────────────────
   // "Dep Tfr 00418160911146 Of Mr. Ravindra Diwakar D At 07339"
-  // "Wdl Tfr Inb E-tdr/e-stdr 00450417164971 Of Mr. Ravindra Diwakar D At 07339"
-  const ofPersonMatch = trimmed.match(/\bOf\s+(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+([A-Za-z][A-Za-z\s.]{1,40})(?:\s+(?:At|D\s+At)\s+\d+)?$/i);
+  // "Dep Tfr Int Trf Frm 43930368794 Of Mr. Ravindra Diwakar D At 07339 University Road (pune)"
+  // No end-anchor — branch address may follow the "At {code}" portion.
+  const ofPersonMatch = trimmed.match(/\bOf\s+(?:Mr\.?|Mrs\.?|Ms\.?|Dr\.?)\s+([A-Za-z][A-Za-z\s.]{1,50})/i);
   if (ofPersonMatch) {
-    const name = ofPersonMatch[1].trim().replace(/\s+D\s*$/, "").trim();
-    // Determine transfer direction and method from prefix keywords.
-    const isDebit = /\bWdl\b|\bWithdraw/i.test(trimmed);
-    const methodHint = /\bNEFT\b/i.test(trimmed) ? "NEFT" :
-                       /\bRTGS\b/i.test(trimmed) ? "RTGS" :
-                       /\bIMPS\b/i.test(trimmed) ? "IMPS" : "Transfer";
+    let name = ofPersonMatch[1].trim();
+    // Strip trailing branch info: "D At 07339 University Road (pune)" or just "D At 07339"
+    name = name.replace(/\s+D\s+At\b.*/i, "").replace(/\s+At\b\s+\d.*/i, "").trim();
+    // Strip lone trailing initial "D" (middle-name initial SBI appends)
+    name = name.replace(/\s+[A-Z]\s*$/, "").trim();
+    const methodHint: TxnMethod =
+      /\bNEFT\b/i.test(trimmed) ? "NEFT" :
+      /\bRTGS\b/i.test(trimmed) ? "RTGS" :
+      /\bIMPS\b/i.test(trimmed) ? "IMPS" : "Transfer";
     return {
       ...base,
-      method: methodHint as TxnMethod,
+      method: methodHint,
       merchant: canonicalMerchant(name) || name,
     };
   }
