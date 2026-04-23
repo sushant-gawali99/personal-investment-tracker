@@ -1,10 +1,13 @@
 // src/app/dashboard/bank-accounts/imports/imports-list.tsx
 "use client";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   AlertCircle,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Clock,
   FileText,
   Inbox,
@@ -42,6 +45,16 @@ function statusBadge(status: string) {
 
 export function ImportsList({ items }: { items: Item[] }) {
   const router = useRouter();
+  const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
+
+  function toggleError(id: string) {
+    setExpandedErrors((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  }
+
   async function remove(id: string) {
     if (!confirm("Delete this import and all its saved transactions?")) return;
     await fetch(`/api/bank-accounts/import/${id}`, { method: "DELETE" });
@@ -75,22 +88,32 @@ export function ImportsList({ items }: { items: Item[] }) {
             if (i.statementPeriodEnd)   p.set("to",   i.statementPeriodEnd.slice(0, 10));
             return `/dashboard/bank-accounts/list?${p}`;
           })();
+          const errorExpanded = expandedErrors.has(i.id);
           return (
-            <li key={i.id} className="px-4 py-2.5 hover:bg-[#1c1c20]/50 transition-colors">
+            <li key={i.id} className="px-4 py-3 hover:bg-[#1c1c20]/50 transition-colors">
               <div className="flex items-center gap-3">
-                <FileText size={14} className="text-[#ff385c] shrink-0" />
+                <FileText size={15} className="text-[#ff385c] shrink-0" />
 
                 {/* Main info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[13px] font-medium text-[#ededed] truncate max-w-[180px] sm:max-w-[320px]">
+                    <span className="text-[14px] font-medium text-[#ededed] truncate max-w-[180px] sm:max-w-[340px]">
                       {i.fileName}
                     </span>
-                    <span className={`ab-chip ${badge.chip}`} style={{ fontSize: 10, padding: "1px 7px" }}>
+                    <span className={`ab-chip ${badge.chip}`} style={{ fontSize: 11, padding: "2px 8px" }}>
                       {badge.icon} {badge.label}
                     </span>
+                    {i.errorMessage && (
+                      <button
+                        onClick={() => toggleError(i.id)}
+                        className="inline-flex items-center gap-1 text-[11px] text-[#ff7a6e] hover:text-[#ffaa99] transition-colors"
+                      >
+                        {errorExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
+                        {errorExpanded ? "Hide error" : "Show error"}
+                      </button>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[11px] text-[#6e6e73]">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[12px] text-[#6e6e73]">
                     <span>{i.account.label}</span>
                     <span>·</span>
                     <span>
@@ -101,8 +124,8 @@ export function ImportsList({ items }: { items: Item[] }) {
                     <span>·</span>
                     <span>Uploaded {formatDate(i.createdAt)}</span>
                   </div>
-                  {i.errorMessage && (
-                    <p className="text-[11px] text-[#ff7a6e] mt-1 break-words line-clamp-2">
+                  {errorExpanded && i.errorMessage && (
+                    <p className="text-[12px] text-[#ff7a6e] mt-1.5 break-words bg-[rgba(255,122,110,0.06)] rounded-lg px-3 py-2">
                       {i.errorMessage}
                     </p>
                   )}
@@ -113,15 +136,15 @@ export function ImportsList({ items }: { items: Item[] }) {
                   <p className="mono text-[13px] font-semibold text-[#ededed] leading-none">
                     {i.newCount}
                     {i.extractedCount > 0 && (
-                      <span className="text-[#6e6e73] font-normal text-[11px]"> / {i.extractedCount}</span>
+                      <span className="text-[#6e6e73] font-normal text-[12px]"> / {i.extractedCount}</span>
                     )}
                   </p>
                   <div className="flex items-center justify-end gap-2 mt-0.5">
                     {i.duplicateCount > 0 && (
-                      <span className="text-[10px] text-[#6e6e73]">{i.duplicateCount} dup</span>
+                      <span className="text-[11px] text-[#6e6e73]">{i.duplicateCount} dup</span>
                     )}
                     {txnsHref && (
-                      <Link href={txnsHref} className="text-[10px] text-[#ff385c] hover:underline">
+                      <Link href={txnsHref} className="text-[11px] text-[#ff385c] hover:underline">
                         View →
                       </Link>
                     )}
@@ -133,7 +156,7 @@ export function ImportsList({ items }: { items: Item[] }) {
                   className="p-1.5 rounded-lg text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
                   title="Delete import"
                 >
-                  <Trash2 size={13} />
+                  <Trash2 size={14} />
                 </button>
               </div>
             </li>
