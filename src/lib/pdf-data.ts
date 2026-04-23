@@ -86,7 +86,7 @@ export function buildPdfData(props: RawProps, userEmail: string): PdfData {
   const mfItems = mfHoldings.map(h => ({ symbol: firstTwoWords(h.fund), value: h.last_price * h.quantity }))
   const topHoldings = [...equityItems, ...mfItems]
     .sort((a, b) => b.value - a.value)
-    .slice(0, 5)
+    .slice(0, 8)
   const invested = goldTotals.invested
   const gainLossPct =
     goldTotals.gainLoss != null && invested > 0
