@@ -101,7 +101,7 @@ export function TallyExportClient({
     ];
     setMappings(rows);
     const selectedAccount = accounts.find((a) => a.id === filters.accountId);
-    setBankLedgerName(selectedAccount?.label ?? "");
+    setBankLedgerName(selectedAccount?.label ?? "Multiple Accounts");
     setError(null);
     setStep("ledger-mapping");
   }
