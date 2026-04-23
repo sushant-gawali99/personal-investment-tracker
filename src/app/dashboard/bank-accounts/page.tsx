@@ -3,7 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { ArrowLeftRight, Landmark, Tag, Files, Upload } from "lucide-react";
+import { ArrowLeftRight, FileOutput, Landmark, Tag, Files, Upload } from "lucide-react";
 import { OverviewClient } from "./overview-client";
 import { BankBalanceStrip } from "@/components/bank-accounts/bank-balance-strip";
 
@@ -51,12 +51,13 @@ export default async function BankAccountsOverview() {
           </Link>
         </div>
         <BankBalanceStrip balances={balances} />
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
           {[
             { href: "/dashboard/bank-accounts/list", label: "Transactions", icon: <ArrowLeftRight size={20} />, desc: "View & filter" },
             { href: "/dashboard/bank-accounts/accounts", label: "Bank Accounts", icon: <Landmark size={20} />, desc: "Manage accounts" },
             { href: "/dashboard/bank-accounts/categories", label: "Categories", icon: <Tag size={20} />, desc: "Rules & labels" },
             { href: "/dashboard/bank-accounts/imports", label: "Manage Statements", icon: <Files size={20} />, desc: "Imports history" },
+            { href: "/dashboard/bank-accounts/export/tally", label: "Tally Export", icon: <FileOutput size={20} />, desc: "Export to Tally ERP 9" },
           ].map(({ href, label, icon, desc }) => (
             <Link
               key={href}
