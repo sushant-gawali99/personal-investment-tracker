@@ -55,7 +55,8 @@ const MERCHANT_CANON: Array<[RegExp, string]> = [
   [/\bmeesho\b/i, "Meesho"],
   [/\bcred\b/i, "CRED"],
   [/\bgoogle\s*asia\s*pacific/i, "Google Play"],
-  [/\bgoogle\s*(play|india)/i, "Google"],
+  [/\bgoogle\s*(play|india)\b/i, "Google"],
+  [/\bgoogle\s+p\b/i, "Google Pay"],        // SBI truncates "Google Pay" to "Google P"
   [/\bikea\s*india/i, "IKEA"],
   [/\bbarbeque\s*nation/i, "Barbeque Nation"],
   [/\bstar\s*bazaar/i, "Star Bazaar"],
@@ -92,7 +93,9 @@ const HONORIFICS = /^(mr|mrs|ms|dr|shri|smt|mr\.|mrs\.)\s+/i;
 
 // ─── Bank-name normalisation ──────────────────────────────────────────────
 const BANK_CANON: Array<[RegExp, string]> = [
-  [/\bax[iy]x(\s*bank)?\b/i, "Axis Bank"],  // also catches SBI's "axix" typo
+  [/\bax[iy]x(\s*bank)?\b/i, "Axis Bank"],  // SBI's "axix"/"axiyx" typo
+  [/\baxb\b/i, "Axis Bank"],               // SBI's "axb" abbreviation
+  [/\butib\b/i, "Axis Bank"],              // Axis Bank IFSC prefix used in UPI slot
   [/\bhdfc(\s*bank(\s*ltd)?)?\b/i, "HDFC Bank"],
   [/\bicici(\s*bank(\s*ltd)?)?\b/i, "ICICI Bank"],
   [/\bsbi\b|\bstate\s*bank(\s*of\s*india)?\b/i, "SBI"],
