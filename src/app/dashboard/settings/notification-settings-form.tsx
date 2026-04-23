@@ -18,6 +18,12 @@ export function NotificationSettingsForm({ savedPhone }: Props) {
     e.preventDefault();
     setError("");
     setSaved(false);
+    const trimmed = phone.trim();
+    if (trimmed && !/^\+\d{7,15}$/.test(trimmed)) {
+      setError("Enter a valid international phone number (e.g. +919876543210).");
+      setSaving(false);
+      return;
+    }
     setSaving(true);
     try {
       const res = await fetch("/api/user/profile", {
@@ -41,6 +47,7 @@ export function NotificationSettingsForm({ savedPhone }: Props) {
         <label htmlFor="phone" className="ab-label">WhatsApp Phone Number</label>
         <input
           id="phone"
+          type="tel"
           className="ab-input"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
