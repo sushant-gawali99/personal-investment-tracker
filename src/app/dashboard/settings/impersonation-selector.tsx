@@ -19,11 +19,16 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
   const router = useRouter();
   const [users, setUsers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/users")
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
       .then(({ users }) => setUsers(users))
+      .catch(() => setFetchError(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -60,6 +65,8 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
         <label className="ab-label">View as user</label>
         {loading ? (
           <div className="h-8 w-64 rounded-lg bg-[#1c1c20] animate-pulse" />
+        ) : fetchError ? (
+          <p className="text-[13px] text-[#ff7a6e]">Failed to load users.</p>
         ) : (
           <Select value={selectValue} onValueChange={handleSelect}>
             <SelectTrigger className="w-72">
