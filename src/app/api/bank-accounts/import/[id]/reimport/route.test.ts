@@ -31,6 +31,7 @@ import { POST } from "./route";
 import { getSessionUserId, isSupAdmin } from "@/lib/session";
 import { prisma } from "@/lib/prisma";
 import { runExtraction } from "@/lib/bank-accounts/run-extraction";
+import { getServerSession } from "next-auth";
 import { NextRequest } from "next/server";
 
 function makeReq(id: string) {
@@ -43,30 +44,31 @@ describe("POST /api/bank-accounts/import/[id]/reimport", () => {
   });
 
   it("returns 401 when not authenticated", async () => {
-    vi.mocked(getSessionUserId).mockResolvedValue(null);
-    vi.mocked(isSupAdmin).mockReturnValue(false);
+    vi.mocked(getServerSession).mockResolvedValue(null);
     const res = await POST(makeReq("abc"), { params: Promise.resolve({ id: "abc" }) });
     expect(res.status).toBe(401);
   });
 
   it("returns 403 when authenticated but not super admin", async () => {
-    vi.mocked(getSessionUserId).mockResolvedValue("other@example.com");
+    vi.mocked(getServerSession).mockResolvedValue({ user: { email: "other@example.com" } });
     vi.mocked(isSupAdmin).mockReturnValue(false);
     const res = await POST(makeReq("abc"), { params: Promise.resolve({ id: "abc" }) });
     expect(res.status).toBe(403);
   });
 
   it("returns 404 when import not found", async () => {
-    vi.mocked(getSessionUserId).mockResolvedValue("sushant.gawali@gmail.com");
+    vi.mocked(getServerSession).mockResolvedValue({ user: { email: "sushant.gawali@gmail.com" } });
     vi.mocked(isSupAdmin).mockReturnValue(true);
+    vi.mocked(getSessionUserId).mockResolvedValue("sushant.gawali@gmail.com");
     vi.mocked(prisma.statementImport.findFirst).mockResolvedValue(null);
     const res = await POST(makeReq("abc"), { params: Promise.resolve({ id: "abc" }) });
     expect(res.status).toBe(404);
   });
 
   it("returns 202, deletes transactions, resets import, and fires runExtraction", async () => {
-    vi.mocked(getSessionUserId).mockResolvedValue("sushant.gawali@gmail.com");
+    vi.mocked(getServerSession).mockResolvedValue({ user: { email: "sushant.gawali@gmail.com" } });
     vi.mocked(isSupAdmin).mockReturnValue(true);
+    vi.mocked(getSessionUserId).mockResolvedValue("sushant.gawali@gmail.com");
     vi.mocked(prisma.statementImport.findFirst).mockResolvedValue({
       id: "imp1", userId: "sushant.gawali@gmail.com",
     } as never);
@@ -91,6 +93,6 @@ describe("POST /api/bank-accounts/import/[id]/reimport", () => {
         errorMessage: null,
       },
     });
-    expect(runExtraction).toHaveBeenCalledWith("imp1", "sushant.gawali@gmail.com", undefined);
+    expect(runExtraction).toHaveBeenCalledWith("imp1", "sushant.gawali@gmail.com");
   });
 });
