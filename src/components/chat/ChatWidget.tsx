@@ -15,7 +15,7 @@ export function ChatWidget() {
       )}
       <button
         onClick={() => setOpen((o) => !o)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-[#0f172a] text-xl text-white shadow-lg hover:bg-[#1e293b] transition-colors"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-2xl text-white shadow-[0_4px_24px_rgba(124,58,237,0.5)] hover:shadow-[0_4px_32px_rgba(124,58,237,0.7)] hover:scale-105 active:scale-95 transition-all duration-200"
         aria-label="Open financial assistant"
       >
         {open ? "✕" : "✨"}
