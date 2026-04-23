@@ -65,6 +65,37 @@ async function getData(userId: string | null) {
   };
 }
 
+async function getBankBalances(userId: string | null) {
+  if (!userId) return [] as { id: string; label: string; bankName: string; closingBalance: number | null; asOf: string | null }[];
+  const [accounts, latestImports] = await Promise.all([
+    prisma.bankAccount.findMany({
+      where: { userId, disabled: false },
+      orderBy: { label: "asc" },
+      select: { id: true, label: true, bankName: true },
+    }),
+    prisma.statementImport.findMany({
+      where: { userId, status: "saved", closingBalance: { not: null } },
+      orderBy: [{ statementPeriodEnd: "desc" }, { createdAt: "desc" }],
+      select: { accountId: true, closingBalance: true, statementPeriodEnd: true, createdAt: true },
+    }),
+  ]);
+  const latest = new Map<string, { closingBalance: number; asOf: string }>();
+  for (const imp of latestImports) {
+    if (latest.has(imp.accountId)) continue;
+    latest.set(imp.accountId, {
+      closingBalance: imp.closingBalance!,
+      asOf: (imp.statementPeriodEnd ?? imp.createdAt).toISOString(),
+    });
+  }
+  return accounts.map((a) => ({
+    id: a.id,
+    label: a.label,
+    bankName: a.bankName,
+    closingBalance: latest.get(a.id)?.closingBalance ?? null,
+    asOf: latest.get(a.id)?.asOf ?? null,
+  }));
+}
+
 async function getGoldTotals(userId: string | null) {
   const [goldItems, goldRate] = await Promise.all([
     prisma.goldItem.findMany({ where: { userId: userId ?? "", disabled: false } }),
@@ -87,8 +118,8 @@ async function getGoldTotals(userId: string | null) {
 
 export default async function OverviewPage() {
   const userId = await getSessionUserId();
-  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, fdsByBank }, goldTotals] =
-    await Promise.all([getData(userId), getGoldTotals(userId)]);
+  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, fdsByBank }, goldTotals, bankBalances] =
+    await Promise.all([getData(userId), getGoldTotals(userId), getBankBalances(userId)]);
 
   return (
     <OverviewClient
@@ -100,6 +131,7 @@ export default async function OverviewPage() {
         kiteConnected={kiteConnected}
         goldTotals={goldTotals}
         fdsByBank={fdsByBank}
+        bankBalances={bankBalances}
         userEmail={userId ?? ""}
       />
   );

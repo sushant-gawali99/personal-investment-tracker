@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { TrendingUp, TrendingDown, Landmark, AlertTriangle, ArrowRight, Wallet, BarChart2, PiggyBank, Activity, Coins, Printer, Loader2, type LucideIcon } from "lucide-react";
+import { BankBalanceStrip, type BankBalance } from "@/components/bank-accounts/bank-balance-strip";
 import { AllocationDonut } from "@/components/charts/allocation-donut";
 import { TopHoldingsChart } from "@/components/charts/top-holdings-chart";
 import { WealthProjectionChart } from "@/components/charts/wealth-projection-chart";
@@ -37,6 +38,7 @@ interface Props {
     hasRate: boolean;
   };
   fdsByBank: { bankName: string; total: number }[];
+  bankBalances: BankBalance[];
   userEmail: string;
 }
 
@@ -71,7 +73,7 @@ function StatCard({
   );
 }
 
-export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals, fdsByBank, userEmail }: Props) {
+export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals, fdsByBank, bankBalances, userEmail }: Props) {
   const [printing, setPrinting] = useState(false);
   const { equity, fd, mf } = summary;
   const hasEquity = holdings.length > 0;
@@ -176,6 +178,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           Icon={Activity}
         />
       </section>
+
+      {bankBalances.length > 0 && <BankBalanceStrip balances={bankBalances} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         <div className="lg:col-span-8 space-y-5">
