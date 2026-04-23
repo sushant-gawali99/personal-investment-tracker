@@ -86,9 +86,9 @@ describe("runGetTransactionSummary groupBy payee", () => {
     ] as never);
 
     const result = await runGetTransactionSummary({ groupBy: "payee" }, "user@example.com");
-    const amruta = result.records.find((r: { payee: string }) => r.payee === "AMRUTA UPI");
-    expect(amruta?.total).toBe(8000);
-    expect(amruta?.count).toBe(2);
+    const amruta = result.records.find((r) => r["payee"] === "AMRUTA UPI");
+    expect(amruta?.["total"]).toBe(8000);
+    expect(amruta?.["count"]).toBe(2);
   });
 });
 

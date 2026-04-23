@@ -2,7 +2,7 @@
 import { NextRequest } from "next/server";
 import { getSessionUserId } from "@/lib/session";
 import { anthropic } from "@/lib/anthropic";
-import { SYSTEM_PROMPT } from "@/lib/chat/system-prompt";
+import { getSystemPrompt } from "@/lib/chat/system-prompt";
 import { TOOL_DEFINITIONS } from "@/lib/chat/tool-definitions";
 import { runTool } from "@/lib/chat/tool-runners";
 import type { SSEChunk } from "@/lib/chat/types";
@@ -28,11 +28,12 @@ export async function POST(req: NextRequest) {
 
   (async () => {
     try {
+      const systemPrompt = getSystemPrompt();
       // Phase 1: non-streaming call to handle tool use
       const firstResponse = await anthropic.messages.create({
         model: "claude-sonnet-4-6",
         max_tokens: 2048,
-        system: SYSTEM_PROMPT,
+        system: systemPrompt,
         tools: TOOL_DEFINITIONS,
         messages,
       });
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
         const finalStream = anthropic.messages.stream({
           model: "claude-sonnet-4-6",
           max_tokens: 2048,
-          system: SYSTEM_PROMPT,
+          system: systemPrompt,
           messages: [
             ...messages,
             { role: "assistant" as const, content: firstResponse.content },
@@ -109,6 +110,7 @@ export async function POST(req: NextRequest) {
   })();
 
   return new Response(readable, {
+    status: 200,
     headers: {
       "Content-Type": "text/event-stream",
       "Cache-Control": "no-cache",
