@@ -13,7 +13,7 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatINR } from "@/lib/format";
 
 interface Account {
   id: string;
@@ -24,6 +24,8 @@ interface Account {
   disabled: boolean;
   txnCount: number;
   lastTxnDate: string | null;
+  closingBalance: number | null;
+  balanceAsOf: string | null;
 }
 
 /** Stable accent color per bank name. */
@@ -202,6 +204,22 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                 {a.accountNumberLast4 && (
                   <div className="flex items-center gap-2 text-[13px] text-[#a0a0a5] font-mono">
                     <span className="tracking-widest">•••• •••• •••• {a.accountNumberLast4}</span>
+                  </div>
+                )}
+
+                {a.closingBalance != null && (
+                  <div className="rounded-lg bg-[#1c1c20] px-3 py-2.5">
+                    <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold">Current Balance</p>
+                    <p
+                      className={`mono text-[18px] font-bold mt-0.5 ${a.closingBalance >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}
+                    >
+                      {formatINR(a.closingBalance)}
+                    </p>
+                    {a.balanceAsOf && (
+                      <p className="text-[11px] text-[#6e6e73] mt-0.5">
+                        as of {formatDate(a.balanceAsOf)}
+                      </p>
+                    )}
                   </div>
                 )}
 

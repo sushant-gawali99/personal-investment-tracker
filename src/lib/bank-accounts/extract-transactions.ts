@@ -13,6 +13,8 @@ type DocumentBlockParam = {
 export interface ExtractionResult {
   statementPeriodStart: string | null;
   statementPeriodEnd: string | null;
+  openingBalance: number | null;
+  closingBalance: number | null;
   transactions: ExtractedTxn[];
   inputTokens: number;
   outputTokens: number;
@@ -34,6 +36,8 @@ interface RawTxn {
 interface RawResponse {
   statementPeriodStart: string | null;
   statementPeriodEnd: string | null;
+  openingBalance: number | null;
+  closingBalance: number | null;
   transactions: RawTxn[];
 }
 
@@ -109,6 +113,10 @@ export async function extractTransactions(
       return {
         statementPeriodStart: jsParsed.statementPeriodStart,
         statementPeriodEnd: jsParsed.statementPeriodEnd,
+        // JS parsers don't capture opening/closing — downstream can infer
+        // from the first/last runningBalance if needed.
+        openingBalance: null,
+        closingBalance: null,
         transactions: jsParsed.transactions,
         inputTokens: 0,
         outputTokens: 0,
@@ -156,7 +164,7 @@ export async function extractTransactions(
 
   const textBlock = res.content.find((b) => b.type === "text");
   if (!textBlock || textBlock.type !== "text") {
-    return { statementPeriodStart: null, statementPeriodEnd: null, transactions: [], inputTokens: res.usage.input_tokens, outputTokens: res.usage.output_tokens, costUsd: estimateCostUsd(res.usage.input_tokens, res.usage.output_tokens) };
+    return { statementPeriodStart: null, statementPeriodEnd: null, openingBalance: null, closingBalance: null, transactions: [], inputTokens: res.usage.input_tokens, outputTokens: res.usage.output_tokens, costUsd: estimateCostUsd(res.usage.input_tokens, res.usage.output_tokens) };
   }
 
   // If Claude was truncated by max_tokens, the JSON will be malformed. Surface that clearly.
@@ -184,6 +192,8 @@ export async function extractTransactions(
   return {
     statementPeriodStart: parsed.statementPeriodStart ?? null,
     statementPeriodEnd: parsed.statementPeriodEnd ?? null,
+    openingBalance: parsed.openingBalance ?? null,
+    closingBalance: parsed.closingBalance ?? null,
     transactions,
     inputTokens: res.usage.input_tokens,
     outputTokens: res.usage.output_tokens,

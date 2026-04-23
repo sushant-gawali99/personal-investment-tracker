@@ -204,6 +204,8 @@ model StatementImport {
   pageCount              Int?
   statementPeriodStart   DateTime?
   statementPeriodEnd     DateTime?
+  openingBalance         Float?
+  closingBalance         Float?
   status                 String   @default("pending") // pending|extracting|preview|saved|failed|cancelled
   extractedCount         Int      @default(0)
   newCount               Int      @default(0)

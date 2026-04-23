@@ -41,6 +41,8 @@ export default async function ImportsPage() {
         updatedAt: i.updatedAt.toISOString(),
         statementPeriodStart: i.statementPeriodStart?.toISOString() ?? null,
         statementPeriodEnd: i.statementPeriodEnd?.toISOString() ?? null,
+        openingBalance: i.openingBalance,
+        closingBalance: i.closingBalance,
         account: { id: i.account.id, label: i.account.label },
       }))} />
     </div>

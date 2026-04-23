@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Landmark } from "lucide-react";
 import { MonthPicker } from "@/components/bank-accounts/month-picker";
 import { StatCards } from "@/components/bank-accounts/stat-cards";
+import { BankBalanceStrip, type BankBalance } from "@/components/bank-accounts/bank-balance-strip";
 import { CategoryBreakdownChart } from "@/components/bank-accounts/category-breakdown-chart";
 import { MonthTrendChart } from "@/components/bank-accounts/month-trend-chart";
 import { TopMerchantsList } from "@/components/bank-accounts/top-merchants-list";
@@ -18,7 +19,13 @@ interface Summary {
   incomeExpense: { month: string; spending: number; income: number }[];
 }
 
-export function OverviewClient({ accounts }: { accounts: { id: string; label: string }[] }) {
+export function OverviewClient({
+  accounts,
+  balances,
+}: {
+  accounts: { id: string; label: string }[];
+  balances: BankBalance[];
+}) {
   const router = useRouter();
   const today = new Date();
   const [year, setYear] = useState(today.getFullYear());
@@ -126,6 +133,8 @@ export function OverviewClient({ accounts }: { accounts: { id: string; label: st
       />
 
       <StatCards {...(summary?.stats ?? { spending: 0, income: 0, net: 0, count: 0 })} prev={prevStats} />
+
+      <BankBalanceStrip balances={balances} />
 
       {/* Row 1: Spending by Category list matches the MonthTrendChart's
           natural height and scrolls internally when categories overflow. */}

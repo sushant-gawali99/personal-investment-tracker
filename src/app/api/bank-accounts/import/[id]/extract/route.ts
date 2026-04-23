@@ -86,6 +86,8 @@ async function runExtraction(importId: string, userId: string, pdfPassword?: str
         status: "preview",
         statementPeriodStart: extraction.statementPeriodStart ? new Date(extraction.statementPeriodStart) : null,
         statementPeriodEnd: extraction.statementPeriodEnd ? new Date(extraction.statementPeriodEnd) : null,
+        openingBalance: extraction.openingBalance,
+        closingBalance: extraction.closingBalance,
         extractedCount: staged.length,
         newCount,
         duplicateCount: dupCount,

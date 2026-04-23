@@ -43,6 +43,8 @@ Return ONLY a JSON object (no prose, no code fences). Schema:
 {
   "statementPeriodStart": "YYYY-MM-DD" | null,
   "statementPeriodEnd":   "YYYY-MM-DD" | null,
+  "openingBalance":       number | null,
+  "closingBalance":       number | null,
   "transactions": [
     {
       "txnDate":           "YYYY-MM-DD",
@@ -59,7 +61,8 @@ Return ONLY a JSON object (no prose, no code fences). Schema:
 }
 
 Rules:
-- Include EVERY transaction row, even small ones. Skip opening/closing balance lines and page totals.
+- Include EVERY transaction row, even small ones. Skip opening/closing balance lines and page totals — but DO capture the values they state into openingBalance and closingBalance on the root object.
+- openingBalance / closingBalance: the statement's "Opening Balance" / "B/F" / "Brought Forward" value at the start of the period, and the "Closing Balance" / "C/F" / "Carried Forward" / final balance at the end. Indian lakh formatting applies exactly as the CRITICAL block above. If either value is not printed, return null — do not compute it from the transactions.
 - txnDate must be the transaction date, not the print/run date.
 - DATE FORMAT: all dates in the statement are INDIAN format — day first, then
   month, then year (DD/MM/YYYY or DD-MM-YYYY or "05 Apr 2025"). NEVER interpret

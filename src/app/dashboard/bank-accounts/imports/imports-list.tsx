@@ -15,12 +15,13 @@ import {
   Trash2,
 } from "lucide-react";
 
-import { formatDate } from "@/lib/format";
+import { formatDate, formatINR } from "@/lib/format";
 
 interface Item {
   id: string; fileName: string; status: string;
   account: { id: string; label: string };
   statementPeriodStart: string | null; statementPeriodEnd: string | null;
+  openingBalance: number | null; closingBalance: number | null;
   extractedCount: number; newCount: number; duplicateCount: number;
   claudeCostUsd: number | null;
   createdAt: string;
@@ -123,6 +124,18 @@ export function ImportsList({ items }: { items: Item[] }) {
                     </span>
                     <span>·</span>
                     <span>Uploaded {formatDate(i.createdAt)}</span>
+                    {(i.openingBalance != null || i.closingBalance != null) && (
+                      <>
+                        <span>·</span>
+                        <span className="mono">
+                          {i.openingBalance != null ? formatINR(i.openingBalance) : "?"}
+                          {" → "}
+                          <span className={i.closingBalance != null && i.closingBalance < 0 ? "text-[#ff7a6e]" : "text-[#ededed]"}>
+                            {i.closingBalance != null ? formatINR(i.closingBalance) : "?"}
+                          </span>
+                        </span>
+                      </>
+                    )}
                   </div>
                   {errorExpanded && i.errorMessage && (
                     <p className="text-[12px] text-[#ff7a6e] mt-1.5 break-words bg-[rgba(255,122,110,0.06)] rounded-lg px-3 py-2">
