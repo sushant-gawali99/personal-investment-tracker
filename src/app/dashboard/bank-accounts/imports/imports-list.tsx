@@ -12,6 +12,7 @@ import {
   FileText,
   Inbox,
   Loader2,
+  RefreshCw,
   Trash2,
 } from "lucide-react";
 
@@ -44,9 +45,10 @@ function statusBadge(status: string) {
   }
 }
 
-export function ImportsList({ items }: { items: Item[] }) {
+export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; isSuperAdmin?: boolean }) {
   const router = useRouter();
   const [expandedErrors, setExpandedErrors] = useState<Set<string>>(new Set());
+  const [reimportingIds, setReimportingIds] = useState<Set<string>>(new Set());
 
   function toggleError(id: string) {
     setExpandedErrors((prev) => {
@@ -60,6 +62,21 @@ export function ImportsList({ items }: { items: Item[] }) {
     if (!confirm("Delete this import and all its saved transactions?")) return;
     await fetch(`/api/bank-accounts/import/${id}`, { method: "DELETE" });
     router.refresh();
+  }
+
+  async function reimport(id: string) {
+    if (!confirm("Re-import this statement? This will delete all existing transactions for this import and re-extract from the PDF.")) return;
+    setReimportingIds((prev) => new Set(prev).add(id));
+    try {
+      await fetch(`/api/bank-accounts/import/${id}/reimport`, { method: "POST" });
+    } finally {
+      setReimportingIds((prev) => {
+        const next = new Set(prev);
+        next.delete(id);
+        return next;
+      });
+      router.refresh();
+    }
   }
 
   if (items.length === 0) {
@@ -90,6 +107,7 @@ export function ImportsList({ items }: { items: Item[] }) {
             return `/dashboard/bank-accounts/list?${p}`;
           })();
           const errorExpanded = expandedErrors.has(i.id);
+          const isReimporting = reimportingIds.has(i.id);
           return (
             <li key={i.id} className="px-4 py-3 hover:bg-[#1c1c20]/50 transition-colors">
               <div className="flex items-center gap-3">
@@ -163,6 +181,20 @@ export function ImportsList({ items }: { items: Item[] }) {
                     )}
                   </div>
                 </div>
+
+                {isSuperAdmin && (
+                  <button
+                    onClick={() => reimport(i.id)}
+                    disabled={isReimporting}
+                    className="p-1.5 rounded-lg text-[#6e6e73] hover:text-[#f59e0b] hover:bg-[rgba(245,158,11,0.08)] transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Re-import (super admin)"
+                  >
+                    {isReimporting
+                      ? <Loader2 size={14} className="animate-spin" />
+                      : <RefreshCw size={14} />
+                    }
+                  </button>
+                )}
 
                 <button
                   onClick={() => remove(i.id)}
