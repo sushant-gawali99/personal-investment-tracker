@@ -102,7 +102,12 @@ export async function POST(req: NextRequest) {
 
       await writer.write(encode({ type: "done" }));
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unknown error";
+      const raw = err instanceof Error ? err.message : String(err);
+      const message = raw.includes("overloaded")
+        ? "Claude is busy right now. Please try again in a moment."
+        : raw.includes("529") || raw.includes("rate_limit")
+        ? "Too many requests. Please wait a few seconds and try again."
+        : "Something went wrong. Please try again.";
       await writer.write(encode({ type: "error", message }));
     } finally {
       await writer.close();
