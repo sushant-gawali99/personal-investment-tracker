@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { groupBanks } from "@/lib/fd-bank";
@@ -12,6 +14,12 @@ export default async function NewStatementPage() {
   const banks = groupBanks(fds);
   return (
     <div className="space-y-6 max-w-5xl">
+      <Link
+        href="/dashboard/fd/statements"
+        className="inline-flex items-center gap-1.5 text-[13px] text-[#a0a0a5] hover:text-[#ededed] transition-colors font-medium"
+      >
+        <ArrowLeft size={13} /> Back to Bank Statements
+      </Link>
       <div>
         <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Upload Bank Statement</h1>
         <p className="text-[14px] text-[#a0a0a5] mt-1">Parse a PDF statement and match transactions to your FDs.</p>

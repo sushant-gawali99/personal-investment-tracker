@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Upload } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { StatementsList } from "./statements-list";
@@ -19,6 +19,12 @@ export default async function StatementsPage() {
 
   return (
     <div className="space-y-6">
+      <Link
+        href="/dashboard/fd"
+        className="inline-flex items-center gap-1.5 text-[13px] text-[#a0a0a5] hover:text-[#ededed] transition-colors font-medium"
+      >
+        <ArrowLeft size={13} /> Back to Fixed Deposits
+      </Link>
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Statements</h1>
