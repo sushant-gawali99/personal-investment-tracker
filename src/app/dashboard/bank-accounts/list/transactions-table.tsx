@@ -297,14 +297,6 @@ export function TransactionsTable({
             />
           </div>
 
-          {hasActiveFilters && (
-            <button
-              onClick={clearAllFilters}
-              className="ml-auto text-[12px] text-[#a0a0a5] hover:text-[#ededed] flex items-center gap-1 px-3 py-1.5 rounded-full hover:bg-[#1c1c20] transition-colors"
-            >
-              <X size={12} /> Clear all
-            </button>
-          )}
         </div>
         </div>
 
@@ -351,6 +343,12 @@ export function TransactionsTable({
                 />
               )}
               {q && <ActiveChip label={`"${q}"`} icon="search" onRemove={() => updateFilter("q", "")} />}
+              <button
+                onClick={clearAllFilters}
+                className="ml-2 text-[12px] text-[#a0a0a5] hover:text-[#ededed] flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-[#2a2a2e] transition-colors"
+              >
+                <X size={11} /> Clear all
+              </button>
             </div>
 
             {/* Totals summary — only shown once data has loaded */}
