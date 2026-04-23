@@ -221,6 +221,24 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
             </div>
           </div>
 
+          {hasEquity && (
+            <div className="ab-card p-6">
+              <h3 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Equity</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                  { label: "Invested", value: formatINR(equity.totalInvested), cls: "text-[#ededed]" },
+                  { label: "Current Value", value: formatINR(equity.currentValue), cls: "text-[#ededed]" },
+                  { label: "Total P&L", value: (equity.totalPnL >= 0 ? "+" : "") + formatINR(equity.totalPnL), cls: equity.totalPnL >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]" },
+                ].map(({ label, value, cls }) => (
+                  <div key={label}>
+                    <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
+                    <p className={cn("mono text-[20px] font-semibold mt-1", cls)}>{value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {hasMF && (
             <div className="ab-card p-6">
               <h3 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Mutual Funds</h3>
@@ -266,7 +284,6 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
               {[
                 { label: "Interest This Year", value: formatINR(fd.interestThisYear), cls: "text-[#ededed]" },
                 { label: "Total FD Interest", value: formatINR(fd.totalInterest), cls: "text-[#ededed]" },
-                { label: "Equity P&L", value: (equity.totalPnL >= 0 ? "+" : "") + formatINR(equity.totalPnL), cls: equity.totalPnL >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]" },
               ].map(({ label, value, cls }) => (
                 <div key={label} className="ab-card-flat p-4 flex items-center justify-between">
                   <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
