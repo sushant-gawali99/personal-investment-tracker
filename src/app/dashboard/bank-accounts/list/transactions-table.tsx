@@ -440,6 +440,11 @@ export function TransactionsTable({
                   </td>
                   <td className="px-3 py-2.5 max-w-[160px] sm:max-w-[280px] md:max-w-[380px] align-middle" title={r.description}>
                     <div className="flex items-center gap-2 flex-wrap">
+                      {pretty.transferDir && (
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-[#6e6e73]">
+                          {pretty.transferDir === "to" ? "To" : "From"}
+                        </span>
+                      )}
                       <span className="text-[#ededed] font-medium truncate">{displayLabel}</span>
                       {pretty.method && (
                         <span className={`ab-chip ${methodChipClass(pretty.method)}`} style={{ fontSize: 10, padding: "1px 7px", lineHeight: 1.5 }}>
@@ -447,7 +452,7 @@ export function TransactionsTable({
                         </span>
                       )}
                       {pretty.counterBank && !r.prettyDescription && (
-                        <span className="text-[11px] text-[#6e6e73]">. {pretty.counterBank}</span>
+                        <span className="text-[11px] text-[#6e6e73]">· {pretty.counterBank}</span>
                       )}
                     </div>
                   </td>

@@ -36,6 +36,8 @@ export interface PrettyDescription {
   counterBank: string | null;
   /** Numeric reference id — useful for disputes, shown on hover/tooltip. */
   ref: string | null;
+  /** Transfer direction inferred from description text: "to" = outgoing, "from" = incoming. */
+  transferDir: "to" | "from" | null;
   /** The untouched raw description, for debugging + tooltip fallback. */
   raw: string;
 }
@@ -155,6 +157,21 @@ function canonicalMerchant(raw: string): string {
  *   4. Known descriptive keywords (SALARY, INTEREST, CHARGES, GST) → label it.
  *   5. Fallback → just Title Case the whole string.
  */
+/** Infer transfer direction from description prefix keywords and UPI direction codes. */
+function detectTransferDir(s: string): "to" | "from" | null {
+  // SBI prefix: "Wdl" = withdrawal = money going out (to someone)
+  //             "Dep" = deposit    = money coming in (from someone)
+  if (/^wdl\b/i.test(s)) return "to";
+  if (/^dep\b/i.test(s)) return "from";
+  // UPI direction codes embedded in the description
+  if (/\bUPI\/i?dr\b/i.test(s)) return "to";
+  if (/\bUPI\/i?cr\b/i.test(s)) return "from";
+  // "By Transfer" / "To Transfer" patterns
+  if (/^by\s+(transfer|tfr)\b/i.test(s)) return "from";
+  if (/^to\s+(transfer|tfr)\b/i.test(s)) return "to";
+  return null;
+}
+
 export function prettifyDescription(raw: string): PrettyDescription {
   const base: PrettyDescription = {
     merchant: raw,
@@ -162,11 +179,13 @@ export function prettifyDescription(raw: string): PrettyDescription {
     subMethod: null,
     counterBank: null,
     ref: null,
+    transferDir: null,
     raw,
   };
   if (!raw) return { ...base, merchant: "" };
 
   const trimmed = raw.trim();
+  base.transferDir = detectTransferDir(trimmed);
 
   // ── UPI / IMPS slot-separated format (Axis) ──────────────────
   // UPI/P2M/237794180606/Google Asia Pacific P/Sold b/AXIS BANK
