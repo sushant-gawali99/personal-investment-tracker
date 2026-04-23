@@ -158,8 +158,11 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       {/* Step indicator */}
       <div className="flex items-center justify-center gap-2">
         {steps.map((s, i) => {
-          const done = currentStep > s.n;
-          const active = currentStep === s.n;
+          // On the terminal "Done" screen, every step (including the last
+          // one) is complete — render them all with the green checkmark
+          // so the user sees the whole run as finished.
+          const done = currentStep > s.n || step === 3;
+          const active = currentStep === s.n && !done;
           return (
             <div key={s.n} className="flex items-center gap-2">
               <div
