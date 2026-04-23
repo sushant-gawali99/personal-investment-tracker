@@ -226,9 +226,10 @@ export function FDList({ fds }: { fds: FD[] }) {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="overflow-x-auto">
-          <div className="inline-flex items-center gap-1 p-1 bg-[#1c1c20] rounded-full w-fit">
+      <div className="space-y-3">
+        {/* Status pills — scrollable, no visible scrollbar */}
+        <div className="overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+          <div className="inline-flex items-center gap-1 p-1 bg-[#1c1c20] rounded-full">
             {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
               <button
                 key={f}
@@ -246,11 +247,12 @@ export function FDList({ fds }: { fds: FD[] }) {
           </div>
         </div>
 
-        <div className="flex items-center gap-3 flex-wrap">
+        {/* Bank select + search */}
+        <div className="flex flex-col sm:flex-row gap-2">
           <select
             value={bankFilter}
             onChange={(e) => setBankFilter(e.target.value)}
-            className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] cursor-pointer transition-all"
+            className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] cursor-pointer transition-all w-full sm:w-auto"
           >
             <option value="all">All banks</option>
             {banks.map(({ key, label }) => (
@@ -269,7 +271,7 @@ export function FDList({ fds }: { fds: FD[] }) {
           {(bankFilter !== "all" || filter !== "all" || fdSearch.trim()) && (
             <button
               onClick={() => { setFilter("all"); setBankFilter("all"); setFdSearch(""); }}
-              className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
+              className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors self-center"
             >
               Clear filters
             </button>
