@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
 import { FDDisableButton } from "./fd-disable-button";
+import { FDDeleteButton } from "./fd-delete-button";
 
 type FD = FDDetailData & { disabled: boolean };
 
@@ -340,14 +341,17 @@ export function FDList({ fds }: { fds: FD[] }) {
                     </div>
                   </div>
 
-                  {/* Expand chevron */}
-                  <ChevronRight
-                    size={14}
-                    className={cn(
-                      "shrink-0 text-[#6e6e73] mt-1 transition-transform duration-200",
-                      isExpanded && "rotate-90"
-                    )}
-                  />
+                  {/* Delete (disabled FDs only) + Expand chevron */}
+                  <div className="flex items-center gap-1 shrink-0 mt-0.5">
+                    {fd.disabled && <FDDeleteButton id={fd.id} />}
+                    <ChevronRight
+                      size={14}
+                      className={cn(
+                        "text-[#6e6e73] transition-transform duration-200",
+                        isExpanded && "rotate-90"
+                      )}
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -367,7 +371,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                           <RefreshCw size={13} /> Renew
                         </Link>
                       )}
-                      <FDDisableButton id={fd.id} disabled={fd.disabled} showDelete={fd.disabled} />
+                      <FDDisableButton id={fd.id} disabled={fd.disabled}  />
                     </div>
                   </div>
                 </div>
@@ -454,18 +458,21 @@ export function FDList({ fds }: { fds: FD[] }) {
                     <td className="px-4 py-2 text-right mono text-[#ededed] font-semibold text-[13px]">{formatINR(displayMaturityValue)}</td>
                     <td className="px-4 py-2"><StatusBadge fd={fd} current={current} now={now} /></td>
                     <td className="px-4 py-2 text-center">
-                      <button
-                        type="button"
-                        onClick={(e) => { e.stopPropagation(); toggleExpanded(fd.id); }}
-                        aria-label={isExpanded ? "Collapse" : "Expand"}
-                        aria-expanded={isExpanded}
-                        className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#6e6e73] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
-                      >
-                        <ChevronRight
-                          size={14}
-                          className={cn("transition-transform duration-200", isExpanded && "rotate-90")}
-                        />
-                      </button>
+                      <div className="inline-flex items-center gap-1">
+                        {fd.disabled && <FDDeleteButton id={fd.id} />}
+                        <button
+                          type="button"
+                          onClick={(e) => { e.stopPropagation(); toggleExpanded(fd.id); }}
+                          aria-label={isExpanded ? "Collapse" : "Expand"}
+                          aria-expanded={isExpanded}
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#6e6e73] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
+                        >
+                          <ChevronRight
+                            size={14}
+                            className={cn("transition-transform duration-200", isExpanded && "rotate-90")}
+                          />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                   {isExpanded && (
@@ -485,7 +492,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                                 <RefreshCw size={13} /> Renew
                               </Link>
                             )}
-                            <FDDisableButton id={fd.id} disabled={fd.disabled} showDelete={fd.disabled} />
+                            <FDDisableButton id={fd.id} disabled={fd.disabled}  />
                           </div>
                         </div>
                       </td>
