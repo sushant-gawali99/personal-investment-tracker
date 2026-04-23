@@ -68,7 +68,11 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
     if (!confirm("Re-import this statement? This will delete all existing transactions for this import and re-extract from the PDF.")) return;
     setReimportingIds((prev) => new Set(prev).add(id));
     try {
-      await fetch(`/api/bank-accounts/import/${id}/reimport`, { method: "POST" });
+      const res = await fetch(`/api/bank-accounts/import/${id}/reimport`, { method: "POST" });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        alert(body.error ?? `Re-import failed (${res.status})`);
+      }
     } finally {
       setReimportingIds((prev) => {
         const next = new Set(prev);
