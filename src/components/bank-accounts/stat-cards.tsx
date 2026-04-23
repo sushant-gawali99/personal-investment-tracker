@@ -48,10 +48,10 @@ function StatCard({
           <Icon size={16} strokeWidth={2} />
         </span>
       </div>
-      <p className={`mono text-[24px] font-bold leading-tight ${tone ?? "text-[#ededed]"}`}>{value}</p>
+      <p className={`mono text-[15px] sm:text-[24px] font-bold leading-tight ${tone ?? "text-[#ededed]"}`}>{value}</p>
       {hasDelta && (
         <p
-          className={`text-[12px] flex items-center gap-1 mt-1.5 font-medium ${
+          className={`text-[11px] sm:text-[12px] flex items-center gap-1 mt-1.5 font-medium ${
             goodDirection ? "text-[#5ee0a4]" : "text-[#ff7a6e]"
           }`}
         >
@@ -60,7 +60,7 @@ function StatCard({
         </p>
       )}
       {!hasDelta && (
-        <p className="text-[12px] text-[#6e6e73] mt-1.5">No prior month</p>
+        <p className="text-[11px] sm:text-[12px] text-[#6e6e73] mt-1.5">No prior month</p>
       )}
     </div>
   );

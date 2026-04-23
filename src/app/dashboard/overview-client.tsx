@@ -57,15 +57,15 @@ function StatCard({
           </span>
         )}
       </div>
-      <p className="mono text-[22px] font-bold text-[#ededed] leading-tight">{value}</p>
+      <p className="mono text-[15px] sm:text-[22px] font-bold text-[#ededed] leading-tight">{value}</p>
       {sub && (
         <p className={cn(
-          "text-[12px] flex items-center gap-1 mt-1.5 font-medium",
+          "text-[11px] sm:text-[12px] flex items-center gap-1 mt-1.5 font-medium truncate",
           positive === true ? "text-[#5ee0a4]" : positive === false ? "text-[#ff7a6e]" : "text-[#a0a0a5]"
         )}>
           {positive === true && <TrendingUp size={12} />}
           {positive === false && <TrendingDown size={12} />}
-          {sub}
+          <span className="truncate">{sub}</span>
         </p>
       )}
     </div>

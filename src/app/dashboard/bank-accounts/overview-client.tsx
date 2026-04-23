@@ -190,10 +190,10 @@ function Toolbar({
   onAccountChange: (id: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-3 flex-wrap">
+    <div className="flex flex-col sm:flex-row sm:items-center gap-3">
       <MonthPicker year={year} month={month} onChange={onMonthChange} />
       <select
-        className="ab-input max-w-[220px]"
+        className="ab-input w-full sm:w-auto sm:max-w-[220px]"
         value={accountId}
         onChange={(e) => onAccountChange(e.target.value)}
       >
