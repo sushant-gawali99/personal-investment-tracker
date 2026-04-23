@@ -27,10 +27,10 @@ export function AllocationDonut({ data }: Props) {
     { label: 'MF', value: data.mf.currentValue },
   ].filter(s => s.value > 0 && total > 0)
 
-  const cx = 45
-  const cy = 45
-  const r = 40
-  const innerR = 22
+  const cx = 65
+  const cy = 65
+  const r = 58
+  const innerR = 32
 
   let currentDeg = 0
   const paths = slices.map(s => {
@@ -42,7 +42,7 @@ export function AllocationDonut({ data }: Props) {
   })
 
   return (
-    <Svg width="200" height="90" viewBox="0 0 200 90">
+    <Svg width="220" height="130" viewBox="0 0 220 130">
       {paths.map((p, i) => (
         <Path key={i} d={p.d} fill={p.color} />
       ))}
@@ -50,13 +50,13 @@ export function AllocationDonut({ data }: Props) {
 
       {/* Legend */}
       {slices.map((s, i) => {
-        const yBase = 8 + i * 18
+        const yBase = 12 + i * 22
         const pct = ((s.value / total) * 100).toFixed(1)
         return (
           <G key={s.label}>
-            <Rect x="100" y={yBase} width="8" height="8" fill={COLORS[s.label] ?? '#999'} rx="1" />
-            <Text x="112" y={yBase + 7} style={{ fontSize: 8, fill: '#444' }}>
-              {s.label} {pct}%
+            <Rect x="142" y={yBase} width="9" height="9" fill={COLORS[s.label] ?? '#999'} rx="1" />
+            <Text x="155" y={yBase + 8} style={{ fontSize: 9, fill: '#444' }}>
+              {s.label}{'  '}{pct} %
             </Text>
           </G>
         )
