@@ -153,17 +153,6 @@ export function OverviewPdf({ data }: Props) {
                 </Text>
               </View>
             </View>
-            {data.upcomingMaturities.length > 0 && (
-              <View style={styles.section}>
-                <Text style={styles.sectionLabel}>Upcoming Maturities</Text>
-                {data.upcomingMaturities.map((m, i) => (
-                  <View key={i} style={styles.maturityItem}>
-                    <Text style={{ fontSize: 8, color: '#444' }}>{m.bankName}</Text>
-                    <Text style={{ fontSize: 8, color: '#444' }}>{fmtINRPdf(m.amount)} · {m.daysRemaining}d</Text>
-                  </View>
-                ))}
-              </View>
-            )}
           </View>
         </View>
 
