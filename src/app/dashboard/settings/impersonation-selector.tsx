@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Select,
   SelectContent,
@@ -16,7 +15,6 @@ interface Props {
 }
 
 export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
-  const router = useRouter();
   const [users, setUsers] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
@@ -47,13 +45,13 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
       body: JSON.stringify({ userId }),
     });
     if (!res.ok) return;
-    router.refresh();
+    window.location.href = "/dashboard";
   }
 
   async function handleStop() {
     const res = await fetch("/api/admin/impersonate", { method: "DELETE" });
     if (!res.ok) return;
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   const selectValue = activeUserId ?? "__self__";

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Menu, X, LogOut, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
@@ -22,7 +22,6 @@ interface Props {
 
 export function TopNav({ impersonatedUser }: Props) {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [stopping, setStopping] = useState(false);
 
@@ -33,7 +32,7 @@ export function TopNav({ impersonatedUser }: Props) {
       setStopping(false);
       return;
     }
-    router.push("/dashboard");
+    window.location.href = "/dashboard";
   }
 
   return (
