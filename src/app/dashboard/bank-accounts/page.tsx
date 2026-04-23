@@ -3,8 +3,9 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { Upload } from "lucide-react";
+import { ArrowLeftRight, Landmark, Tag, Files, Upload } from "lucide-react";
 import { OverviewClient } from "./overview-client";
+import { BankBalanceStrip } from "@/components/bank-accounts/bank-balance-strip";
 
 export default async function BankAccountsOverview() {
   const userId = await getSessionUserId();
@@ -39,32 +40,38 @@ export default async function BankAccountsOverview() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between gap-4 flex-wrap">
-        <div>
-          <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
-          <p className="text-[14px] text-[#a0a0a5] mt-1">Import statements and analyse spending.</p>
-        </div>
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
-          {/* Nav links — equal-width on mobile, natural-width on desktop */}
-          <div className="flex gap-1 p-1 bg-[#1c1c20] rounded-xl sm:rounded-full sm:inline-flex">
-            {[
-              { href: "/dashboard/bank-accounts/list", label: "Transactions" },
-              { href: "/dashboard/bank-accounts/accounts", label: "Accounts" },
-              { href: "/dashboard/bank-accounts/categories", label: "Categories" },
-              { href: "/dashboard/bank-accounts/imports", label: "Imports" },
-            ].map(({ href, label }) => (
-              <Link
-                key={href}
-                href={href}
-                className="flex-1 sm:flex-none text-center px-2 sm:px-4 py-1.5 rounded-lg sm:rounded-full text-[12px] sm:text-[13px] font-semibold text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#17171a] transition-colors"
-              >
-                {label}
-              </Link>
-            ))}
+      <div className="space-y-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
+            <p className="text-[14px] text-[#a0a0a5] mt-1">Import statements and analyse spending.</p>
           </div>
-          <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent justify-center">
+          <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent shrink-0">
             <Upload size={15} /> Import Statement
           </Link>
+        </div>
+        <BankBalanceStrip balances={balances} />
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {[
+            { href: "/dashboard/bank-accounts/list", label: "Transactions", icon: <ArrowLeftRight size={20} />, desc: "View & filter" },
+            { href: "/dashboard/bank-accounts/accounts", label: "Bank Accounts", icon: <Landmark size={20} />, desc: "Manage accounts" },
+            { href: "/dashboard/bank-accounts/categories", label: "Categories", icon: <Tag size={20} />, desc: "Rules & labels" },
+            { href: "/dashboard/bank-accounts/imports", label: "Manage Statements", icon: <Files size={20} />, desc: "Imports history" },
+          ].map(({ href, label, icon, desc }) => (
+            <Link
+              key={href}
+              href={href}
+              className="group flex items-center gap-3 p-3 sm:p-4 bg-[#1c1c20] border border-[#2a2a2e] rounded-xl hover:border-[#3a3a3e] hover:bg-[#222226] transition-all"
+            >
+              <span className="shrink-0 w-9 h-9 rounded-lg bg-[#2a2a2e] flex items-center justify-center text-[#ff385c] group-hover:bg-[#ff385c]/10 transition-colors">
+                {icon}
+              </span>
+              <span className="min-w-0">
+                <span className="block text-[13px] font-semibold text-[#ededed] leading-tight truncate">{label}</span>
+                <span className="block text-[11px] text-[#6e6e73] mt-0.5">{desc}</span>
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
       <OverviewClient

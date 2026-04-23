@@ -174,97 +174,130 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {accounts.map((a) => {
-            const accent = bankAccent(a.bankName);
-            return (
-              <div
-                key={a.id}
-                className={`ab-card ab-card-interactive p-5 flex flex-col gap-4 ${a.disabled ? "opacity-60" : ""}`}
-                style={{ borderColor: a.disabled ? "#2a2a2e" : accent.border }}
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span
-                      className="w-11 h-11 rounded-[12px] flex items-center justify-center shrink-0"
-                      style={{ background: accent.bg, color: accent.fg }}
+        <div className="ab-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-[14px]">
+              <thead>
+                <tr className="border-b border-[#2a2a2e] bg-[#1c1c20] text-left">
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73]">Account</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden sm:table-cell">Type</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden md:table-cell">Number</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] text-right">Balance</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] text-right hidden sm:table-cell">Txns</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden lg:table-cell">Last Txn</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden sm:table-cell">Status</th>
+                  <th className="px-5 py-4" />
+                </tr>
+              </thead>
+              <tbody>
+                {accounts.map((a) => {
+                  const accent = bankAccent(a.bankName);
+                  return (
+                    <tr
+                      key={a.id}
+                      className={`border-t border-[#2a2a2e] hover:bg-[#1c1c20]/60 transition-colors group ${a.disabled ? "opacity-50" : ""}`}
                     >
-                      <CreditCard size={18} />
-                    </span>
-                    <div className="min-w-0">
-                      <p className="text-[15px] font-semibold text-[#ededed] truncate">{a.label}</p>
-                      <p className="text-[12px] text-[#a0a0a5] truncate">{a.bankName}</p>
-                    </div>
-                  </div>
-                  <span className={`ab-chip ${typeBadgeClass(a.accountType)}`}>
-                    {a.accountType}
-                  </span>
-                </div>
+                      {/* Account name + bank */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center gap-3.5">
+                          <span
+                            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+                            style={{ background: accent.bg, color: accent.fg }}
+                          >
+                            <CreditCard size={18} />
+                          </span>
+                          <div className="min-w-0">
+                            <p className="text-[14px] font-semibold text-[#ededed] truncate">{a.label}</p>
+                            <p className="text-[12px] text-[#6e6e73] truncate mt-0.5">{a.bankName}</p>
+                          </div>
+                        </div>
+                      </td>
 
-                {a.accountNumberLast4 && (
-                  <div className="flex items-center gap-2 text-[13px] text-[#a0a0a5] font-mono">
-                    <span className="tracking-widest">•••• •••• •••• {a.accountNumberLast4}</span>
-                  </div>
-                )}
+                      {/* Type */}
+                      <td className="px-5 py-4 hidden sm:table-cell">
+                        <span className={`ab-chip ${typeBadgeClass(a.accountType)}`}>
+                          {a.accountType}
+                        </span>
+                      </td>
 
-                {a.closingBalance != null && (
-                  <div className="rounded-lg bg-[#1c1c20] px-3 py-2.5">
-                    <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold">Current Balance</p>
-                    <p
-                      className={`mono text-[18px] font-bold mt-0.5 ${a.closingBalance >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}
-                    >
-                      {formatINR(a.closingBalance)}
-                    </p>
-                    {a.balanceAsOf && (
-                      <p className="text-[11px] text-[#6e6e73] mt-0.5">
-                        as of {formatDate(a.balanceAsOf)}
-                      </p>
-                    )}
-                  </div>
-                )}
+                      {/* Account number */}
+                      <td className="px-5 py-4 hidden md:table-cell">
+                        {a.accountNumberLast4 ? (
+                          <span className="mono text-[13px] text-[#a0a0a5] tracking-widest">
+                            ···· {a.accountNumberLast4}
+                          </span>
+                        ) : (
+                          <span className="text-[#3a3a3e]">—</span>
+                        )}
+                      </td>
 
-                <div className="grid grid-cols-2 gap-3 py-2 border-y border-[#2a2a2e]">
-                  <div>
-                    <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold">Transactions</p>
-                    <p className="mono text-[16px] font-semibold text-[#ededed] mt-0.5">{a.txnCount}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold">Last Txn</p>
-                    <p className="text-[13px] font-semibold text-[#ededed] mt-0.5">
-                      {a.lastTxnDate ? formatDate(a.lastTxnDate) : "—"}
-                    </p>
-                  </div>
-                </div>
+                      {/* Balance */}
+                      <td className="px-5 py-4 text-right">
+                        {a.closingBalance != null ? (
+                          <div>
+                            <p className={`mono text-[14px] font-semibold ${a.closingBalance >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}>
+                              {formatINR(a.closingBalance)}
+                            </p>
+                            {a.balanceAsOf && (
+                              <p className="text-[11px] text-[#6e6e73] mt-0.5">
+                                {formatDate(a.balanceAsOf)}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[#3a3a3e]">—</span>
+                        )}
+                      </td>
 
-                <div className="flex items-center justify-between">
-                  <span
-                    className={`ab-chip ${a.disabled ? "" : "ab-chip-success"}`}
-                    style={a.disabled ? { background: "#222226", color: "#a0a0a5" } : undefined}
-                  >
-                    {a.disabled ? <AlertTriangle size={10} /> : <CheckCircle2 size={10} />}
-                    {a.disabled ? "Disabled" : "Active"}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => toggleDisabled(a)}
-                      className="p-2 rounded-lg text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
-                      title={a.disabled ? "Enable" : "Disable"}
-                    >
-                      {a.disabled ? <Eye size={14} /> : <EyeOff size={14} />}
-                    </button>
-                    <button
-                      onClick={() => remove(a)}
-                      className="p-2 rounded-lg text-[#a0a0a5] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                      title={a.txnCount > 0 ? "Can't delete — has transactions" : "Delete"}
-                      disabled={a.txnCount > 0}
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+                      {/* Txn count */}
+                      <td className="px-5 py-4 text-right hidden sm:table-cell">
+                        <span className="mono text-[14px] font-semibold text-[#ededed]">{a.txnCount}</span>
+                      </td>
+
+                      {/* Last txn */}
+                      <td className="px-5 py-4 hidden lg:table-cell">
+                        <span className="text-[13px] text-[#a0a0a5]">
+                          {a.lastTxnDate ? formatDate(a.lastTxnDate) : "—"}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-5 py-4 hidden sm:table-cell">
+                        <span
+                          className={`ab-chip ${a.disabled ? "" : "ab-chip-success"}`}
+                          style={a.disabled ? { background: "#222226", color: "#a0a0a5" } : undefined}
+                        >
+                          {a.disabled ? <AlertTriangle size={11} /> : <CheckCircle2 size={11} />}
+                          {a.disabled ? "Disabled" : "Active"}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => toggleDisabled(a)}
+                            className="p-2 rounded-lg text-[#6e6e73] hover:text-[#ededed] hover:bg-[#2a2a2e] transition-colors"
+                            title={a.disabled ? "Enable" : "Disable"}
+                          >
+                            {a.disabled ? <Eye size={15} /> : <EyeOff size={15} />}
+                          </button>
+                          <button
+                            onClick={() => remove(a)}
+                            className="p-2 rounded-lg text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            title={a.txnCount > 0 ? "Can't delete — has transactions" : "Delete"}
+                            disabled={a.txnCount > 0}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>

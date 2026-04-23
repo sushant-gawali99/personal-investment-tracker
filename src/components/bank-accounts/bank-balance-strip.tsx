@@ -1,4 +1,4 @@
-import { Landmark } from "lucide-react";
+import { Landmark, Wallet } from "lucide-react";
 import { formatDate, formatINR } from "@/lib/format";
 
 export interface BankBalance {
@@ -9,55 +9,89 @@ export interface BankBalance {
   asOf: string | null;
 }
 
-/**
- * Horizontal strip of bank-balance tiles: one tile per account, showing the
- * latest known closing balance sourced from the most recent saved
- * StatementImport that captured it. Accounts without a known closing render
- * a muted placeholder so the user knows they need a fresh import.
- */
+function bankAccent(bankName: string): { bg: string; fg: string } {
+  const key = (bankName ?? "").toLowerCase();
+  if (key.includes("hdfc"))                       return { bg: "rgba(0,79,159,0.18)",   fg: "#5aa9ff" };
+  if (key.includes("axis"))                       return { bg: "rgba(174,35,61,0.18)",  fg: "#ff7a8a" };
+  if (key.includes("icici"))                      return { bg: "rgba(175,27,45,0.18)",  fg: "#ff8074" };
+  if (key.includes("sbi") || key.includes("state bank")) return { bg: "rgba(30,77,163,0.18)", fg: "#7ab8ff" };
+  if (key.includes("kotak"))                      return { bg: "rgba(208,29,47,0.18)",  fg: "#ff8090" };
+  if (key.includes("idfc"))                       return { bg: "rgba(234,60,83,0.18)",  fg: "#ff7a90" };
+  return { bg: "rgba(255,56,92,0.14)", fg: "#ff385c" };
+}
+
 export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
   if (balances.length === 0) return null;
-  const anyKnown = balances.some((b) => b.closingBalance != null);
+
+  const knownBalances = balances.filter((b) => b.closingBalance != null);
+  const netTotal = knownBalances.reduce((sum, b) => sum + b.closingBalance!, 0);
+  const allKnown = knownBalances.length === balances.length;
+
   return (
-    <div className="ab-card p-4 sm:p-5">
-      <div className="flex items-baseline justify-between mb-3">
-        <h3 className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Bank Balances</h3>
-        {!anyKnown && (
-          <span className="text-[11px] text-[#6e6e73]">Re-import statements to populate</span>
-        )}
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-        {balances.map((b) => (
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      {balances.map((b) => {
+        const accent = bankAccent(b.bankName);
+        const hasBalance = b.closingBalance != null;
+        return (
           <div
             key={b.id}
-            className="rounded-xl bg-[#1c1c20] border border-[#2a2a2e] px-3 py-3 flex flex-col gap-1.5"
+            className="rounded-2xl bg-[#1c1c20] border border-[#2a2a2e] p-4 flex flex-col gap-3 hover:border-[#3a3a3e] transition-colors"
           >
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="w-7 h-7 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                <Landmark size={13} className="text-[#ff385c]" />
+            <div className="flex items-center gap-2.5 min-w-0">
+              <span
+                className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
+                style={{ background: accent.bg, color: accent.fg }}
+              >
+                <Landmark size={15} />
               </span>
-              <p className="text-[12px] font-semibold text-[#ededed] truncate" title={b.label}>
-                {b.label}
-              </p>
+              <div className="min-w-0">
+                <p className="text-[12px] font-semibold text-[#ededed] truncate leading-tight" title={b.label}>{b.label}</p>
+                <p className="text-[10px] text-[#6e6e73] truncate mt-0.5">{b.bankName}</p>
+              </div>
             </div>
-            {b.closingBalance != null ? (
-              <>
-                <p className={`mono text-[15px] font-bold ${b.closingBalance >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}>
-                  {formatINR(b.closingBalance)}
+            {hasBalance ? (
+              <div>
+                <p className={`mono text-[17px] font-bold leading-none ${b.closingBalance! >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}>
+                  {formatINR(b.closingBalance!)}
                 </p>
                 {b.asOf && (
-                  <p className="text-[10px] text-[#6e6e73]">as of {formatDate(b.asOf)}</p>
+                  <p className="text-[10px] text-[#6e6e73] mt-1.5">as of {formatDate(b.asOf)}</p>
                 )}
-              </>
+              </div>
             ) : (
-              <>
-                <p className="text-[13px] text-[#6e6e73]">No balance captured</p>
-                <p className="text-[10px] text-[#6e6e73]">Import a statement</p>
-              </>
+              <div>
+                <p className="text-[13px] text-[#4a4a4e] font-medium">—</p>
+                <p className="text-[10px] text-[#4a4a4e] mt-1.5">No statement imported</p>
+              </div>
             )}
           </div>
-        ))}
-      </div>
+        );
+      })}
+
+      {/* Net total tile */}
+      {knownBalances.length > 1 && (
+        <div className="rounded-2xl bg-[#17171a] border border-[#2a2a2e] p-4 flex flex-col gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="w-8 h-8 rounded-xl bg-[rgba(255,56,92,0.12)] flex items-center justify-center shrink-0">
+              <Wallet size={15} className="text-[#ff385c]" />
+            </span>
+            <div>
+              <p className="text-[12px] font-semibold text-[#a0a0a5] leading-tight">Net Total</p>
+              <p className="text-[10px] text-[#6e6e73] mt-0.5">
+                {allKnown ? "all accounts" : `${knownBalances.length} of ${balances.length} accounts`}
+              </p>
+            </div>
+          </div>
+          <div>
+            <p className={`mono text-[17px] font-bold leading-none ${netTotal >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+              {netTotal >= 0 ? "+" : ""}{formatINR(netTotal)}
+            </p>
+            {!allKnown && (
+              <p className="text-[10px] text-[#6e6e73] mt-1.5">partial — import missing statements</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -134,8 +134,6 @@ export function OverviewClient({
 
       <StatCards {...(summary?.stats ?? { spending: 0, income: 0, net: 0, count: 0 })} prev={prevStats} />
 
-      <BankBalanceStrip balances={balances} />
-
       {/* Row 1: Spending by Category list matches the MonthTrendChart's
           natural height and scrolls internally when categories overflow. */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-start">
