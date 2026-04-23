@@ -46,7 +46,11 @@ export async function GET(req: NextRequest) {
           : [{ txnDate: sortOrder }, { createdAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
-      include: { category: true, account: true },
+      include: {
+        category: true,
+        account: true,
+        fd: { select: { id: true, bankName: true, fdNumber: true, accountNumber: true } },
+      },
     }),
     prisma.transaction.count({ where }),
     prisma.transaction.aggregate({ where: { ...where, direction: "debit" },  _sum: { amount: true } }),

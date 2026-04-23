@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
@@ -10,6 +11,7 @@ import {
   Calendar,
   ChevronLeft,
   ChevronRight,
+  Link2,
   Pencil,
   Search,
   SlidersHorizontal,
@@ -30,6 +32,8 @@ interface Row {
   category: { id: string; name: string } | null;
   account: { id: string; label: string };
   notes: string | null;
+  fdId: string | null;
+  fd: { id: string; bankName: string; fdNumber: string | null; accountNumber: string | null } | null;
 }
 
 export function TransactionsTable({
@@ -453,6 +457,18 @@ export function TransactionsTable({
                       )}
                       {pretty.counterBank && !r.prettyDescription && (
                         <span className="text-[11px] text-[#6e6e73]">· {pretty.counterBank}</span>
+                      )}
+                      {r.fd && (
+                        <Link
+                          href={`/dashboard/fd/${r.fd.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-[#2a1218] text-[#ff385c] border-[#3a1a22] hover:bg-[#3a1a22] transition-colors"
+                          title={`Linked to FD at ${r.fd.bankName}`}
+                        >
+                          <Link2 size={10} />
+                          FD · {r.fd.bankName.split(" ")[0]}
+                          {r.fd.fdNumber ? ` · ${r.fd.fdNumber}` : r.fd.accountNumber ? ` · ${r.fd.accountNumber.slice(-4)}` : ""}
+                        </Link>
                       )}
                     </div>
                   </td>
