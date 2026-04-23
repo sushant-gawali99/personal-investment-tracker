@@ -1,14 +1,26 @@
-import { headers } from "next/headers";
+import { headers, cookies } from "next/headers";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
 import { KiteSettingsForm } from "./kite-settings-form";
 import { CopyableUrl } from "./copyable-url";
+import { ImpersonationSelector } from "./impersonation-selector";
 import { prisma } from "@/lib/prisma";
-import { getSessionUserId } from "@/lib/session";
+import { getSessionUserId, isSupAdmin, IMPERSONATE_COOKIE } from "@/lib/session";
 
 export default async function SettingsPage() {
   const headersList = await headers();
   const host = headersList.get("x-forwarded-host") ?? headersList.get("host") ?? "localhost:3000";
   const protocol = headersList.get("x-forwarded-proto") ?? "http";
   const baseUrl = `${protocol}://${host}`;
+
+  const session = await getServerSession(authOptions);
+  const realEmail = session?.user?.email ?? null;
+  const isSA = isSupAdmin(realEmail);
+
+  const cookieStore = await cookies();
+  const activeUserId = isSA
+    ? (cookieStore.get(IMPERSONATE_COOKIE)?.value ?? null)
+    : null;
 
   const userId = await getSessionUserId();
   const config = userId ? await prisma.kiteConfig.findUnique({ where: { userId } }) : null;
@@ -23,6 +35,8 @@ export default async function SettingsPage() {
         <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Settings</h1>
         <p className="text-[14px] text-[#a0a0a5] mt-1">Manage your API credentials and app configuration.</p>
       </div>
+
+      <ImpersonationSelector isSuperAdmin={isSA} activeUserId={activeUserId} />
 
       <section className="ab-card p-6 space-y-5">
         <div>
