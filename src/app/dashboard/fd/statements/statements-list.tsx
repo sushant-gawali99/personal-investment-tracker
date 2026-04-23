@@ -6,6 +6,7 @@ import {
   Trash2, Download, ExternalLink, CalendarDays, Inbox, ChevronRight, Loader2,
   Minus, Circle, ArrowDownLeft, ArrowUpRight, Sparkles,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { formatDate, formatINR } from "@/lib/format";
 
 type Item = {
@@ -113,7 +114,154 @@ export function StatementsList({ items }: { items: Item[] }) {
         />
       </div>
 
-      <div className="ab-card overflow-hidden p-0">
+      {/* ── Mobile card list ── */}
+      <div className="sm:hidden ab-card overflow-hidden divide-y divide-[#222226]">
+        {items.map((s) => {
+          const rate = s.txnCount > 0 ? Math.round((s.matchedCount / s.txnCount) * 100) : 0;
+          const isExpanded = expandedId === s.id;
+          const isDeleting = pendingDelete === s.id;
+          const isLoading = loadingId === s.id;
+          const txns = txnsById[s.id] ?? [];
+          const nonFdTxns = txns.filter((t) => ["tds", "other", "transfer_in", "transfer_out"].includes(t.type));
+
+          return (
+            <Fragment key={s.id}>
+              <div
+                onClick={() => toggleExpand(s.id)}
+                className={cn(
+                  "p-4 cursor-pointer transition-colors",
+                  isDeleting ? "opacity-40" : isExpanded ? "bg-[#17171a]" : "hover:bg-[#17171a]"
+                )}
+              >
+                <div className="flex items-start gap-3">
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="font-bold text-[12px] text-[#ff385c]">{bankInitials(s.bankName)}</span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <span className="font-semibold text-[#ededed] text-[14px] truncate">{s.bankName}</span>
+                      <span className={cn("mono text-[12px] font-semibold tabular-nums shrink-0", matchRateTone(s.matchedCount, s.txnCount))}>
+                        {s.matchedCount}/{s.txnCount}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#6e6e73] truncate mt-0.5">{s.fileName}</p>
+
+                    {/* Period + uploaded */}
+                    <div className="flex items-center gap-1.5 mt-1.5 text-[11px] text-[#a0a0a5] flex-wrap">
+                      {s.fromDate ? (
+                        <>
+                          <CalendarDays size={11} className="text-[#6e6e73]" />
+                          <span>{formatDate(s.fromDate)} &#x2192; {formatDate(s.toDate!)}</span>
+                        </>
+                      ) : (
+                        <span className="text-[#6e6e73]">Period unknown</span>
+                      )}
+                      <span className="text-[#6e6e73]">&middot;</span>
+                      <span>Uploaded {formatDate(s.uploadedAt)}</span>
+                    </div>
+
+                    {/* Match bar */}
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex-1 h-1 rounded-full bg-[#222226] overflow-hidden">
+                        <div
+                          className={cn(
+                            "h-full rounded-full",
+                            rate >= 80 ? "bg-[#5ee0a4]" : rate >= 40 ? "bg-[#f5a524]" : "bg-[#ff7a8a]"
+                          )}
+                          style={{ width: `${rate}%` }}
+                        />
+                      </div>
+                      <span className="text-[11px] text-[#6e6e73]">{rate}% matched</span>
+                    </div>
+
+                    {/* Action buttons */}
+                    <div
+                      className="flex items-center gap-1 mt-3"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Link
+                        href={`/dashboard/fd/statements/${s.id}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#24242a] transition-colors"
+                      >
+                        <ExternalLink size={12} /> View
+                      </Link>
+                      <a
+                        href={`/api/fd/statements/${s.id}/pdf`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#24242a] transition-colors"
+                      >
+                        <Download size={12} /> Download
+                      </a>
+                      <button
+                        onClick={() => del(s.id)}
+                        disabled={isDeleting}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium text-[#a0a0a5] hover:text-[#ff7a8a] hover:bg-[#2a1218] transition-colors disabled:opacity-40"
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                    </div>
+                  </div>
+
+                  <ChevronRight
+                    size={14}
+                    className={cn("shrink-0 text-[#6e6e73] mt-1 transition-transform duration-200", isExpanded && "rotate-90")}
+                  />
+                </div>
+              </div>
+
+              {/* Expanded: non-FD transactions */}
+              {isExpanded && (
+                <div className="bg-[#131316] px-4 py-4">
+                  {isLoading ? (
+                    <div className="flex items-center gap-2 text-[12px] text-[#a0a0a5] py-2">
+                      <Loader2 size={12} className="animate-spin" /> Loading transactions&hellip;
+                    </div>
+                  ) : nonFdTxns.length === 0 ? (
+                    <div className="flex items-center gap-2 text-[12px] text-[#6e6e73] py-2">
+                      <Sparkles size={12} /> No non-FD transactions in this statement.
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-[11px] uppercase tracking-wider text-[#6e6e73] font-medium">
+                        Non-FD transactions ({nonFdTxns.length})
+                      </p>
+                      <div className="divide-y divide-[#1e1e22]">
+                        {nonFdTxns.map((t) => {
+                          const meta = NON_FD_TYPE_META[t.type] ?? NON_FD_TYPE_META.other;
+                          const Icon = meta.icon;
+                          const isCredit = t.credit > 0;
+                          return (
+                            <div key={t.id} className="py-2.5 flex items-start justify-between gap-3">
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-medium border ${meta.tone}`}>
+                                    <Icon size={10} />
+                                    {meta.label}
+                                  </span>
+                                  <span className="text-[11px] text-[#6e6e73]">{formatDate(t.txnDate)}</span>
+                                </div>
+                                <p className="text-[11px] text-[#a0a0a5] mt-1 truncate">{t.particulars}</p>
+                              </div>
+                              <span className={cn("mono text-[13px] font-semibold whitespace-nowrap shrink-0", isCredit ? "text-[#5ee0a4]" : "text-[#ff7a8a]")}>
+                                {isCredit ? "+" : "−"}{formatINR(isCredit ? t.credit : t.debit)}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </Fragment>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop table ── */}
+      <div className="hidden sm:block ab-card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
@@ -162,7 +310,7 @@ export function StatementsList({ items }: { items: Item[] }) {
                           <div className="flex items-center gap-1.5 text-[#ededed]">
                             <CalendarDays size={12} className="text-[#6e6e73]" />
                             <span>{formatDate(s.fromDate)}</span>
-                            <span className="text-[#6e6e73]">→</span>
+                            <span className="text-[#6e6e73]">&#x2192;</span>
                             <span>{formatDate(s.toDate!)}</span>
                           </div>
                         ) : (
@@ -218,7 +366,7 @@ export function StatementsList({ items }: { items: Item[] }) {
                         <td colSpan={7} className="px-5 py-4">
                           {isLoading ? (
                             <div className="flex items-center gap-2 text-[12px] text-[#a0a0a5] py-2">
-                              <Loader2 size={12} className="animate-spin" /> Loading transactions…
+                              <Loader2 size={12} className="animate-spin" /> Loading transactions&hellip;
                             </div>
                           ) : nonFdTxns.length === 0 ? (
                             <div className="flex items-center gap-2 text-[12px] text-[#6e6e73] py-2">

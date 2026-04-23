@@ -169,8 +169,45 @@ export default async function StatementDetail({ params }: { params: Promise<{ id
         <StatTile label="TDS" value={totalTds > 0 ? formatINR(totalTds) : "—"} />
       </div>
 
-      {/* Transactions table */}
-      <div className="ab-card overflow-hidden p-0">
+      {/* ── Mobile card list ── */}
+      <div className="sm:hidden ab-card overflow-hidden p-0 divide-y divide-[#222226]">
+        {s.transactions.map((t) => {
+          const meta = TYPE_META[t.type] ?? TYPE_META.other;
+          const Icon = meta.icon;
+          const isCredit = t.credit > 0;
+          const fdLabel = t.fd?.fdNumber ?? t.fd?.accountNumber ?? null;
+          return (
+            <div key={t.id} className="p-4 flex items-start justify-between gap-3">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium border ${meta.tone}`}>
+                    <Icon size={11} />
+                    {meta.label}
+                  </span>
+                  <span className="text-[11px] text-[#6e6e73]">{formatDate(t.txnDate)}</span>
+                </div>
+                <p className="text-[12px] text-[#a0a0a5] mt-1.5 truncate" title={t.particulars}>{t.particulars}</p>
+                {t.fd && fdLabel ? (
+                  <Link
+                    href={`/dashboard/fd/${t.fd.id}`}
+                    className="inline-flex items-center gap-1 mt-1 text-[11px] text-[#a0a0a5] hover:text-[#ff385c] mono transition-colors"
+                  >
+                    {fdLabel} <ExternalLink size={10} className="opacity-60" />
+                  </Link>
+                ) : (
+                  <span className="inline-block mt-1 text-[11px] text-[#6e6e73]">Unmatched</span>
+                )}
+              </div>
+              <span className={`mono text-[14px] font-semibold whitespace-nowrap shrink-0 ${isCredit ? "text-[#5ee0a4]" : "text-[#ff7a8a]"}`}>
+                {isCredit ? "+" : "−"}{formatINR(isCredit ? t.credit : t.debit)}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ── Desktop table ── */}
+      <div className="hidden sm:block ab-card overflow-hidden p-0">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
