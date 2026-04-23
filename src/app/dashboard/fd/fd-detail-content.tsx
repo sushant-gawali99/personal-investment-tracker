@@ -4,7 +4,7 @@ import { useState } from "react";
 import { FileText, Copy, Check } from "lucide-react";
 import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { FdTxnSection, type FdTxnRow } from "./statements/fd-txn-section";
+import { FdTxnSection, type FdTxnRow } from "./fd-txn-section";
 
 export interface FDRenewalData {
   id: string;
