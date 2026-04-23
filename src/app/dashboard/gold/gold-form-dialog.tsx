@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, Upload } from "lucide-react";
 import type { GoldItem } from "@prisma/client";
+import { DatePicker } from "@/components/ui/date-picker";
 
 type Input = {
   title: string;
@@ -125,9 +126,10 @@ export function GoldFormDialog({
           </label>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className="block text-[12px] text-[#a0a0a5]">Purchased on
-              <input type="date" className="ab-input mt-1 w-full" value={input.purchasedOn} onChange={(e) => update("purchasedOn", e.target.value)} />
-            </label>
+            <div>
+              <p className="text-[12px] text-[#a0a0a5] mb-1">Purchased on</p>
+              <DatePicker value={input.purchasedOn} onChange={(v) => update("purchasedOn", v)} />
+            </div>
             <label className="block text-[12px] text-[#a0a0a5]">Purchased from
               <input className="ab-input mt-1 w-full" value={input.purchasedFrom} onChange={(e) => update("purchasedFrom", e.target.value)} />
             </label>
