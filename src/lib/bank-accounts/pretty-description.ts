@@ -187,12 +187,21 @@ export function prettifyDescription(raw: string): PrettyDescription {
   // "Wdl Tfr Upi/dr/608386283125/jyotiram/ Sury/7387993273/uber"
   // "Dep Tfr Upi/cr/420831234567/Sushant Gawali/sushant@upi/SBI"
   // UPI sits inside a longer prefix (Wdl Tfr / Dep Tfr etc.).
-  const sbiUpiMatch = trimmed.match(/\bUPI\/(dr|cr)\/(\d*)\/(.+)/i);
+  // Direction codes seen in the wild: dr, cr, idr (immediate debit), icr, p2p, etc.
+  const sbiUpiMatch = trimmed.match(/\bUPI\/([a-z]{1,4})\/(\d*)\/(.+)/i);
   if (sbiUpiMatch) {
     const [, dir, ref, rest] = sbiUpiMatch;
-    // Split remaining slots; discard pure-numeric (phone/account) and VPA handles (@).
+    // Split remaining slots; discard:
+    //   • pure-numeric tokens (phone/account numbers)
+    //   • near-numeric tokens — 8+ chars where ≥80% are digits (OCR noise like "73879932t3")
+    //   • VPA handles (contain @)
+    function isNumericish(s: string): boolean {
+      if (/^\d+$/.test(s)) return true;
+      if (s.length >= 8 && (s.replace(/\D/g, "").length / s.length) >= 0.8) return true;
+      return false;
+    }
     const parts = rest.split("/").map((p) => p.trim()).filter(
-      (p) => p && !/^\d+$/.test(p) && !p.includes("@"),
+      (p) => p && !isNumericish(p) && !p.includes("@"),
     );
     const nameRaw = parts.join(" ");
     return {
