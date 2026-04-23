@@ -19,6 +19,7 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     /* no body — extraction proceeds without a password */
   }
 
+  // Guard against double-starts: only kick off if pending or previously failed.
   if (imp.status === "extracting") {
     return NextResponse.json({ importId: id, status: "extracting", alreadyRunning: true }, { status: 202 });
   }
@@ -28,6 +29,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ id: string
     data: { status: "extracting", errorMessage: null },
   });
 
+  // Fire-and-forget. Works in both `next dev` and long-running Node (Railway).
+  // Would need a queue (BullMQ, etc.) to work on serverless platforms.
   void runExtraction(id, userId, pdfPassword);
 
   return NextResponse.json({ importId: id, status: "extracting" }, { status: 202 });
