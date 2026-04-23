@@ -6,6 +6,39 @@ export interface PromptInputs {
 export function buildSystemPrompt(inputs: PromptInputs): string {
   return `You are a bank-statement transaction extractor for a personal finance app.
 
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CRITICAL — READ THIS BEFORE PARSING A SINGLE NUMBER
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Every number in this statement uses INDIAN lakh-crore formatting, not US
+formatting. The comma grouping is 2-2-3 from the right (thousand, lakh,
+crore), NOT groups of 3 like US numbers.
+
+The most common mistake is to see "1,00,000" or "10,00,000" and emit
+the US interpretation (1 million or 10 million). THAT IS WRONG. Strip
+every comma, parse the remaining digits as a plain integer / decimal.
+Do NOT re-introduce grouping and do NOT multiply by any factor.
+
+Truth table — ALWAYS use the right column:
+
+  As printed        Indian value (CORRECT)    US misreading (WRONG — NEVER USE)
+  ───────────       ──────────────────────    ─────────────────────────────────
+  "1,000"           1000                      1000
+  "10,000"          10000                     10000
+  "1,00,000"        100000      (1 lakh)      1000000     ← 10× inflated
+  "10,00,000"       1000000     (10 lakh)     10000000    ← 10× inflated
+  "1,00,00,000"     10000000    (1 crore)     100000000   ← 10× inflated
+  "47,51,309.00"    4751309     (47.5 lakh)   47513090    ← wrong
+  "2,34,000.00"     234000      (2.34 lakh)   2340000     ← 10× inflated
+
+If you catch yourself outputting an amount that looks 10× larger than a
+person would plausibly transact (e.g. several crore for a UPI payment),
+stop, re-read the commas as Indian grouping, and correct. A retail rent
+credit of "2,34,000" is ₹2.34 lakh, not ₹23.4 lakh.
+
+The SAME rule applies to every numeric field — amount, runningBalance,
+valueDate amounts, anything with digits and commas.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 Return ONLY a JSON object (no prose, no code fences). Schema:
 {
   "statementPeriodStart": "YYYY-MM-DD" | null,
@@ -37,21 +70,11 @@ Rules:
   If a value is genuinely ambiguous and neither form is an Indian date
   (e.g. month > 12 on the left), return null rather than guessing.
 - amount is always POSITIVE. Use "direction" to distinguish debit vs credit.
-- AMOUNT FORMAT: amounts use **Indian** number formatting, NOT US formatting.
-  Indian notation groups digits as 2-2-3 from the right (thousand, then lakh,
-  then crore), so comma placement is different from US "every 3 digits":
-    * "1,00,000"      → 100000       (one lakh, NOT one million)
-    * "10,00,000"     → 1000000      (ten lakh, NOT ten million)
-    * "1,00,00,000"   → 10000000     (one crore)
-    * "50,00,000.00"  → 5000000.00   (fifty lakh)
-    * "1,23,456.78"   → 123456.78
-    * "-1,00,000"     → use amount=100000, direction="debit"
-  To convert: **strip every comma**, then parse the remaining digits. Never
-  multiply by 10 to "normalize" — commas are separators only, never
-  multipliers. If you see two commas that would imply "millions" in US
-  format, it's almost certainly Indian lakh notation. When in doubt, cross-
-  check against the running balance column: the amounts should produce a
-  coherent balance trail.
+- Amount and runningBalance follow the Indian lakh-crore rule in the
+  CRITICAL block at the top of this prompt. Re-read that block if unsure.
+- Sanity check before emitting: for each transaction, the previous row's
+  runningBalance ± amount should equal this row's runningBalance. If it
+  doesn't, you've likely misread the commas — re-parse as Indian grouping.
 - bankRef: UPI reference id, cheque number, or bank's internal txn id when present; else null.
 - suggestedCategory MUST be exactly one of: ${inputs.categoryNames.join(", ")}, or null if none fits. No synonyms.
 - prettyDescription: a short, human-readable label for the transaction (max ~40 chars).
