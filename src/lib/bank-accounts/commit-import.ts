@@ -52,11 +52,25 @@ export async function commitImport(
     const CHUNK = 500;
     for (let i = 0; i < rows.length; i += CHUNK) {
       const slice = rows.slice(i, i + CHUNK);
-      const res = await prisma.transaction.createMany({
-        data: slice,
-        skipDuplicates: true,
-      });
-      inserted += res.count;
+      try {
+        // Fast path: single bulk insert. Prisma 7's SQLite/libsql driver
+        // does NOT support `skipDuplicates`, so we let this throw on a
+        // unique-constraint collision and fall back to per-row inserts.
+        const res = await prisma.transaction.createMany({ data: slice });
+        inserted += res.count;
+      } catch {
+        // Slow path: chunk hit a unique-constraint collision (rare — only
+        // happens if two commits race for the same import). Insert row by
+        // row, silently skipping the duplicate offenders.
+        for (const row of slice) {
+          try {
+            await prisma.transaction.create({ data: row });
+            inserted += 1;
+          } catch {
+            // duplicate — already exists, skip.
+          }
+        }
+      }
     }
   }
 
