@@ -16,7 +16,9 @@ import {
   Sparkles,
   AlertCircle,
   CheckCircle2,
+  Printer,
 } from "lucide-react";
+import { generateNJIndiaPdf } from "@/lib/generate-nj-india-pdf";
 import { formatINR, formatPercent, formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -98,8 +100,34 @@ export function NJIndiaClient({ statements, schemes }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [printing, setPrinting] = useState(false);
 
   const latest = statements[0] ?? null;
+
+  async function handlePrint() {
+    if (!latest) return;
+    setPrinting(true);
+    try {
+      await generateNJIndiaPdf({
+        generatedAt: new Date(),
+        investorName: latest.investorName,
+        reportDate: latest.reportDate,
+        summary: {
+          totalInvested: latest.totalInvested,
+          totalCurrentValue: latest.totalCurrentValue,
+          totalGainLoss: latest.totalGainLoss,
+          xirrPct: latest.weightedReturnPct,
+          absoluteReturnPct: latest.absoluteReturnPct,
+          schemeCount: latest.schemeCount,
+        },
+        schemes,
+      });
+    } catch (err) {
+      console.error("PDF generation failed", err);
+    } finally {
+      setPrinting(false);
+    }
+  }
 
   const onDrop = useCallback(async (files: File[]) => {
     const file = files[0];
@@ -194,7 +222,7 @@ export function NJIndiaClient({ statements, schemes }: Props) {
         )}
       </div>
 
-      {latest && <LatestSnapshotCards latest={latest} />}
+      {latest && <LatestSnapshotCards latest={latest} onPrint={handlePrint} printing={printing} />}
       {latest && schemes.length > 0 && <SchemesTable schemes={schemes} />}
       <UploadsList statements={statements} onDelete={handleDelete} deletingId={deletingId} />
 
@@ -209,7 +237,7 @@ export function NJIndiaClient({ statements, schemes }: Props) {
   );
 }
 
-function LatestSnapshotCards({ latest }: { latest: NJStatementSummary }) {
+function LatestSnapshotCards({ latest, onPrint, printing }: { latest: NJStatementSummary; onPrint?: () => void; printing?: boolean }) {
   const gain = latest.totalGainLoss >= 0;
   const pnlPct = latest.totalInvested > 0 ? (latest.totalGainLoss / latest.totalInvested) * 100 : 0;
   return (
@@ -224,6 +252,16 @@ function LatestSnapshotCards({ latest }: { latest: NJStatementSummary }) {
             </span>
           </span>
         </div>
+        {onPrint && (
+          <button
+            onClick={onPrint}
+            disabled={printing}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+            {printing ? "Generating…" : "Print PDF"}
+          </button>
+        )}
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard label="Invested" value={formatINR(latest.totalInvested)} />

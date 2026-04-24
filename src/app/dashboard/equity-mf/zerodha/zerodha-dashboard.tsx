@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { Search, ArrowUpRight, ArrowDownRight, Printer, Loader2 } from "lucide-react";
 import { formatINR, formatPercent } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { generateZerodhaPdf } from "@/lib/generate-zerodha-pdf";
 
 interface Holding {
   tradingsymbol: string;
@@ -94,6 +95,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<HoldingSortKey>("tradingsymbol");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [printing, setPrinting] = useState(false);
 
   const holdings: Holding[] = rawHoldings ?? [];
   const netPositions: Position[] = rawPositions?.net?.filter((p: Position) => p.quantity !== 0) ?? [];
@@ -163,8 +165,44 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
   const thL = cn(thBase, "text-left");
   const thR = cn(thBase, "text-right");
 
+  async function handlePrint() {
+    setPrinting(true);
+    try {
+      await generateZerodhaPdf({
+        generatedAt: new Date(),
+        holdings: holdings.map((h) => ({
+          tradingsymbol: h.tradingsymbol,
+          quantity: h.quantity,
+          average_price: h.average_price,
+          last_price: h.last_price,
+          day_change: h.day_change,
+        })),
+        mfHoldings: mfHoldings.map((h) => ({
+          fund: h.fund,
+          quantity: h.quantity,
+          average_price: h.average_price,
+          last_price: h.last_price,
+        })),
+      });
+    } catch (err) {
+      console.error("PDF generation failed", err);
+    } finally {
+      setPrinting(false);
+    }
+  }
+
   return (
     <div className="space-y-6">
+      <div className="flex items-center justify-end">
+        <button
+          onClick={handlePrint}
+          disabled={printing}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+          {printing ? "Generating…" : "Print PDF"}
+        </button>
+      </div>
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <InlineStatCard label="Total Invested" value={formatINR(totalInvested)} />
         <InlineStatCard label="Current Value" value={formatINR(currentValue)} />
