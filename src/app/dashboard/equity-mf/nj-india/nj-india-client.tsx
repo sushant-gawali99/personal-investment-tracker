@@ -223,12 +223,6 @@ function LatestSnapshotCards({ latest }: { latest: NJStatementSummary }) {
               {latest.reportDate ? formatDate(latest.reportDate) : formatDate(latest.createdAt)}
             </span>
           </span>
-          {latest.investorName && (
-            <>
-              <span className="text-[#3a3a3f]">•</span>
-              <span>{latest.investorName}</span>
-            </>
-          )}
         </div>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
@@ -256,7 +250,7 @@ function StatCard({ label, value, sub, tone }: { label: string; value: string; s
   return (
     <div className="ab-card p-4">
       <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
-      <p className={cn("mono text-[20px] font-semibold", color)}>{value}</p>
+      <p className={cn("mono text-[15px] sm:text-[18px] lg:text-[20px] font-semibold tabular-nums", color)}>{value}</p>
       {sub && <p className="text-[#a0a0a5] text-[12px] mt-1 font-medium">{sub}</p>}
     </div>
   );
@@ -314,18 +308,100 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
           <h2 className="text-[18px] font-semibold text-[#ededed] tracking-tight">Holdings</h2>
           <span className="ab-chip">{schemes.length}</span>
         </div>
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a5]" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search scheme…"
-            className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-56 transition-all"
+            className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-full sm:w-56 transition-all"
           />
         </div>
       </div>
 
-      <div className="ab-card overflow-hidden">
+      {/* Mobile card list */}
+      <div className="md:hidden ab-card overflow-auto max-h-[560px] divide-y divide-[#2a2a2e]">
+        {grouped.map((g) => {
+          const groupPositive = g.gain >= 0;
+          const groupPnlPct = g.invested > 0 ? (g.gain / g.invested) * 100 : 0;
+          return (
+            <Fragment key={g.amc}>
+              <div className="bg-[#1c1c20]/70 px-4 py-2.5 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="text-[11px] font-bold text-[#ededed] uppercase tracking-wider truncate">{g.amc}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono shrink-0">{g.items.length}</span>
+                </div>
+                <span className={cn("mono text-[11px] font-semibold shrink-0", groupPositive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                  {groupPositive ? "+" : ""}{formatINR(g.gain)}
+                  <span className="opacity-70 ml-1">({formatPercent(groupPnlPct)})</span>
+                </span>
+              </div>
+              {g.items.map((s) => {
+                const gain = s.currentValue - s.invested;
+                const pnlPct = s.invested > 0 ? (gain / s.invested) * 100 : 0;
+                const positive = gain >= 0;
+                const initials = s.scheme.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+                return (
+                  <div key={s.serial} className="px-4 py-3 space-y-2.5">
+                    <div className="flex items-start gap-3">
+                      <div className="w-9 h-9 rounded-full bg-[#1a2a20] flex items-center justify-center shrink-0 ring-1 ring-[#2a3a2e]">
+                        <span className="text-[11px] font-bold text-[#5ee0a4]">{initials}</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-[13px] text-[#ededed] leading-tight">{s.scheme}</p>
+                        <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{s.subType}</span>
+                          <span className="text-[10px] text-[#6e6e73]">{s.units.toFixed(3)} units · {s.tenure}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Invested</p>
+                        <p className="mono text-[12px] text-[#a0a0a5] font-medium">{formatINR(s.invested)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Value</p>
+                        <p className="mono text-[12px] text-[#ededed] font-medium">{formatINR(s.currentValue)}</p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Gain</p>
+                        <p className={cn("mono text-[12px] font-semibold", positive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                          {positive ? "+" : ""}{formatINR(gain)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Abs %</p>
+                        <p className={cn("mono text-[12px] font-medium", s.absoluteReturnPct != null && s.absoluteReturnPct >= 0 ? "text-[#5ee0a4]" : s.absoluteReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                          {s.absoluteReturnPct != null ? `${s.absoluteReturnPct.toFixed(2)}%` : "—"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">XIRR</p>
+                        <p className={cn("mono text-[12px] font-medium", s.annualizedReturnPct != null && s.annualizedReturnPct >= 0 ? "text-[#5ee0a4]" : s.annualizedReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                          {s.annualizedReturnPct != null ? `${s.annualizedReturnPct.toFixed(2)}%` : "—"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Holding</p>
+                        <p className="mono text-[12px] text-[#a0a0a5] font-medium">{s.holdingPct.toFixed(2)}%</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </Fragment>
+          );
+        })}
+        {totalRows === 0 && (
+          <div className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No schemes match.</div>
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block ab-card overflow-hidden">
         <div className="overflow-auto max-h-[560px]">
           <table className="w-full text-[14px]">
             <thead className="bg-[#1c1c20] sticky top-0 z-10 shadow-[0_1px_0_0_#2a2a2e]">
