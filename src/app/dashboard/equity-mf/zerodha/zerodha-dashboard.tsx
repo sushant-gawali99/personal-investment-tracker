@@ -57,9 +57,9 @@ function InlineStatCard({
 }) {
   const valueColor = tone === "positive" ? "text-[#5ee0a4]" : tone === "negative" ? "text-[#ff7a6e]" : "text-[#ededed]";
   return (
-    <div className="ab-card p-4">
+    <div className="ab-card px-4 py-4 sm:px-5">
       <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
-      <p className={cn("mono text-[20px] font-semibold", valueColor)}>{value}</p>
+      <p className={cn("mono text-[17px] sm:text-[20px] font-semibold break-all", valueColor)}>{value}</p>
       {sub && <p className="text-[#a0a0a5] text-[12px] mt-1 font-medium">{sub}</p>}
     </div>
   );
@@ -184,18 +184,54 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
       <section className="space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-3">
           <SectionHeader title="Equity Holdings" count={holdings.length} />
-          <div className="relative">
+          <div className="relative w-full sm:w-48">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a5]" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search symbol…"
-              className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-48 transition-all"
+              className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-full transition-all"
             />
           </div>
         </div>
 
-        <div className="ab-card overflow-hidden">
+        {/* Mobile cards */}
+        <div className="sm:hidden space-y-2">
+          {filtered.length === 0 && (
+            <p className="text-center text-[#a0a0a5] text-[13px] py-8">No holdings found.</p>
+          )}
+          {filtered.map((h) => {
+            const gain = h.pnl >= 0;
+            const pnlPct = h.average_price > 0 ? (h.pnl / (h.average_price * h.quantity)) * 100 : 0;
+            return (
+              <div key={h.tradingsymbol} className="ab-card px-4 py-3">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <SymbolAvatar symbol={h.tradingsymbol} />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-semibold text-[14px] text-[#ededed]">{h.tradingsymbol}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{h.exchange}</span>
+                      </div>
+                      <p className="text-[12px] text-[#a0a0a5] mt-0.5">Qty {h.quantity} · Avg {formatINR(h.average_price)}</p>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="mono text-[15px] font-semibold text-[#ededed]">{formatINR(h.last_price * h.quantity)}</p>
+                    <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                      {gain ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                      {formatINR(Math.abs(h.pnl))}
+                      <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden sm:block ab-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-[14px]">
               <thead className="bg-[#1c1c20]">
@@ -307,7 +343,42 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
               <InlineStatCard label="Current Value" value={formatINR(mfValue)} />
               <InlineStatCard label="Total P&L" value={formatINR(mfPnL)} sub={formatPercent(mfPnLPct)} tone={mfPnL >= 0 ? "positive" : "negative"} />
             </div>
-            <div className="ab-card overflow-hidden">
+            {/* Mobile cards */}
+            <div className="sm:hidden space-y-2">
+              {sortedMfHoldings.map((h) => {
+                const invested = h.average_price * h.quantity;
+                const pnl = h.last_price * h.quantity - invested;
+                const gain = pnl >= 0;
+                const pnlPct = invested > 0 ? (pnl / invested) * 100 : 0;
+                const initials = (h.fund as string).split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
+                return (
+                  <div key={`${h.tradingsymbol}-${h.folio ?? ""}`} className="ab-card px-4 py-3">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-[11px] font-bold text-[#ff385c]">{initials}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-semibold text-[13px] text-[#ededed] leading-snug">{h.fund}</p>
+                          <p className="text-[12px] text-[#a0a0a5] mt-1">{h.quantity.toFixed(3)} units · Avg NAV {formatINR(h.average_price)}</p>
+                        </div>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="mono text-[15px] font-semibold text-[#ededed]">{formatINR(h.last_price * h.quantity)}</p>
+                        <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                          {gain ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                          {formatINR(Math.abs(pnl))}
+                          <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop table */}
+            <div className="hidden sm:block ab-card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-[14px]">
                   <thead className="bg-[#1c1c20]">
