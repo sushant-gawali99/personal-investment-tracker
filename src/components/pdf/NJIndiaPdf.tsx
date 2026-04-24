@@ -79,9 +79,7 @@ export function NJIndiaPdf({ data }: { data: NJIndiaPdfData }) {
         <View style={S.headerRow}>
           <View>
             <Text style={S.headerTitle}>Mutual Funds — NJ India</Text>
-            <Text style={S.headerSub}>
-              {data.investorName ? `${data.investorName} · ` : ''}As on {reportStr}
-            </Text>
+            <Text style={S.headerSub}>As on {reportStr}</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
             <Text style={S.headerValueLabel}>Current Value</Text>
