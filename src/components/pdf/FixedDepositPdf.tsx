@@ -45,10 +45,10 @@ const S = StyleSheet.create({
   // Section
   sectionTitle: { fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#333', marginBottom: 5 },
   // Table
-  tableHead: { flexDirection: 'row', backgroundColor: '#f0f0f0', paddingVertical: 5, paddingHorizontal: 6, borderRadius: 2, marginBottom: 1 },
+  tableHead: { flexDirection: 'row', gap: 8, backgroundColor: '#f0f0f0', paddingVertical: 5, paddingHorizontal: 6, borderRadius: 2, marginBottom: 1 },
   tableHeadCell: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#555' },
-  tableRow: { flexDirection: 'row', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
-  tableRowAlt: { flexDirection: 'row', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0', backgroundColor: '#fbfbfc' },
+  tableRow: { flexDirection: 'row', gap: 8, paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
+  tableRowAlt: { flexDirection: 'row', gap: 8, paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0', backgroundColor: '#fbfbfc' },
   cell: { fontSize: 8, color: '#333' },
   cellBold: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#111' },
   cellPos: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#16a34a' },
