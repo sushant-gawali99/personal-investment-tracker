@@ -2,7 +2,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Landmark } from "lucide-react";
+import Link from "next/link";
+import { ArrowLeftRight, Files, FileOutput, Landmark, Tag } from "lucide-react";
 import { MonthPicker } from "@/components/bank-accounts/month-picker";
 import { StatCards } from "@/components/bank-accounts/stat-cards";
 import { BankBalanceStrip, type BankBalance } from "@/components/bank-accounts/bank-balance-strip";
@@ -181,6 +182,14 @@ function monthName(year: number, month: number): string {
   return new Date(year, month - 1, 1).toLocaleString("en-IN", { month: "long", year: "numeric" });
 }
 
+const NAV_ITEMS = [
+  { href: "/dashboard/bank-accounts/list",         label: "Transactions", icon: <ArrowLeftRight size={13} /> },
+  { href: "/dashboard/bank-accounts/accounts",     label: "Accounts",     icon: <Landmark size={13} /> },
+  { href: "/dashboard/bank-accounts/categories",   label: "Categories",   icon: <Tag size={13} /> },
+  { href: "/dashboard/bank-accounts/imports",      label: "Statements",   icon: <Files size={13} /> },
+  { href: "/dashboard/bank-accounts/export/tally", label: "Tally Export", icon: <FileOutput size={13} /> },
+];
+
 function Toolbar({
   year,
   month,
@@ -197,16 +206,36 @@ function Toolbar({
   onAccountChange: (id: string) => void;
 }) {
   return (
-    <div className="flex flex-col items-start sm:flex-row sm:items-center gap-3">
+    <div className="flex items-center gap-2 flex-wrap">
+      {/* Filters — left */}
       <MonthPicker year={year} month={month} onChange={onMonthChange} />
-      <select
-        className="ab-input w-full sm:w-auto sm:max-w-[220px]"
-        value={accountId}
-        onChange={(e) => onAccountChange(e.target.value)}
-      >
-        <option value="">All accounts</option>
-        {accounts.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-      </select>
+      <div className="inline-flex items-center bg-[#17171a] border border-[#2a2a2e] rounded-full px-1 h-[46px]">
+        <select
+          className="bg-transparent text-[14px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer min-w-[140px] max-w-[220px]"
+          value={accountId}
+          onChange={(e) => onAccountChange(e.target.value)}
+        >
+          <option value="">All accounts</option>
+          {accounts.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
+        </select>
+      </div>
+
+      {/* Spacer */}
+      <div className="flex-1" />
+
+      {/* Nav — right */}
+      <nav className="flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full p-1.5 gap-1 overflow-x-auto">
+        {NAV_ITEMS.map(({ href, label, icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className="flex items-center gap-2 px-4 py-2 rounded-full text-[#606065] hover:text-[#e0e0e4] hover:bg-[#1e1e22] border border-transparent hover:border-[#2e2e32] transition-all shrink-0 text-[13px] font-semibold whitespace-nowrap"
+          >
+            {icon}
+            {label}
+          </Link>
+        ))}
+      </nav>
     </div>
   );
 }

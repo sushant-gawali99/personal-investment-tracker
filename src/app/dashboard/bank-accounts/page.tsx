@@ -3,7 +3,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
 import { redirect } from "next/navigation";
-import { ArrowLeftRight, FileOutput, Landmark, Tag, Files, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import { OverviewClient } from "./overview-client";
 import { BankBalanceStrip } from "@/components/bank-accounts/bank-balance-strip";
 
@@ -46,34 +46,14 @@ export default async function BankAccountsOverview() {
             <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
             <p className="text-[14px] text-[#a0a0a5] mt-1">Import statements and analyse spending.</p>
           </div>
-          <Link href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent shrink-0">
-            <Upload size={15} /> Import Statement
+          <Link
+            href="/dashboard/bank-accounts/import"
+            className="ab-btn ab-btn-secondary shrink-0 gap-2"
+          >
+            <Upload size={14} className="text-[#ff385c]" /> Import Statement
           </Link>
         </div>
         <BankBalanceStrip balances={balances} />
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
-          {[
-            { href: "/dashboard/bank-accounts/list", label: "Transactions", icon: <ArrowLeftRight size={20} />, desc: "View & filter" },
-            { href: "/dashboard/bank-accounts/accounts", label: "Bank Accounts", icon: <Landmark size={20} />, desc: "Manage accounts" },
-            { href: "/dashboard/bank-accounts/categories", label: "Categories", icon: <Tag size={20} />, desc: "Rules & labels" },
-            { href: "/dashboard/bank-accounts/imports", label: "Manage Statements", icon: <Files size={20} />, desc: "Imports history" },
-            { href: "/dashboard/bank-accounts/export/tally", label: "Tally Export", icon: <FileOutput size={20} />, desc: "Export to Tally ERP 9" },
-          ].map(({ href, label, icon, desc }) => (
-            <Link
-              key={href}
-              href={href}
-              className="group flex items-center gap-3 p-3 sm:p-4 bg-[#1c1c20] border border-[#2a2a2e] rounded-xl hover:border-[#3a3a3e] hover:bg-[#222226] transition-all"
-            >
-              <span className="shrink-0 w-9 h-9 rounded-lg bg-[#2a2a2e] flex items-center justify-center text-[#ff385c] group-hover:bg-[#ff385c]/10 transition-colors">
-                {icon}
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[13px] font-semibold text-[#ededed] leading-tight truncate">{label}</span>
-                <span className="block text-[11px] text-[#6e6e73] mt-0.5">{desc}</span>
-              </span>
-            </Link>
-          ))}
-        </div>
       </div>
       <OverviewClient
         accounts={accounts.map((a) => ({ id: a.id, label: a.label }))}
