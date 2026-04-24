@@ -31,12 +31,73 @@ export interface NJParsed {
 const NUM = String.raw`-?[\d,]+(?:\.\d+)?`;
 const TENURE = String.raw`LT|ST|Both`;
 
-// Each scheme row ends with: annualizedReturn absReturn holdingPct tenure
-// and starts with a serial number. Tenure tags serve as row anchors.
-const ROW_RE = new RegExp(
-  `(\\d+)\\s+(.+?)\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM}|NA)\\s+(${NUM}|NA)\\s+(${NUM})\\s+(${TENURE})`,
+// Anchor on the trailing block: 10 numeric columns + tenure. Works regardless
+// of where wrapped scheme-name fragments land after coordinate reconstruction.
+const ANCHOR_RE = new RegExp(
+  `(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM})\\s+(${NUM}|NA)\\s+(${NUM}|NA)\\s+(${NUM})\\s+(${TENURE})\\b`,
   "g"
 );
+
+const SUBTYPES = [
+  "Large and Mid Cap",
+  "Multi Asset Allocation",
+  "Conservative Hybrid",
+  "Dividend Yield",
+  "Agg. Hybrid",
+  "Equity Sav",
+  "Dynamic AA",
+  "Bal Adv",
+  "Multi AA",
+  "Multi Cap",
+  "Small Cap",
+  "Large Cap",
+  "Mid Cap",
+  "Flexi Cap",
+  "Focused",
+  "Contra",
+  "ELSS",
+  "Arbitrage",
+  "Thematic",
+  "Sectoral",
+  "Index",
+  "ETF",
+  "Debt",
+  "Liquid",
+  "Gilt",
+  "Gold",
+  "Hybrid",
+  "Value",
+];
+
+const AMC_PREFIXES = [
+  "Aditya Birla Sun Life",
+  "Nippon India",
+  "Canara Robeco",
+  "Franklin India",
+  "Invesco India",
+  "ICICI Prudential",
+  "Mirae Asset",
+  "Motilal Oswal",
+  "Parag Parikh",
+  "Bandhan",
+  "Quant",
+  "PPFAS",
+  "Tata",
+  "Axis",
+  "HDFC",
+  "HSBC",
+  "Kotak",
+  "SBI",
+  "DSP",
+  "UTI",
+  "L&T",
+  "Edelweiss",
+  "Baroda",
+  "PGIM",
+  "Sundaram",
+  "JM",
+  "IDFC",
+];
 
 function num(s: string): number {
   if (s === "NA" || s === "-" || s === "") return 0;
@@ -105,82 +166,69 @@ export function parseNJIndiaText(text: string): NJParsed {
 
   const schemes: NJScheme[] = [];
   const seen = new Set<number>();
-  for (const m of flat.matchAll(ROW_RE)) {
-    const serial = parseInt(m[1]);
+  let prevEnd = 0;
+  for (const m of flat.matchAll(ANCHOR_RE)) {
+    const prefix = flat.slice(prevEnd, m.index!).trim();
+    prevEnd = m.index! + m[0].length;
+
+    // Serial = last standalone integer in prefix (wrap-leftover from prev row
+    // contains only alphabetic tokens, so the actual serial sits last).
+    const serialMatches = [...prefix.matchAll(/(?:^|\s)(\d+)(?=\s|$)/g)];
+    if (serialMatches.length === 0) continue;
+    const lastSerial = serialMatches[serialMatches.length - 1];
+    const serial = parseInt(lastSerial[1]);
     if (seen.has(serial)) continue;
-    seen.add(serial);
-    const rawName = m[2].trim();
-    // Last 1–3 words of rawName form the sub-type (before the first amount column).
-    // Strategy: find where the sub-type starts by splitting tokens. Sub-types are
-    // short descriptors like "Multi Cap", "Small Cap", "ELSS", "Agg. Hybrid", "Flexi Cap",
-    // "Large and Mid Cap", "Large Cap", "Mid Cap", "Focused", "Contra", "Bal Adv",
-    // "Equity Sav", "Multi AA".
-    const subTypePatterns = [
-      "Large and Mid Cap",
-      "Multi Asset Allocation",
-      "Agg. Hybrid",
-      "Equity Sav",
-      "Bal Adv",
-      "Multi AA",
-      "Multi Cap",
-      "Small Cap",
-      "Large Cap",
-      "Mid Cap",
-      "Flexi Cap",
-      "Focused",
-      "Contra",
-      "ELSS",
-      "Arbitrage",
-      "Conservative Hybrid",
-      "Dynamic AA",
-      "Index",
-      "ETF",
-      "Debt",
-      "Liquid",
-      "Gilt",
-      "Gold",
-      "Hybrid",
-      "Thematic",
-      "Sectoral",
-      "Value",
-      "Dividend Yield",
-    ];
-    let scheme = rawName;
+
+    // Remove the serial, leaving name + subtype tokens (possibly scattered).
+    const sIdx = lastSerial.index! + lastSerial[0].indexOf(lastSerial[1]);
+    const before = prefix.slice(0, sIdx).trim();
+    const after = prefix.slice(sIdx + lastSerial[1].length).trim();
+    const nameAndSubtype = `${before} ${after}`.trim().replace(/\s+/g, " ");
+
+    // Sub-type: match known pattern at end of nameAndSubtype.
+    let scheme = nameAndSubtype;
     let subType = "";
-    for (const p of subTypePatterns) {
-      if (rawName.endsWith(" " + p)) {
-        scheme = rawName.slice(0, -p.length - 1).trim();
+    for (const p of SUBTYPES) {
+      if (nameAndSubtype.endsWith(" " + p) || nameAndSubtype === p) {
+        scheme = nameAndSubtype.slice(0, nameAndSubtype.length - p.length).trim();
         subType = p;
         break;
       }
     }
-    if (!subType) {
-      // Fallback: assume last 1-2 tokens are sub-type
-      const parts = rawName.split(" ");
-      subType = parts.slice(-2).join(" ");
-      scheme = parts.slice(0, -2).join(" ");
+
+    // Clip any leading wrap-leftover from the previous row by locating the
+    // earliest AMC prefix in the scheme text.
+    let clipIdx = -1;
+    for (const p of AMC_PREFIXES) {
+      const idx = scheme.toLowerCase().indexOf(p.toLowerCase());
+      if (idx >= 0 && (clipIdx === -1 || idx < clipIdx)) clipIdx = idx;
     }
+    if (clipIdx > 0) scheme = scheme.slice(clipIdx).trim();
+
+    if (!scheme || !/^[A-Za-z]/.test(scheme)) continue;
+
+    seen.add(serial);
     schemes.push({
       serial,
       scheme,
       subType,
-      invested: num(m[3]),
-      divReinv: num(m[4]),
-      units: num(m[5]),
-      currentValue: num(m[6]),
-      divR: num(m[7]),
-      divP: num(m[8]),
-      total: num(m[9]),
-      annualizedReturnPct: numOrNull(m[10]),
-      absoluteReturnPct: numOrNull(m[11]),
-      holdingPct: num(m[12]),
-      tenure: m[13],
+      invested: num(m[1]),
+      divReinv: num(m[2]),
+      units: num(m[3]),
+      currentValue: num(m[4]),
+      divR: num(m[5]),
+      divP: num(m[6]),
+      total: num(m[7]),
+      annualizedReturnPct: numOrNull(m[8]),
+      absoluteReturnPct: numOrNull(m[9]),
+      holdingPct: num(m[10]),
+      tenure: m[11],
     });
   }
 
   schemes.sort((a, b) => a.serial - b.serial);
 
-  const grand = parseGrandTotal(flat);
+  const grand = parseGrandTotal(cleaned.replace(/\s+/g, " "));
   const totalInvested = grand?.invested ?? schemes.reduce((s, x) => s + x.invested, 0);
   const totalCurrentValue = grand?.value ?? schemes.reduce((s, x) => s + x.currentValue, 0);
 
