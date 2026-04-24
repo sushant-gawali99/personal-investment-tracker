@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useState, Fragment, useMemo } from "react";
-import { AlertTriangle, CheckCircle2, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw, ArrowUpRight } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronRight, ChevronUp, ChevronDown, ChevronsUpDown, RefreshCw, ArrowUpRight, Printer, Loader2 } from "lucide-react";
+import { generateFDPdf } from "@/lib/generate-fd-pdf";
 import { cn } from "@/lib/utils";
 import { formatINR, formatDate, daysUntil, formatTenure } from "@/lib/format";
 import { FDDetailContent, type FDDetailData } from "./fd-detail-content";
@@ -78,6 +79,7 @@ export function FDList({ fds }: { fds: FD[] }) {
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const [sort, setSort] = useState<{ col: SortCol; dir: SortDir } | null>(null);
   const [fdSearch, setFdSearch] = useState("");
+  const [printing, setPrinting] = useState(false);
   const now = new Date();
 
   const resolvedForStats = useMemo(() => {
@@ -188,6 +190,37 @@ export function FDList({ fds }: { fds: FD[] }) {
     );
   }
 
+  async function handlePrint() {
+    setPrinting(true);
+    try {
+      await generateFDPdf({
+        generatedAt: new Date(),
+        stats,
+        fds: fds.map((fd) => {
+          const c = resolveCurrent(fd);
+          const isMatured = c.maturityDate <= now;
+          return {
+            bankName: fd.bankName,
+            branchName: fd.branchName ?? null,
+            fdNumber: fd.fdNumber ?? null,
+            principal: c.principal,
+            interestRate: c.interestRate,
+            tenureText: c.tenureText ?? null,
+            tenureMonths: c.tenureMonths,
+            tenureDays: c.tenureDays,
+            startDate: c.startDate.toISOString(),
+            maturityDate: c.maturityDate.toISOString(),
+            maturityAmount: c.maturityAmount ?? null,
+            isMatured,
+            disabled: fd.disabled,
+          };
+        }),
+      });
+    } finally {
+      setPrinting(false);
+    }
+  }
+
   if (fds.length === 0) {
     return (
       <div className="ab-card p-12 text-center">
@@ -206,6 +239,18 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   return (
     <div className="space-y-5">
+      {/* Print button */}
+      <div className="flex items-center justify-end">
+        <button
+          onClick={handlePrint}
+          disabled={printing}
+          className="ab-btn ab-btn-secondary"
+        >
+          {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
+          {printing ? "Generating…" : "Print PDF"}
+        </button>
+      </div>
+
       {/* Stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {[
