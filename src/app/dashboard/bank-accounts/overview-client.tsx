@@ -183,11 +183,11 @@ function monthName(year: number, month: number): string {
 }
 
 const NAV_ITEMS = [
-  { href: "/dashboard/bank-accounts/list",         label: "Transactions", icon: <ArrowLeftRight size={13} /> },
-  { href: "/dashboard/bank-accounts/accounts",     label: "Accounts",     icon: <Landmark size={13} /> },
-  { href: "/dashboard/bank-accounts/categories",   label: "Categories",   icon: <Tag size={13} /> },
-  { href: "/dashboard/bank-accounts/imports",      label: "Statements",   icon: <Files size={13} /> },
-  { href: "/dashboard/bank-accounts/export/tally", label: "Tally Export", icon: <FileOutput size={13} /> },
+  { href: "/dashboard/bank-accounts/list",         label: "Transactions", icon: <ArrowLeftRight size={12} /> },
+  { href: "/dashboard/bank-accounts/accounts",     label: "Accounts",     icon: <Landmark size={12} /> },
+  { href: "/dashboard/bank-accounts/categories",   label: "Categories",   icon: <Tag size={12} /> },
+  { href: "/dashboard/bank-accounts/imports",      label: "Statements",   icon: <Files size={12} /> },
+  { href: "/dashboard/bank-accounts/export/tally", label: "Tally",        icon: <FileOutput size={12} /> },
 ];
 
 function Toolbar({
@@ -206,12 +206,12 @@ function Toolbar({
   onAccountChange: (id: string) => void;
 }) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-2">
       {/* Filters — left */}
       <MonthPicker year={year} month={month} onChange={onMonthChange} />
-      <div className="inline-flex items-center bg-[#17171a] border border-[#2a2a2e] rounded-full px-1 h-[46px]">
+      <div className="inline-flex items-center bg-[#17171a] border border-[#2a2a2e] rounded-full px-1 h-[42px] shrink-0">
         <select
-          className="bg-transparent text-[14px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer min-w-[140px] max-w-[220px]"
+          className="bg-transparent text-[14px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer min-w-[130px] max-w-[200px]"
           value={accountId}
           onChange={(e) => onAccountChange(e.target.value)}
         >
@@ -224,12 +224,12 @@ function Toolbar({
       <div className="flex-1" />
 
       {/* Nav — right */}
-      <nav className="flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full p-1.5 gap-1 overflow-x-auto">
+      <nav className="flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full p-1 gap-0.5 shrink-0">
         {NAV_ITEMS.map(({ href, label, icon }) => (
           <Link
             key={href}
             href={href}
-            className="flex items-center gap-2 px-4 py-2 rounded-full text-[#606065] hover:text-[#e0e0e4] hover:bg-[#1e1e22] border border-transparent hover:border-[#2e2e32] transition-all shrink-0 text-[13px] font-semibold whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[#606065] hover:text-[#e0e0e4] hover:bg-[#1e1e22] border border-transparent hover:border-[#2e2e32] transition-all text-[12px] font-semibold whitespace-nowrap"
           >
             {icon}
             {label}

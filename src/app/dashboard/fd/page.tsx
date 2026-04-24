@@ -69,26 +69,22 @@ export default async function FDPage() {
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Fixed Deposits</h1>
           <p className="text-[14px] text-[#a0a0a5] mt-1">Track and analyse your fixed deposit investments.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {/* Secondary — quiet dark pill with a "New" dot indicator */}
           <Link
             href="/dashboard/fd/bulk"
-            className="ab-btn ab-btn-ghost relative flex-1 sm:flex-none justify-center"
-            style={{ borderColor: "#ff385c", border: "1px solid #ff385c", color: "#ff385c" }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#a0a0a5] text-[13px] font-semibold hover:border-[#3a3a3e] hover:text-[#e0e0e4] transition-all flex-1 sm:flex-none justify-center"
           >
-            <Upload size={15} />
+            <Upload size={13} />
             Bulk Upload
-            <span
-              className="ab-chip ab-chip-accent"
-              style={{ fontSize: "10px", padding: "2px 6px", marginLeft: "4px" }}
-            >
-              New
-            </span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#ff385c] shrink-0" title="New feature" />
           </Link>
+          {/* Primary — clean solid accent */}
           <Link
             href="/dashboard/fd/new"
-            className="ab-btn ab-btn-accent w-full sm:w-auto justify-center"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,56,92,0.15)] border border-[rgba(255,56,92,0.35)] text-[#ff385c] text-[13px] font-bold hover:bg-[rgba(255,56,92,0.22)] hover:border-[rgba(255,56,92,0.5)] transition-all flex-1 sm:flex-none justify-center"
           >
-            <Plus size={15} />
+            <Plus size={14} />
             Add FD
           </Link>
         </div>

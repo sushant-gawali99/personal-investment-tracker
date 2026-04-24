@@ -233,18 +233,18 @@ export function FDList({ fds }: { fds: FD[] }) {
       </div>
 
       {/* Filters */}
-      <div className="space-y-3">
-        {/* Status pills — equal-width on mobile, natural-width on desktop */}
-        <div className="flex gap-1 p-1 bg-[#1c1c20] rounded-xl sm:rounded-full sm:inline-flex">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+        {/* Status segment */}
+        <div className="flex gap-0.5 p-1 bg-[#0d0d0f] border border-[#2a2a2d] rounded-full overflow-x-auto shrink-0">
           {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={cn(
-                "flex-1 sm:flex-none text-center px-2 sm:px-4 py-1.5 rounded-lg sm:rounded-full text-[12px] sm:text-[13px] font-semibold transition-all capitalize",
+                "px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all capitalize whitespace-nowrap",
                 filter === f
-                  ? "bg-[#17171a] text-[#ededed] shadow-[0_1px_3px_rgba(0,0,0,0.08)]"
-                  : "text-[#a0a0a5] hover:text-[#ededed]"
+                  ? "bg-[#1e1e22] text-[#ededed] border border-[#2e2e32]"
+                  : "text-[#606065] hover:text-[#d0d0d5] hover:bg-[#1a1a1e]"
               )}
             >
               {f} ({counts[f]})
@@ -252,33 +252,40 @@ export function FDList({ fds }: { fds: FD[] }) {
           ))}
         </div>
 
-        {/* Bank select + search */}
-        <div className="flex flex-col sm:flex-row gap-2">
-          <select
-            value={bankFilter}
-            onChange={(e) => setBankFilter(e.target.value)}
-            className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] cursor-pointer transition-all w-full sm:w-auto"
-          >
-            <option value="all">All banks</option>
-            {banks.map(({ key, label }) => (
-              <option key={key} value={key}>{label}</option>
-            ))}
-          </select>
+        {/* Divider — desktop only */}
+        <div className="hidden sm:block w-px h-5 bg-[#252528] shrink-0" />
 
-          <input
-            type="text"
-            value={fdSearch}
-            onChange={(e) => setFdSearch(e.target.value)}
-            placeholder="Search FD number&hellip;"
-            className="bg-[#17171a] border border-[#3a3a3f] rounded-full px-4 py-2 text-[13px] font-semibold text-[#ededed] placeholder:text-[#6e6e73] placeholder:font-normal focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] transition-all w-full sm:w-48"
-          />
+        {/* Bank select + search — side by side on both mobile and desktop */}
+        <div className="flex items-center gap-2">
+          <div className="inline-flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full px-1 h-[38px] flex-1 sm:flex-none">
+            <select
+              value={bankFilter}
+              onChange={(e) => setBankFilter(e.target.value)}
+              className="bg-transparent text-[13px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer w-full sm:min-w-[110px] sm:max-w-[180px]"
+            >
+              <option value="all">All banks</option>
+              {banks.map(({ key, label }) => (
+                <option key={key} value={key}>{label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="inline-flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full px-3 h-[38px] flex-1 sm:flex-none">
+            <input
+              type="text"
+              value={fdSearch}
+              onChange={(e) => setFdSearch(e.target.value)}
+              placeholder="Search FD number…"
+              className="bg-transparent text-[13px] font-medium text-[#ededed] placeholder:text-[#505055] outline-none w-full sm:w-36"
+            />
+          </div>
 
           {(bankFilter !== "all" || filter !== "all" || fdSearch.trim()) && (
             <button
               onClick={() => { setFilter("all"); setBankFilter("all"); setFdSearch(""); }}
-              className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors self-center"
+              className="text-[12px] text-[#606065] hover:text-[#b0b0b5] font-semibold transition-colors px-2 shrink-0"
             >
-              Clear filters
+              Clear
             </button>
           )}
         </div>

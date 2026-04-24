@@ -216,23 +216,16 @@ export function TransactionsTable({
 
   return (
     <div className="space-y-4">
-      {/* Filter bar — three layers:
-          1. Prominent search that always stays in place.
-          2. Quick-range pills + dropdown-pill facets for one-tap filtering.
-          3. Inline custom date pickers (only when Custom is toggled or dates set manually).
-          4. Active-filter chips row, each with its own remove-X.
-       */}
-      <div className="ab-card p-5 space-y-4">
-        {/* Layer 1: Search (full-width, prominent).
-            NOTE: `.ab-input` declares `padding: 12px 14px` (shorthand) in
-            globals.css, which can beat Tailwind's `pl-11`/`pr-10` utilities
-            depending on stylesheet order. Force paddings via inline style
-            so the search icon and clear button never overlap the text. */}
-        <div className="relative">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6e6e73] pointer-events-none z-10" />
+      {/* Filter bar */}
+      <div
+        className="rounded-2xl border border-[#252528]"
+        style={{ background: "#0f0f11" }}
+      >
+        {/* Search — borderless command-bar style */}
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1e1e21]">
+          <Search size={15} className="text-[#606065] shrink-0 pointer-events-none" />
           <input
-            className="ab-input text-[14px]"
-            style={{ paddingLeft: 44, paddingRight: 40 }}
+            className="flex-1 bg-transparent text-[14px] font-medium text-[#ededed] placeholder:text-[#505055] outline-none min-w-0"
             placeholder="Search transactions by description…"
             value={searchInput}
             onChange={(e) => {
@@ -244,47 +237,49 @@ export function TransactionsTable({
           {searchInput && (
             <button
               onClick={() => { setSearchInput(""); updateFilter("q", ""); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-[#2a2a2e] text-[#a0a0a5] hover:text-[#ededed] transition-colors"
+              className="p-1 rounded-full hover:bg-[#1e1e22] text-[#505055] hover:text-[#c0c0c5] transition-colors shrink-0"
               aria-label="Clear search"
             >
-              <X size={14} />
+              <X size={13} />
             </button>
           )}
         </div>
 
-        {/* Layer 2: Quick-range pills + facet pills */}
-        <div className="overflow-x-auto pb-0.5 -mb-0.5">
-        <div className="flex items-center gap-2 min-w-max">
-          {/* Date range pills */}
-          <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[#1c1c20] border border-[#2a2a2e] shrink-0">
-            <Calendar size={13} className="ml-2 mr-1 text-[#6e6e73]" />
-            {RANGE_PRESETS.map((p) => (
+        {/* Filters row */}
+        <div className="px-4 py-3 overflow-x-auto">
+          <div className="flex items-center gap-2 min-w-max">
+            {/* Date range pills */}
+            <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-[#111113] border border-[#232325] shrink-0">
+              <Calendar size={12} className="ml-2 mr-0.5 text-[#606065] shrink-0" />
+              {RANGE_PRESETS.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => applyRangePreset(p)}
+                  className={
+                    activePreset === p.id
+                      ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[#ff385c] border border-[rgba(255,56,92,0.25)] transition-all"
+                      : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#808088] hover:text-[#d0d0d5] hover:bg-[#1e1e22] transition-all"
+                  }
+                >
+                  {p.label}
+                </button>
+              ))}
               <button
-                key={p.id}
-                onClick={() => applyRangePreset(p)}
+                onClick={toggleCustomRange}
                 className={
-                  activePreset === p.id
-                    ? "px-3 py-1.5 rounded-full text-[12px] font-semibold bg-[#ededed] text-[#0e0e11] transition-colors"
-                    : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#2a2a2e] transition-colors"
+                  activePreset === "custom" || showCustomRange
+                    ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[#ff385c] border border-[rgba(255,56,92,0.25)] transition-all"
+                    : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#808088] hover:text-[#d0d0d5] hover:bg-[#1e1e22] transition-all"
                 }
               >
-                {p.label}
+                Custom
               </button>
-            ))}
-            <button
-              onClick={toggleCustomRange}
-              className={
-                activePreset === "custom" || showCustomRange
-                  ? "px-3 py-1.5 rounded-full text-[12px] font-semibold bg-[#ededed] text-[#0e0e11] transition-colors"
-                  : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#2a2a2e] transition-colors"
-              }
-            >
-              Custom
-            </button>
-          </div>
+            </div>
 
-          {/* Facet pills (native selects styled like pills) */}
-          <div className="inline-flex items-center gap-1.5 shrink-0">
+            {/* Divider */}
+            <div className="w-px h-5 bg-[#252528] shrink-0" />
+
+            {/* Facet pills */}
             <FacetSelect
               icon={<SlidersHorizontal size={12} />}
               label="Account"
@@ -309,28 +304,27 @@ export function TransactionsTable({
               allLabel="Both"
             />
           </div>
-
-        </div>
         </div>
 
-        {/* Layer 3: Inline custom date pickers */}
+        {/* Custom date pickers */}
         {(showCustomRange || activePreset === "custom") && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-full sm:max-w-md pt-1">
-            <div>
-              <label className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold block mb-1">From</label>
-              <DatePicker value={from} onChange={(v) => updateFilter("from", v)} placeholder="Start date" />
-            </div>
-            <div>
-              <label className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold block mb-1">To</label>
-              <DatePicker value={to} onChange={(v) => updateFilter("to", v)} placeholder="End date" />
+          <div className="px-5 pb-4 border-t border-[#1e1e21] pt-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-full sm:max-w-md">
+              <div>
+                <label className="text-[10px] text-[#707075] uppercase tracking-wider font-bold block mb-1">From</label>
+                <DatePicker value={from} onChange={(v) => updateFilter("from", v)} placeholder="Start date" />
+              </div>
+              <div>
+                <label className="text-[10px] text-[#707075] uppercase tracking-wider font-bold block mb-1">To</label>
+                <DatePicker value={to} onChange={(v) => updateFilter("to", v)} placeholder="End date" />
+              </div>
             </div>
           </div>
         )}
 
-        {/* Layer 4: Active filter chips + totals summary */}
+        {/* Active filter chips + totals */}
         {hasActiveFilters && (
-          <div className="pt-3 border-t border-[#2a2a2e] space-y-3">
-            {/* Chips row */}
+          <div className="px-5 pb-4 border-t border-[#1e1e21] pt-3 space-y-3">
             <div className="flex items-center gap-1.5 flex-wrap">
               {from && <ActiveChip label={`From ${formatDate(from)}`} onRemove={() => updateFilter("from", "")} />}
               {to && <ActiveChip label={`To ${formatDate(to)}`} onRemove={() => updateFilter("to", "")} />}
@@ -358,42 +352,41 @@ export function TransactionsTable({
               {q && <ActiveChip label={`"${q}"`} icon="search" onRemove={() => updateFilter("q", "")} />}
               <button
                 onClick={clearAllFilters}
-                className="ml-2 text-[12px] text-[#a0a0a5] hover:text-[#ededed] flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-[#2a2a2e] transition-colors"
+                className="ml-1 text-[12px] text-[#707075] hover:text-[#b0b0b5] flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-[#1a1a1e] transition-colors"
               >
                 <X size={11} /> Clear all
               </button>
             </div>
 
-            {/* Totals summary — only shown once data has loaded */}
             {!loading && total > 0 && (
-              <div className="flex items-center gap-x-4 gap-y-1.5 flex-wrap text-[12px] bg-[#1c1c20] rounded-lg px-3 py-2">
-                <span className="text-[#a0a0a5]">
-                  <span className="text-[#ededed] font-semibold">{total}</span> transaction{total === 1 ? "" : "s"}
+              <div className="flex items-center gap-x-5 gap-y-1.5 flex-wrap text-[12px] bg-[#111113] border border-[#1e1e21] rounded-xl px-4 py-2.5">
+                <span className="text-[#808088]">
+                  <span className="text-[#d0d0d5] font-bold">{total}</span> transaction{total === 1 ? "" : "s"}
                 </span>
                 {totalDebit > 0 && (
                   <span className="flex items-center gap-1">
                     <ArrowUpRight size={11} className="text-[#ff7a6e]" />
-                    <span className="text-[#ff7a6e] font-semibold mono">{formatINR(totalDebit)}</span>
-                    <span className="text-[#6e6e73]">spent</span>
+                    <span className="text-[#ff7a6e] font-bold mono">{formatINR(totalDebit)}</span>
+                    <span className="text-[#707075]">spent</span>
                   </span>
                 )}
                 {totalCredit > 0 && (
                   <span className="flex items-center gap-1">
                     <ArrowDownLeft size={11} className="text-[#5ee0a4]" />
-                    <span className="text-[#5ee0a4] font-semibold mono">{formatINR(totalCredit)}</span>
-                    <span className="text-[#6e6e73]">received</span>
+                    <span className="text-[#5ee0a4] font-bold mono">{formatINR(totalCredit)}</span>
+                    <span className="text-[#707075]">received</span>
                   </span>
                 )}
                 {totalDebit > 0 && totalCredit > 0 && (
-                  <span className="text-[#6e6e73]">
+                  <span className="text-[#707075]">
                     net{" "}
-                    <span className={`font-semibold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+                    <span className={`font-bold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
                       {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
                     </span>
                   </span>
                 )}
                 {transferCount > 0 && (
-                  <span className="text-[#6e6e73]" title="Transfers between your own accounts don't count as income or spending.">
+                  <span className="text-[#707075]" title="Transfers between your own accounts don't count as income or spending.">
                     · excl. {transferCount} transfer{transferCount === 1 ? "" : "s"}
                   </span>
                 )}
