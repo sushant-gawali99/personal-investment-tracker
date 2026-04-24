@@ -193,10 +193,13 @@ export function FDList({ fds }: { fds: FD[] }) {
   async function handlePrint() {
     setPrinting(true);
     try {
+      const printFDs = bankFilter === "all"
+        ? fds
+        : fds.filter((fd) => (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) === bankFilter);
       await generateFDPdf({
         generatedAt: new Date(),
         stats,
-        fds: fds.map((fd) => {
+        fds: printFDs.map((fd) => {
           const c = resolveCurrent(fd);
           const isMatured = c.maturityDate <= now;
           return {
