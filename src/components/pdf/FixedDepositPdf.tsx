@@ -37,34 +37,40 @@ const S = StyleSheet.create({
   headerValueLabel: { fontSize: 8, color: '#999' },
   headerValue: { fontSize: 16, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
   // Stat cards
-  cardsRow: { flexDirection: 'row', gap: 6, marginBottom: 14 },
-  card: { flex: 1, backgroundColor: '#f7f7f8', borderRadius: 4, padding: 7 },
+  cardsRow: { flexDirection: 'row', gap: 8, marginBottom: 14 },
+  card: { flex: 1, backgroundColor: '#f7f7f8', borderRadius: 4, padding: 8 },
   cardLabel: { fontSize: 7, color: '#888' },
-  cardValue: { fontSize: 11, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
-  cardSubPos: { fontSize: 7, marginTop: 2, color: '#16a34a' },
+  cardValue: { fontSize: 12, fontFamily: 'Helvetica-Bold', color: '#111', marginTop: 2 },
   cardSubNeu: { fontSize: 7, marginTop: 2, color: '#888' },
   // Section
   sectionTitle: { fontSize: 10, fontFamily: 'Helvetica-Bold', color: '#333', marginBottom: 5 },
-  // Summary strip
-  summaryRow: { flexDirection: 'row', gap: 6, marginBottom: 14 },
-  summaryItem: { flex: 1, flexDirection: 'row', justifyContent: 'space-between', backgroundColor: '#f7f7f8', borderRadius: 4, paddingVertical: 5, paddingHorizontal: 8 },
-  summaryLabel: { fontSize: 7, color: '#888', alignSelf: 'center' },
-  summaryValue: { fontSize: 9, fontFamily: 'Helvetica-Bold', color: '#111' },
   // Table
-  tableHead: { flexDirection: 'row', backgroundColor: '#f0f0f0', paddingVertical: 4, paddingHorizontal: 4, borderRadius: 2, marginBottom: 1 },
+  tableHead: { flexDirection: 'row', backgroundColor: '#f0f0f0', paddingVertical: 5, paddingHorizontal: 6, borderRadius: 2, marginBottom: 1 },
   tableHeadCell: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#555' },
-  tableRow: { flexDirection: 'row', paddingVertical: 3, paddingHorizontal: 4, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
-  tableRowAlt: { flexDirection: 'row', paddingVertical: 3, paddingHorizontal: 4, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0', backgroundColor: '#fbfbfc' },
-  cell: { fontSize: 7.5, color: '#333' },
-  cellBold: { fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#111' },
-  cellPos: { fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#16a34a' },
-  cellMuted: { fontSize: 6.5, color: '#888' },
-  cellWarn: { fontSize: 7, fontFamily: 'Helvetica-Bold', color: '#d97706' },
-  cellGray: { fontSize: 7, color: '#aaa' },
+  tableRow: { flexDirection: 'row', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0' },
+  tableRowAlt: { flexDirection: 'row', paddingVertical: 4, paddingHorizontal: 6, borderBottomWidth: 0.5, borderBottomColor: '#f0f0f0', backgroundColor: '#fbfbfc' },
+  cell: { fontSize: 8, color: '#333' },
+  cellBold: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#111' },
+  cellPos: { fontSize: 8, fontFamily: 'Helvetica-Bold', color: '#16a34a' },
+  cellMuted: { fontSize: 7, color: '#888' },
+  cellWarn: { fontSize: 7.5, fontFamily: 'Helvetica-Bold', color: '#d97706' },
+  cellGray: { fontSize: 7.5, color: '#aaa' },
   // Footer
   footer: { flexDirection: 'row', justifyContent: 'space-between', borderTopWidth: 0.5, borderTopColor: '#e0e0e0', paddingTop: 6, marginTop: 12 },
   footerText: { fontSize: 7, color: '#aaa' },
 })
+
+// Column flex ratios — must match between header and rows
+const COL = {
+  bank:      2.6,
+  fdNum:     1.8,
+  principal: 1.4,
+  rateTenure:1.4,
+  start:     1.2,
+  maturity:  1.2,
+  atMaturity:1.4,
+  status:    1.0,
+}
 
 function fmtDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -87,7 +93,7 @@ export function FixedDepositPdf({ data }: { data: FDPdfData }) {
 
   return (
     <Document>
-      <Page size="A4" style={S.page}>
+      <Page size="A4" orientation="landscape" style={S.page}>
         {/* Header */}
         <View style={S.headerRow}>
           <View>
@@ -133,16 +139,16 @@ export function FixedDepositPdf({ data }: { data: FDPdfData }) {
         <Text style={[S.sectionTitle, { marginBottom: 6 }]}>
           All Fixed Deposits ({fds.filter((f) => !f.disabled).length} active · {disabledFDs.length} disabled)
         </Text>
+
         <View style={S.tableHead}>
-          <Text style={[S.tableHeadCell, { flex: 2 }]}>Bank</Text>
-          <Text style={[S.tableHeadCell, { flex: 1.5 }]}>FD Number</Text>
-          <Text style={[S.tableHeadCell, { flex: 1.1, textAlign: 'right' }]}>Principal</Text>
-          <Text style={[S.tableHeadCell, { flex: 0.7, textAlign: 'right' }]}>Rate</Text>
-          <Text style={[S.tableHeadCell, { flex: 0.9 }]}>Tenure</Text>
-          <Text style={[S.tableHeadCell, { flex: 1, textAlign: 'right' }]}>Start</Text>
-          <Text style={[S.tableHeadCell, { flex: 1, textAlign: 'right' }]}>Maturity</Text>
-          <Text style={[S.tableHeadCell, { flex: 1.2, textAlign: 'right' }]}>At Maturity</Text>
-          <Text style={[S.tableHeadCell, { flex: 0.8 }]}>Status</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.bank }]}>Bank</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.fdNum }]}>FD Number</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.principal, textAlign: 'right' }]}>Principal</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.rateTenure, textAlign: 'center' }]}>Rate / Tenure</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.start, textAlign: 'right' }]}>Start</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.maturity, textAlign: 'right' }]}>Maturity</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.atMaturity, textAlign: 'right' }]}>At Maturity</Text>
+          <Text style={[S.tableHeadCell, { flex: COL.status }]}>Status</Text>
         </View>
 
         {[...activeFDs, ...maturedFDs, ...disabledFDs].map((fd, i) => {
@@ -152,32 +158,32 @@ export function FixedDepositPdf({ data }: { data: FDPdfData }) {
           const statusStyle = fd.disabled ? S.cellGray : fd.isMatured ? S.cellWarn : S.cellPos
           return (
             <View key={i} style={isAlt ? S.tableRowAlt : S.tableRow} wrap={false}>
-              <Text style={[S.cellBold, { flex: 2 }]}>{bank}</Text>
-              <Text style={[S.cellMuted, { flex: 1.5 }]}>{fd.fdNumber ?? '—'}</Text>
-              <Text style={[S.cell, { flex: 1.1, textAlign: 'right' }]}>{fmtINRPdf(fd.principal)}</Text>
-              <Text style={[S.cell, { flex: 0.7, textAlign: 'right' }]}>{fd.interestRate.toFixed(2)}%</Text>
-              <Text style={[S.cell, { flex: 0.9 }]}>{fmtTenure(fd.tenureMonths, fd.tenureDays, fd.tenureText)}</Text>
-              <Text style={[S.cell, { flex: 1, textAlign: 'right' }]}>{fmtDate(fd.startDate)}</Text>
-              <Text style={[S.cell, { flex: 1, textAlign: 'right' }]}>{fmtDate(fd.maturityDate)}</Text>
-              <Text style={[S.cellBold, { flex: 1.2, textAlign: 'right' }]}>
+              <Text style={[S.cellBold, { flex: COL.bank }]}>{bank}</Text>
+              <Text style={[S.cellMuted, { flex: COL.fdNum }]}>{fd.fdNumber ?? '—'}</Text>
+              <Text style={[S.cell, { flex: COL.principal, textAlign: 'right' }]}>{fmtINRPdf(fd.principal)}</Text>
+              <Text style={[S.cell, { flex: COL.rateTenure, textAlign: 'center' }]}>
+                {fd.interestRate.toFixed(2)}% · {fmtTenure(fd.tenureMonths, fd.tenureDays, fd.tenureText)}
+              </Text>
+              <Text style={[S.cell, { flex: COL.start, textAlign: 'right' }]}>{fmtDate(fd.startDate)}</Text>
+              <Text style={[S.cell, { flex: COL.maturity, textAlign: 'right' }]}>{fmtDate(fd.maturityDate)}</Text>
+              <Text style={[S.cellBold, { flex: COL.atMaturity, textAlign: 'right' }]}>
                 {fd.maturityAmount != null ? fmtINRPdf(fd.maturityAmount) : '—'}
               </Text>
-              <Text style={[statusStyle, { flex: 0.8 }]}>{statusText}</Text>
+              <Text style={[statusStyle, { flex: COL.status }]}>{statusText}</Text>
             </View>
           )
         })}
 
         {/* Totals row */}
         <View style={[S.tableRow, { backgroundColor: '#f0f0f0', borderTopWidth: 1, borderTopColor: '#e0e0e0', marginTop: 1 }]} wrap={false}>
-          <Text style={[S.cellBold, { flex: 2 }]}>Total</Text>
-          <Text style={[S.cell, { flex: 1.5 }]} />
-          <Text style={[S.cellBold, { flex: 1.1, textAlign: 'right' }]}>{fmtINRPdf(stats.totalPrincipal)}</Text>
-          <Text style={[S.cell, { flex: 0.7 }]} />
-          <Text style={[S.cell, { flex: 0.9 }]} />
-          <Text style={[S.cell, { flex: 1 }]} />
-          <Text style={[S.cell, { flex: 1 }]} />
-          <Text style={[S.cellBold, { flex: 1.2, textAlign: 'right' }]}>{fmtINRPdf(stats.totalMaturity)}</Text>
-          <Text style={[S.cell, { flex: 0.8 }]} />
+          <Text style={[S.cellBold, { flex: COL.bank }]}>Total</Text>
+          <Text style={[S.cell, { flex: COL.fdNum }]} />
+          <Text style={[S.cellBold, { flex: COL.principal, textAlign: 'right' }]}>{fmtINRPdf(stats.totalPrincipal)}</Text>
+          <Text style={[S.cell, { flex: COL.rateTenure }]} />
+          <Text style={[S.cell, { flex: COL.start }]} />
+          <Text style={[S.cell, { flex: COL.maturity }]} />
+          <Text style={[S.cellBold, { flex: COL.atMaturity, textAlign: 'right' }]}>{fmtINRPdf(stats.totalMaturity)}</Text>
+          <Text style={[S.cell, { flex: COL.status }]} />
         </View>
 
         {/* Footer */}
