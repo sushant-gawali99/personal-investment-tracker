@@ -5,7 +5,7 @@ import { getSessionUserId } from "@/lib/session";
 import { getTodaysRate, valuePerGram } from "@/lib/gold-rate";
 
 async function getData(userId: string | null) {
-  const [fds, kiteConfig, snapshot] = await Promise.all([
+  const [fds, kiteConfig, snapshot, njLatest] = await Promise.all([
     prisma.fixedDeposit.findMany({
       where: { userId: userId ?? "" },
       orderBy: { maturityDate: "asc" },
@@ -13,10 +13,27 @@ async function getData(userId: string | null) {
     }),
     userId ? prisma.kiteConfig.findUnique({ where: { userId } }) : null,
     userId ? prisma.kiteSnapshot.findUnique({ where: { userId } }) : null,
+    userId
+      ? prisma.nJIndiaStatement.findFirst({
+          where: { userId },
+          orderBy: { createdAt: "desc" },
+        })
+      : null,
   ]);
 
   const holdings: Holding[] = snapshot ? JSON.parse(snapshot.holdingsJson) : [];
   const mfHoldings: MFHolding[] = snapshot ? JSON.parse(snapshot.mfHoldingsJson) : [];
+
+  const njTotals = njLatest
+    ? {
+        invested: njLatest.totalInvested,
+        currentValue: njLatest.totalCurrentValue,
+        gainLoss: njLatest.totalGainLoss,
+        xirrPct: njLatest.weightedReturnPct,
+        schemeCount: njLatest.schemeCount,
+        reportDate: njLatest.reportDate?.toISOString() ?? njLatest.createdAt.toISOString(),
+      }
+    : null;
 
   const fdRecords: FDRecord[] = fds.map((fd) => {
     const latest = fd.renewals.length > 0 ? fd.renewals[fd.renewals.length - 1] : null;
@@ -62,6 +79,7 @@ async function getData(userId: string | null) {
     upcomingMaturities,
     kiteConnected: !!kiteConfig?.accessToken,
     fdsByBank,
+    njTotals,
   };
 }
 
@@ -118,7 +136,7 @@ async function getGoldTotals(userId: string | null) {
 
 export default async function OverviewPage() {
   const userId = await getSessionUserId();
-  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, fdsByBank }, goldTotals, bankBalances] =
+  const [{ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, fdsByBank, njTotals }, goldTotals, bankBalances] =
     await Promise.all([getData(userId), getGoldTotals(userId), getBankBalances(userId)]);
 
   return (
@@ -132,6 +150,7 @@ export default async function OverviewPage() {
         goldTotals={goldTotals}
         fdsByBank={fdsByBank}
         bankBalances={bankBalances}
+        njTotals={njTotals}
         userEmail={userId ?? ""}
       />
   );

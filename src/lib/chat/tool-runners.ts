@@ -245,13 +245,78 @@ export async function runGetGoldHoldings(userId: string): Promise<ToolResult> {
   return { records, citations };
 }
 
+// ── get_nj_india_mutual_funds ──────────────────────────────────────────────
+
+export async function runGetNJIndiaMutualFunds(userId: string): Promise<ToolResult> {
+  const latest = await prisma.nJIndiaStatement.findFirst({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+  });
+  if (!latest) return { records: [], citations: [] };
+
+  type NJScheme = {
+    scheme: string;
+    subType: string;
+    invested: number;
+    units: number;
+    currentValue: number;
+    absoluteReturnPct: number | null;
+    annualizedReturnPct: number | null;
+    holdingPct: number;
+    tenure: string;
+  };
+
+  let schemes: NJScheme[] = [];
+  try {
+    schemes = JSON.parse(latest.schemesJson);
+  } catch {
+    schemes = [];
+  }
+
+  const records = [
+    {
+      kind: "summary",
+      reportDate: latest.reportDate?.toISOString().slice(0, 10) ?? null,
+      totalInvested: latest.totalInvested,
+      totalCurrentValue: latest.totalCurrentValue,
+      totalGainLoss: latest.totalGainLoss,
+      weightedReturnPct: latest.weightedReturnPct,
+      absoluteReturnPct: latest.absoluteReturnPct,
+      schemeCount: latest.schemeCount,
+    },
+    ...schemes.map((s) => ({
+      kind: "scheme",
+      scheme: s.scheme,
+      subType: s.subType,
+      invested: s.invested,
+      units: s.units,
+      currentValue: s.currentValue,
+      gainLoss: s.currentValue - s.invested,
+      absoluteReturnPct: s.absoluteReturnPct,
+      annualizedReturnPct: s.annualizedReturnPct,
+      holdingPct: s.holdingPct,
+      tenure: s.tenure,
+    })),
+  ];
+
+  const citations: Citation[] = schemes.map((s, i) => ({
+    id: `nj-${i}`,
+    type: "mf" as const,
+    label: `${s.scheme} — ${s.subType}`,
+    amount: s.currentValue,
+  }));
+
+  return { records, citations };
+}
+
 // ── get_net_worth_summary ──────────────────────────────────────────────────
 
 export async function runGetNetWorthSummary(userId: string): Promise<ToolResult> {
-  const [fdResult, equityResult, goldResult] = await Promise.all([
+  const [fdResult, equityResult, goldResult, njResult] = await Promise.all([
     runGetFixedDeposits(userId),
     runGetEquityHoldings(userId),
     runGetGoldHoldings(userId),
+    runGetNJIndiaMutualFunds(userId),
   ]);
 
   type FDRecord = { principal: number };
@@ -261,30 +326,22 @@ export async function runGetNetWorthSummary(userId: string): Promise<ToolResult>
   const fdTotal = (fdResult.records as FDRecord[]).reduce((s, fd) => s + fd.principal, 0);
   const equityTotal = (equityResult.records as EquityRecord[]).reduce((s, h) => s + h.currentValue, 0);
   const goldTotal = (goldResult.records as GoldRecord[]).reduce((s, g) => s + g.currentValue, 0);
-  const netWorth = fdTotal + equityTotal + goldTotal;
+
+  const njSummary = (njResult.records.find((r) => (r as { kind?: string }).kind === "summary") as
+    | { totalCurrentValue: number; schemeCount: number }
+    | undefined) ?? null;
+  const njTotal = njSummary?.totalCurrentValue ?? 0;
+  const njCount = njSummary?.schemeCount ?? 0;
+
+  const netWorth = fdTotal + equityTotal + goldTotal + njTotal;
 
   return {
     records: [
-      {
-        assetClass: "Fixed Deposits",
-        value: fdTotal,
-        count: fdResult.records.length,
-      },
-      {
-        assetClass: "Equity",
-        value: equityTotal,
-        count: equityResult.records.length,
-      },
-      {
-        assetClass: "Gold",
-        value: goldTotal,
-        count: goldResult.records.length,
-      },
-      {
-        assetClass: "Total Net Worth",
-        value: netWorth,
-        count: null,
-      },
+      { assetClass: "Fixed Deposits", value: fdTotal, count: fdResult.records.length },
+      { assetClass: "Equity (Zerodha)", value: equityTotal, count: equityResult.records.length },
+      { assetClass: "Mutual Funds (NJ India)", value: njTotal, count: njCount },
+      { assetClass: "Gold", value: goldTotal, count: goldResult.records.length },
+      { assetClass: "Total Net Worth", value: netWorth, count: null },
     ],
     citations: [],
   };
@@ -308,6 +365,8 @@ export async function runTool(
       return runGetEquityHoldings(userId);
     case "get_gold_holdings":
       return runGetGoldHoldings(userId);
+    case "get_nj_india_mutual_funds":
+      return runGetNJIndiaMutualFunds(userId);
     case "get_net_worth_summary":
       return runGetNetWorthSummary(userId);
     default:

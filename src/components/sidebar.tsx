@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/dashboard/zerodha", label: "Zerodha", icon: TrendingUp },
+  { href: "/dashboard/equity-mf", label: "Equity & MF", icon: TrendingUp },
   { href: "/dashboard/fd", label: "Fixed Deposits", icon: Landmark },
   { href: "/dashboard/gold", label: "Gold", icon: Coins },
   { href: "/dashboard/bank-accounts", label: "Bank Accounts", icon: Wallet },

@@ -39,6 +39,14 @@ interface Props {
   };
   fdsByBank: { bankName: string; total: number }[];
   bankBalances: BankBalance[];
+  njTotals: {
+    invested: number;
+    currentValue: number;
+    gainLoss: number;
+    xirrPct: number | null;
+    schemeCount: number;
+    reportDate: string;
+  } | null;
   userEmail: string;
 }
 
@@ -73,23 +81,28 @@ function StatCard({
   );
 }
 
-export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals, fdsByBank, bankBalances, userEmail }: Props) {
+export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomingMaturities, kiteConnected, goldTotals, fdsByBank, bankBalances, njTotals, userEmail }: Props) {
   const [printing, setPrinting] = useState(false);
   const { equity, fd, mf } = summary;
   const hasEquity = holdings.length > 0;
   const hasMF = mfHoldings.length > 0;
   const hasFD = fd.totalPrincipal > 0;
   const hasGold = goldTotals.count > 0;
-  const hasAny = hasEquity || hasFD || hasMF || hasGold;
+  const hasNJ = !!njTotals && njTotals.schemeCount > 0;
+  const hasAny = hasEquity || hasFD || hasMF || hasGold || hasNJ;
 
-  const allocationTotal = summary.totalValue + goldTotals.currentValue;
+  const njValue = njTotals?.currentValue ?? 0;
+  const njInvested = njTotals?.invested ?? 0;
+  const njPnL = njTotals?.gainLoss ?? 0;
+
+  const allocationTotal = summary.totalValue + goldTotals.currentValue + njValue;
   const allocationPct = (v: number) => (allocationTotal > 0 ? (v / allocationTotal) * 100 : 0);
 
   async function handlePrint() {
     setPrinting(true);
     try {
       const data = buildPdfData(
-        { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances },
+        { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances, njTotals },
         userEmail,
       );
       await generateOverviewPdf(data);
@@ -140,8 +153,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
       <section className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <StatCard
           label="Total Portfolio"
-          value={formatINR(summary.totalValue)}
-          sub={`Capital ${formatINR(summary.totalCapital)}`}
+          value={formatINR(summary.totalValue + njValue)}
+          sub={`Capital ${formatINR(summary.totalCapital + njInvested)}`}
           Icon={Wallet}
         />
         <StatCard
@@ -191,7 +204,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
                 <AllocationDonut
                   equityValue={equity.currentValue}
                   fdValue={fd.totalMaturity}
-                  mfValue={mf.currentValue}
+                  mfValue={mf.currentValue + njValue}
                   goldValue={goldTotals.currentValue}
                   centerLabel="Total"
                   centerValue={formatINRCompact(allocationTotal)}
@@ -200,7 +213,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
               <div className="flex-1 min-w-[260px] space-y-4">
                 {[
                   { label: "Equity", sub: "Zerodha stocks", value: formatINR(equity.currentValue), pct: allocationPct(equity.currentValue), color: "#ff385c" },
-                  { label: "Mutual Funds", sub: "Direct MF", value: formatINR(mf.currentValue), pct: allocationPct(mf.currentValue), color: "#5aa9ff" },
+                  { label: "MF — Zerodha", sub: "Direct MF", value: formatINR(mf.currentValue), pct: allocationPct(mf.currentValue), color: "#5aa9ff" },
+                  { label: "MF — NJ India", sub: "Statement-based", value: formatINR(njValue), pct: allocationPct(njValue), color: "#8b5cf6" },
                   { label: "Fixed Deposits", sub: "FDs + SGBs", value: formatINR(fd.totalMaturity), pct: allocationPct(fd.totalMaturity), color: "#5ee0a4" },
                   { label: "Gold", sub: "Jewellery (IBJA rate)", value: formatINR(goldTotals.currentValue), pct: allocationPct(goldTotals.currentValue), color: "#f5a524" },
                 ].filter((r) => r.pct > 0).map(({ label, sub, value, pct, color }) => (
@@ -245,7 +259,10 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
 
           {hasMF && (
             <div className="ab-card p-6">
-              <h3 className="text-[16px] font-semibold text-[#ededed] mb-4 tracking-tight">Mutual Funds</h3>
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Mutual Funds — Zerodha</h3>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#ff385c]/10 text-[#ff385c] ring-1 ring-inset ring-[#ff385c]/20">Zerodha</span>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 {[
                   { label: "Invested", value: formatINR(mf.totalInvested), cls: "text-[#ededed]" },
@@ -257,6 +274,44 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
                     <p className={cn("mono text-[20px] font-semibold mt-1", cls)}>{value}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          )}
+
+          {hasNJ && njTotals && (
+            <div className="ab-card p-6">
+              <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+                <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Mutual Funds — NJ India</h3>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#8b5cf6]/10 text-[#8b5cf6] ring-1 ring-inset ring-[#8b5cf6]/20">NJ India</span>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                  { label: "Invested", value: formatINR(njInvested), cls: "text-[#ededed]" },
+                  { label: "Current Value", value: formatINR(njValue), cls: "text-[#ededed]" },
+                  { label: "Total P&L", value: (njPnL >= 0 ? "+" : "") + formatINR(njPnL), cls: njPnL >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]" },
+                ].map(({ label, value, cls }) => (
+                  <div key={label}>
+                    <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
+                    <p className={cn("mono text-[20px] font-semibold mt-1", cls)}>{value}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 pt-5 border-t border-[#2a2a2e] grid grid-cols-2 md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold">XIRR</p>
+                  <p className="mono text-[15px] font-semibold text-[#ededed] mt-1">
+                    {njTotals.xirrPct != null ? `${njTotals.xirrPct.toFixed(2)}%` : "—"}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Schemes</p>
+                  <p className="mono text-[15px] font-semibold text-[#ededed] mt-1">{njTotals.schemeCount}</p>
+                </div>
+              </div>
+              <div className="mt-4 flex items-center justify-end">
+                <Link href="/dashboard/equity-mf/nj-india" className="text-[12px] text-[#a0a0a5] font-semibold hover:text-[#ededed] flex items-center gap-1 transition-colors">
+                  Manage uploads <ArrowRight size={11} />
+                </Link>
               </div>
             </div>
           )}
@@ -273,7 +328,7 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
             <div className="ab-card p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[18px] font-semibold text-[#ededed] tracking-tight">Top Holdings</h3>
-                <Link href="/dashboard/zerodha" className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                <Link href="/dashboard/equity-mf/zerodha" className="text-[13px] text-[#ededed] font-semibold underline underline-offset-4 flex items-center gap-1 hover:text-[#ff385c] transition-colors">
                   View all <ArrowRight size={12} />
                 </Link>
               </div>

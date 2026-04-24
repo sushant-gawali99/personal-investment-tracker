@@ -24,6 +24,7 @@ export interface FDRenewalData {
 export interface FDDetailData {
   id: string;
   bankName: string;
+  branchName: string | null;
   fdNumber: string | null;
   accountNumber: string | null;
   principal: number;

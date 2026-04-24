@@ -10,6 +10,7 @@ export interface PdfData {
   fd: { totalMaturity: number; totalPrincipal: number; weightedRate: number }
   gold: { currentValue: number; gainLossPct: number | null }
   mf: { totalInvested: number; currentValue: number; totalPnL: number }
+  nj: { totalInvested: number; currentValue: number; totalPnL: number; xirrPct: number | null; schemeCount: number } | null
   cagr: number
   fdsByBank: { bankName: string; total: number }[]
   holdings: { symbol: string; value: number }[]
@@ -76,6 +77,14 @@ interface RawProps {
   upcomingMaturities: FDRecord[]
   fdsByBank: { bankName: string; total: number }[]
   bankBalances: { label: string; bankName: string; closingBalance: number | null; asOf: string | null }[]
+  njTotals: {
+    invested: number
+    currentValue: number
+    gainLoss: number
+    xirrPct: number | null
+    schemeCount: number
+    reportDate: string
+  } | null
 }
 
 function firstTwoWords(s: string) {
@@ -83,7 +92,7 @@ function firstTwoWords(s: string) {
 }
 
 export function buildPdfData(props: RawProps, userEmail: string): PdfData {
-  const { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances } = props
+  const { summary, timeline, holdings, mfHoldings, goldTotals, upcomingMaturities, fdsByBank, bankBalances, njTotals } = props
   const equityItems = holdings.map(h => ({ symbol: h.tradingsymbol, value: h.last_price * h.quantity }))
   const mfItems = mfHoldings.map(h => ({ symbol: firstTwoWords(h.fund), value: h.last_price * h.quantity }))
   const topHoldings = [...equityItems, ...mfItems]
@@ -98,7 +107,7 @@ export function buildPdfData(props: RawProps, userEmail: string): PdfData {
   return {
     userEmail,
     generatedAt: new Date(),
-    totalValue: summary.totalValue,
+    totalValue: summary.totalValue + (njTotals?.currentValue ?? 0),
     equity: { totalInvested: summary.equity.totalInvested, currentValue: summary.equity.currentValue, totalPnL: summary.equity.totalPnL, pnlPct: summary.equity.totalPnLPct },
     fd: {
       totalMaturity: summary.fd.totalMaturity,
@@ -111,6 +120,15 @@ export function buildPdfData(props: RawProps, userEmail: string): PdfData {
       currentValue: summary.mf.currentValue,
       totalPnL: summary.mf.totalPnL,
     },
+    nj: njTotals
+      ? {
+          totalInvested: njTotals.invested,
+          currentValue: njTotals.currentValue,
+          totalPnL: njTotals.gainLoss,
+          xirrPct: njTotals.xirrPct,
+          schemeCount: njTotals.schemeCount,
+        }
+      : null,
     cagr: summary.cagr,
     fdsByBank,
     holdings: topHoldings,

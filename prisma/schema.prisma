@@ -80,6 +80,25 @@ model KiteSnapshot {
   syncedAt       DateTime @default(now())
 }
 
+model NJIndiaStatement {
+  id                 String   @id @default(cuid())
+  userId             String
+  fileUrl            String
+  fileName           String
+  reportDate         DateTime?
+  totalInvested      Float
+  totalCurrentValue  Float
+  totalGainLoss      Float
+  weightedReturnPct  Float?
+  absoluteReturnPct  Float?
+  schemeCount        Int
+  schemesJson        String
+  investorName       String?
+  createdAt          DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
 model GoldItem {
   id             String   @id @default(cuid())
   userId         String   @default("")

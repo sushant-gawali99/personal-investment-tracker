@@ -98,9 +98,19 @@ export const TOOL_DEFINITIONS: Anthropic.Tool[] = [
     },
   },
   {
+    name: "get_nj_india_mutual_funds",
+    description:
+      "Get mutual fund holdings from the latest NJ India valuation statement. Returns per-scheme invested amount, units, current value, gain/loss, absolute return %, XIRR, and sub-type (ELSS, Flexi Cap, etc.). Also returns overall totals and the report date.",
+    input_schema: {
+      type: "object" as const,
+      properties: {},
+      required: [],
+    },
+  },
+  {
     name: "get_net_worth_summary",
     description:
-      "Get total net worth broken down by asset class: fixed deposits, equity, and gold.",
+      "Get total net worth broken down by asset class: fixed deposits, equity, Zerodha mutual funds, NJ India mutual funds, and gold.",
     input_schema: {
       type: "object" as const,
       properties: {},

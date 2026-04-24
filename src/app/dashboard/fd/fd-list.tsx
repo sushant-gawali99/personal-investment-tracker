@@ -88,7 +88,7 @@ export function FDList({ fds }: { fds: FD[] }) {
     return fds
       .filter((fd) => {
         if (fd.disabled) return false;
-        if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
+        if (bankFilter !== "all" && (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) !== bankFilter) return false;
         return true;
       })
       .map((fd) => {
@@ -124,10 +124,11 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   const bankMap = new Map<string, { label: string; count: number }>();
   for (const fd of fds) {
-    const key = normalizeBankName(fd.bankName);
+    const key = normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase();
     const entry = bankMap.get(key);
+    const label = fd.bankName.trim() + (fd.branchName ? ", " + fd.branchName.trim() : "");
     if (!entry) {
-      bankMap.set(key, { label: fd.bankName.trim(), count: 1 });
+      bankMap.set(key, { label, count: 1 });
     } else {
       entry.count += 1;
     }
@@ -145,7 +146,7 @@ export function FDList({ fds }: { fds: FD[] }) {
       if (filter === "active" && matured) return false;
       if (filter === "matured" && !matured) return false;
     }
-    if (bankFilter !== "all" && normalizeBankName(fd.bankName) !== bankFilter) return false;
+    if (bankFilter !== "all" && (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) !== bankFilter) return false;
     if (fdSearch.trim()) {
       const q = fdSearch.trim().toLowerCase();
       const matchesFd = (fd.fdNumber ?? "").toLowerCase().includes(q);

@@ -6,7 +6,8 @@ const COLORS: Record<string, string> = {
   Equity: '#ff385c',
   FD: '#3b82f6',
   Gold: '#f59e0b',
-  MF: '#8b5cf6',
+  'MF (Zerodha)': '#5aa9ff',
+  'MF (NJ India)': '#8b5cf6',
 }
 
 interface Props {
@@ -14,17 +15,20 @@ interface Props {
 }
 
 export function AllocationDonut({ data }: Props) {
+  const njValue = data.nj?.currentValue ?? 0
   const total =
     data.equity.currentValue +
     data.fd.totalMaturity +
     data.gold.currentValue +
-    data.mf.currentValue
+    data.mf.currentValue +
+    njValue
 
   const slices = [
     { label: 'Equity', value: data.equity.currentValue },
     { label: 'FD', value: data.fd.totalMaturity },
     { label: 'Gold', value: data.gold.currentValue },
-    { label: 'MF', value: data.mf.currentValue },
+    { label: 'MF (Zerodha)', value: data.mf.currentValue },
+    { label: 'MF (NJ India)', value: njValue },
   ].filter(s => s.value > 0 && total > 0)
 
   const cx = 65

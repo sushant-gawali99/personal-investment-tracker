@@ -134,23 +134,50 @@ export function OverviewPdf({ data }: Props) {
                 </View>
               </View>
             )}
-            <View style={styles.section}>
-              <Text style={styles.sectionLabel}>Mutual Funds</Text>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Invested</Text>
-                <Text style={styles.rowValue}>{fmtINRPdf(data.mf.totalInvested)}</Text>
+            {data.mf.currentValue > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Mutual Funds — Zerodha</Text>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Invested</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.mf.totalInvested)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Current Value</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.mf.currentValue)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>P&L</Text>
+                  <Text style={data.mf.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
+                    {data.mf.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.mf.totalPnL)}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>Current Value</Text>
-                <Text style={styles.rowValue}>{fmtINRPdf(data.mf.currentValue)}</Text>
+            )}
+            {data.nj && data.nj.currentValue > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionLabel}>Mutual Funds — NJ India</Text>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Invested</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.nj.totalInvested)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>Current Value</Text>
+                  <Text style={styles.rowValue}>{fmtINRPdf(data.nj.currentValue)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>P&L</Text>
+                  <Text style={data.nj.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
+                    {data.nj.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.nj.totalPnL)}
+                  </Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.rowLabel}>XIRR · Schemes</Text>
+                  <Text style={styles.rowValue}>
+                    {data.nj.xirrPct != null ? `${data.nj.xirrPct.toFixed(2)}%` : '—'} · {data.nj.schemeCount}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.row}>
-                <Text style={styles.rowLabel}>P&L</Text>
-                <Text style={data.mf.totalPnL >= 0 ? styles.rowValuePos : styles.rowValueNeg}>
-                  {data.mf.totalPnL >= 0 ? '+' : ''}{fmtINRPdf(data.mf.totalPnL)}
-                </Text>
-              </View>
-            </View>
+            )}
           </View>
         </View>
 

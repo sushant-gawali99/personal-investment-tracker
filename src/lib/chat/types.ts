@@ -10,7 +10,7 @@ export interface ChatMessage {
 
 export interface Citation {
   id: string;
-  type: "transaction" | "fd" | "equity" | "gold";
+  type: "transaction" | "fd" | "equity" | "gold" | "mf";
   date?: string;
   description?: string;
   amount?: number;
