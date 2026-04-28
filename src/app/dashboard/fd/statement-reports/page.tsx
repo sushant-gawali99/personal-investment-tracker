@@ -39,7 +39,7 @@ export default async function StatementReportsPage() {
         </div>
         <Link
           href="/dashboard/fd/statement-reports/new"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,56,92,0.15)] border border-[rgba(255,56,92,0.35)] text-[#ff385c] text-[13px] font-bold hover:bg-[rgba(255,56,92,0.22)] hover:border-[rgba(255,56,92,0.5)] transition-all"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-[rgba(255,56,92,0.15)] border border-[rgba(255,56,92,0.35)] text-[#ff385c] text-[13px] font-bold hover:bg-[rgba(255,56,92,0.22)] hover:border-[rgba(255,56,92,0.5)] transition-all w-full sm:w-auto"
         >
           <Plus size={14} />
           Upload FD Statement
@@ -74,9 +74,9 @@ export default async function StatementReportsPage() {
               <Link
                 key={r.id}
                 href={`/dashboard/fd/statement-reports/${r.id}`}
-                className="block bg-[#0d0d0f] border border-[#2a2a2d] rounded-xl p-5 hover:border-[#3a3a3e] transition-all group"
+                className="block bg-[#0d0d0f] border border-[#2a2a2d] rounded-xl p-5 hover:border-[#3a3a3e] transition-all group overflow-hidden"
               >
-                <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                   <div className="min-w-0">
                     <p className="text-[15px] font-semibold text-[#ededed] truncate">{r.bankName}</p>
                     {r.accountHolderName && (
@@ -86,7 +86,7 @@ export default async function StatementReportsPage() {
                       <p className="text-[12px] text-[#606065] mt-0.5">A/C {r.accountNumber}</p>
                     )}
                   </div>
-                  <div className="text-right shrink-0">
+                  <div className="sm:text-right sm:shrink-0">
                     <p className="text-[12px] text-[#606065]">Added {formatDate(r.createdAt)}</p>
                     {r.statementFromDate && r.statementToDate && (
                       <p className="text-[12px] text-[#606065] mt-0.5">

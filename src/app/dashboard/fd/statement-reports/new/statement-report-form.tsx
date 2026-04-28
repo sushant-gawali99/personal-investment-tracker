@@ -37,69 +37,73 @@ function FDRow({ fd }: { fd: FDEntry }) {
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-center gap-3 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left"
+        className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left"
       >
-        {expanded ? <ChevronDown size={14} className="text-[#606065] shrink-0" /> : <ChevronRight size={14} className="text-[#606065] shrink-0" />}
-        <span className="text-[13px] font-semibold text-[#ededed] flex-1 truncate">
-          <span className="text-[#606065] font-normal">FD No.: </span>{fd.fdNumber}
-        </span>
-        <span className={`text-[11px] px-2 py-0.5 rounded-full border ${colorClass} shrink-0`}>
-          {fd.closureType}
-        </span>
-        <span className="text-[13px] text-[#4ade80] font-semibold shrink-0 ml-2">
-          +{formatINR(fd.totalInterest)}
-        </span>
-        {fd.principalReturned != null && (
-          <span className="text-[12px] text-[#a0a0a5] shrink-0">
-            | P: {formatINR(fd.principalReturned)}
-          </span>
-        )}
-        {fd.closureDate && (
-          <span className="text-[11px] text-[#606065] shrink-0 hidden sm:inline">
-            {formatDate(fd.closureDate)}
-          </span>
-        )}
-        {fd.linkedFdId && (
-          <Link
-            href={`/dashboard/fd/${fd.linkedFdId}`}
-            onClick={(e) => e.stopPropagation()}
-            className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[#ff385c] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors shrink-0"
-          >
-            <Link2 size={10} />
-            In system
-          </Link>
-        )}
+        {expanded
+          ? <ChevronDown size={14} className="text-[#606065] shrink-0 mt-0.5" />
+          : <ChevronRight size={14} className="text-[#606065] shrink-0 mt-0.5" />}
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[13px] font-semibold text-[#ededed] truncate">
+              <span className="text-[#606065] font-normal">FD No.: </span>{fd.fdNumber}
+            </span>
+            <span className={`text-[11px] px-2 py-0.5 rounded-full border ${colorClass} shrink-0`}>
+              {fd.closureType}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[13px] text-[#4ade80] font-semibold">+{formatINR(fd.totalInterest)}</span>
+            {fd.principalReturned != null && (
+              <span className="text-[12px] text-[#a0a0a5]">P: {formatINR(fd.principalReturned)}</span>
+            )}
+            {fd.closureDate && (
+              <span className="text-[11px] text-[#606065]">{formatDate(fd.closureDate)}</span>
+            )}
+            {fd.linkedFdId && (
+              <Link
+                href={`/dashboard/fd/${fd.linkedFdId}`}
+                onClick={(e) => e.stopPropagation()}
+                className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[#ff385c] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors"
+              >
+                <Link2 size={10} />
+                In system
+              </Link>
+            )}
+          </div>
+        </div>
       </button>
 
       {expanded && (
         <div className="border-t border-[#2a2a2d]">
-          <table className="w-full text-[12px]">
-            <thead>
-              <tr className="bg-[#0d0d0f]">
-                <th className="text-left px-4 py-2 text-[#606065] font-medium">Date</th>
-                <th className="text-left px-4 py-2 text-[#606065] font-medium">Description</th>
-                <th className="text-left px-4 py-2 text-[#606065] font-medium">Type</th>
-                <th className="text-right px-4 py-2 text-[#606065] font-medium">Amount</th>
-              </tr>
-            </thead>
-            <tbody>
-              {fd.transactions.map((t, i) => (
-                <tr key={i} className="border-t border-[#1e1e21]">
-                  <td className="px-4 py-2 text-[#a0a0a5] whitespace-nowrap">{t.date}</td>
-                  <td className="px-4 py-2 text-[#c8c8cc] max-w-[200px] truncate">{t.description}</td>
-                  <td className="px-4 py-2">
-                    <span className="text-[11px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#a0a0a5]">
-                      {TXN_TYPE_LABELS[t.type] ?? t.type}
-                    </span>
-                  </td>
-                  <td className="px-4 py-2 text-right text-[#ededed] font-medium whitespace-nowrap">
-                    {formatINR(t.amount)}
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-[12px]">
+              <thead>
+                <tr className="bg-[#0d0d0f]">
+                  <th className="text-left px-3 py-2 text-[#606065] font-medium whitespace-nowrap">Date</th>
+                  <th className="text-left px-3 py-2 text-[#606065] font-medium hidden sm:table-cell">Description</th>
+                  <th className="text-left px-3 py-2 text-[#606065] font-medium">Type</th>
+                  <th className="text-right px-3 py-2 text-[#606065] font-medium whitespace-nowrap">Amount</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="px-4 py-2 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[12px]">
+              </thead>
+              <tbody>
+                {fd.transactions.map((t, i) => (
+                  <tr key={i} className="border-t border-[#1e1e21]">
+                    <td className="px-3 py-2 text-[#a0a0a5] whitespace-nowrap">{t.date}</td>
+                    <td className="px-3 py-2 text-[#c8c8cc] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
+                    <td className="px-3 py-2">
+                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#a0a0a5] whitespace-nowrap">
+                        {TXN_TYPE_LABELS[t.type] ?? t.type}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 text-right text-[#ededed] font-medium whitespace-nowrap">
+                      {formatINR(t.amount)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-3 py-2 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[12px]">
             <span className="text-[#606065]">Total interest earned</span>
             <span className="text-[#4ade80] font-semibold">{formatINR(fd.totalInterest)}</span>
           </div>
@@ -148,10 +152,35 @@ export function StatementReportForm() {
     form.append("pdfFile", file);
 
     try {
-      const res = await fetch("/api/fd/statement-report/extract", { method: "POST", body: form });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Extraction failed");
-      setReportData(json.data as FDReportData);
+      const [extractRes, fdsRes] = await Promise.all([
+        fetch("/api/fd/statement-report/extract", { method: "POST", body: form }),
+        fetch("/api/fd"),
+      ]);
+      const json = await extractRes.json();
+      if (!extractRes.ok) throw new Error(json.error ?? "Extraction failed");
+
+      const data = json.data as FDReportData;
+
+      if (fdsRes.ok) {
+        const fdsJson = await fdsRes.json() as { fds: Array<{ id: string; fdNumber: string | null; bankName: string }> };
+        const existingFds = fdsJson.fds;
+        data.fds = data.fds.map((entry) => {
+          const normalizedEntry = normalizeFdNum(entry.fdNumber);
+          const match = existingFds.find(
+            (f) => f.fdNumber && normalizeFdNum(f.fdNumber) === normalizedEntry
+          );
+          if (match) {
+            return {
+              ...entry,
+              linkedFdId: match.id,
+              linkedFdLabel: `${match.bankName} · ${match.fdNumber}`,
+            };
+          }
+          return entry;
+        });
+      }
+
+      setReportData(data);
       setStep("preview");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Extraction failed. Please try again.");
