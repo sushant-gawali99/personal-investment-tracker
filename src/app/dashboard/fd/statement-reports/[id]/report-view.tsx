@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ChevronDown, ChevronRight, Printer, Trash2, Loader2, AlertTriangle, Link2, RefreshCw } from "lucide-react";
+import { ChevronDown, ChevronRight, Printer, Trash2, Loader2, AlertTriangle, Link2, RefreshCw, X } from "lucide-react";
 import { formatINR, formatDate } from "@/lib/format";
 import type { FDReportData, FDEntry } from "@/lib/fd-statement-report/types";
 
@@ -282,37 +283,14 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           {printing ? "Generating…" : "Download PDF"}
         </button>
 
-        {!confirmDelete ? (
           <button
             type="button"
             onClick={() => setConfirmDelete(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#606065] text-[13px] font-semibold hover:border-[#ff385c] hover:text-[#ff385c] transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#9a9aa2] text-[13px] font-semibold hover:border-[#ff385c] hover:text-[#ff385c] transition-all"
           >
             <Trash2 size={13} />
             Delete
           </button>
-        ) : (
-          <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[13px] text-[#c8c8d2]">Delete this report?</span>
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={deleteReport}
-                disabled={deleting}
-                className="px-3 py-1.5 rounded-full bg-[rgba(255,56,92,0.15)] border border-[rgba(255,56,92,0.35)] text-[#ff385c] text-[12px] font-semibold hover:bg-[rgba(255,56,92,0.22)] transition-all disabled:opacity-40"
-              >
-                {deleting ? <Loader2 size={12} className="animate-spin inline" /> : "Confirm"}
-              </button>
-              <button
-                type="button"
-                onClick={() => setConfirmDelete(false)}
-                className="px-3 py-1.5 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#606065] text-[12px] font-semibold hover:border-[#3a3a3e] transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
       {deleteError && (
@@ -320,6 +298,51 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           <AlertTriangle size={14} className="shrink-0" />
           {deleteError}
         </div>
+      )}
+
+      {confirmDelete && createPortal(
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4">
+          <div className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border border-[#2a2a2e] overflow-hidden" style={{ background: "#131316" }}>
+            <div className="flex items-center gap-2 px-5 py-4 border-b border-[#2a2a2e]">
+              <AlertTriangle size={16} style={{ color: "#ff7a6e" }} />
+              <p className="text-[15px] font-semibold text-[#ededed] tracking-tight flex-1">Delete this report?</p>
+              <button
+                onClick={() => setConfirmDelete(false)}
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[#9a9aa2] hover:bg-[#1c1c20] transition-colors"
+                aria-label="Close"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="px-5 py-4">
+              <p className="text-[14px] text-[#c8c8d2]">
+                This will permanently delete this FD interest report. The original bank statement PDF will remain on the server.
+              </p>
+              <p className="text-[13px] text-[#9a9aa2] mt-2">This action cannot be undone.</p>
+            </div>
+            <div className="px-5 pb-5 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(false)}
+                className="ab-btn ab-btn-ghost w-full sm:w-auto"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={deleteReport}
+                disabled={deleting}
+                className="ab-btn ab-btn-secondary w-full sm:w-auto"
+                style={{ color: "#ff7a6e", borderColor: "rgba(255, 122, 110, 0.3)" }}
+              >
+                {deleting
+                  ? <><Loader2 size={13} className="animate-spin" /> Deleting…</>
+                  : <><Trash2 size={13} /> Delete permanently</>}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Per-FD expandable rows */}
