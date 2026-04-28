@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ChevronRight, Printer, Trash2, Loader2, AlertTriangle, Link2, RefreshCw } from "lucide-react";
@@ -120,9 +120,8 @@ type Props = {
   isSuperAdmin?: boolean;
 };
 
-export function ReportView({ reportId, reportData, bankName, accountHolderName, accountNumber, statementFromDate, statementToDate, createdAt, isSuperAdmin }: Props) {
+export function ReportView({ reportId, reportData, bankName, accountHolderName, accountNumber, statementPdfUrl, statementFromDate, statementToDate, createdAt, isSuperAdmin }: Props) {
   const router = useRouter();
-  const reuploadRef = useRef<HTMLInputElement>(null);
   const [printing, setPrinting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
@@ -170,33 +169,27 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
     }
   };
 
-  const handleReupload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = "";
+  const handleReextract = async () => {
+    if (!statementPdfUrl) return;
     setReuploading(true);
     setReuploadError(null);
 
     try {
+      const pdfRes = await fetch(statementPdfUrl);
+      if (!pdfRes.ok) throw new Error("Could not fetch stored PDF");
+      const blob = await pdfRes.blob();
+      const file = new File([blob], "statement.pdf", { type: "application/pdf" });
+
       const form = new FormData();
       form.append("pdfFile", file);
       const extractRes = await fetch("/api/fd/statement-report/extract", { method: "POST", body: form });
       const extractJson = await extractRes.json();
       if (!extractRes.ok) throw new Error(extractJson.error ?? "Extraction failed");
 
-      let newPdfUrl: string | undefined;
-      const uploadForm = new FormData();
-      uploadForm.append("file", file);
-      const uploadRes = await fetch("/api/fd/upload", { method: "POST", body: uploadForm });
-      if (uploadRes.ok) {
-        const uploadJson = await uploadRes.json();
-        newPdfUrl = uploadJson.url as string;
-      }
-
       const patchRes = await fetch(`/api/fd/statement-report/${reportId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reportData: extractJson.data, statementPdfUrl: newPdfUrl }),
+        body: JSON.stringify({ reportData: extractJson.data }),
       });
       if (!patchRes.ok) {
         const j = await patchRes.json();
@@ -205,7 +198,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
 
       router.refresh();
     } catch (err) {
-      setReuploadError(err instanceof Error ? err.message : "Re-upload failed. Please try again.");
+      setReuploadError(err instanceof Error ? err.message : "Re-extraction failed. Please try again.");
     } finally {
       setReuploading(false);
     }
@@ -261,25 +254,16 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
 
       {/* Action buttons */}
       <div className="flex items-center gap-3 flex-wrap">
-        {isSuperAdmin && (
-          <>
-            <input
-              ref={reuploadRef}
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={handleReupload}
-            />
-            <button
-              type="button"
-              onClick={() => reuploadRef.current?.click()}
-              disabled={reuploading}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#a0a0a5] text-[13px] font-semibold hover:border-[#3a3a3e] hover:text-[#e0e0e4] transition-all disabled:opacity-40"
-            >
-              {reuploading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
-              {reuploading ? "Re-extracting…" : "Re-upload Statement"}
-            </button>
-          </>
+        {isSuperAdmin && statementPdfUrl && (
+          <button
+            type="button"
+            onClick={handleReextract}
+            disabled={reuploading}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#a0a0a5] text-[13px] font-semibold hover:border-[#3a3a3e] hover:text-[#e0e0e4] transition-all disabled:opacity-40"
+          >
+            {reuploading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+            {reuploading ? "Re-extracting…" : "Re-extract"}
+          </button>
         )}
         {reuploadError && (
           <span className="text-[12px] text-[#fb923c] flex items-center gap-1">
