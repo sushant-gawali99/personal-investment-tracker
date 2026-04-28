@@ -10,13 +10,15 @@ type DocumentBlockParam = {
 const PROMPT = `This is a bank account passbook or personal ledger PDF. Extract all Fixed Deposit related transactions and return a single JSON object.
 
 FD transaction patterns to identify in the description/particulars column:
-- "Int. FD-XXXXXX" or "INT FD-XXXXXX" → interest_payout for that FD
-- "INT ON FD XXXXX" → interest_payout for that FD
+- "Int. FD-XXXXXX" or "INT FD-XXXXXX" or "INT ON FD XXXXX" → interest_payout for that FD
 - "INT FD XXXXX MAT CLSD" → maturity_interest (interest credited at maturity)
 - "MAT FD XXXXX CLSD" → maturity_principal (principal returned on natural maturity)
+- "Transfer fr FD-XXXXXX" or "Transfer from FD-XXXXXX" or "TRF FR FD XXXXX" or similar transfer-from-FD patterns → maturity_principal (principal transferred out of FD on maturity or renewal)
 - "FD NO XXXXX PRE MAT CLD INT" → premature_interest
 - "FD NO XXXXX PRE MAT CLD" → premature_principal (principal on premature closure)
 - Any other FD-related row → other
+
+IMPORTANT: Any credit transaction where the description references an FD number and the amount is large (likely principal-sized, not just interest) should be classified as maturity_principal rather than other, even if the wording doesn't exactly match the patterns above.
 
 Extract the FD number from each description. Group all transactions by FD number.
 
