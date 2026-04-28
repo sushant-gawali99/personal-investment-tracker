@@ -27,13 +27,13 @@ export default async function StatementReportsPage() {
         <div>
           <Link
             href="/dashboard/fd"
-            className="inline-flex items-center gap-1.5 text-[13px] text-[#9a9aa2] hover:text-[#c8c8d2] transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#b0b0b8] hover:text-[#dcdce4] transition-colors mb-2"
           >
             <ArrowLeft size={13} />
             Fixed Deposits
           </Link>
           <h1 className="text-[30px] font-bold text-[#ededed] tracking-tight">Past FD Interest</h1>
-          <p className="text-[15px] text-[#c8c8d2] mt-1">
+          <p className="text-[15px] text-[#dcdce4] mt-1">
             Upload bank statements to generate FD interest reports for past deposits.
           </p>
         </div>
@@ -50,7 +50,7 @@ export default async function StatementReportsPage() {
         <div className="flex flex-col items-center justify-center py-20 text-center">
           <FileText size={40} className="text-[#5a5a62] mb-4" />
           <p className="text-[17px] font-semibold text-[#ededed]">No reports yet</p>
-          <p className="text-[15px] text-[#c8c8d2] mt-1 max-w-xs">
+          <p className="text-[15px] text-[#dcdce4] mt-1 max-w-xs">
             Upload a bank passbook or savings account statement to extract FD interest history.
           </p>
           <Link
@@ -81,23 +81,23 @@ export default async function StatementReportsPage() {
                   <div className="min-w-0">
                     <p className="text-[17px] font-semibold text-[#ededed] truncate">{r.bankName}</p>
                     {r.accountHolderName && (
-                      <p className="text-[15px] text-[#c8c8d2] mt-0.5">{r.accountHolderName}</p>
+                      <p className="text-[15px] text-[#dcdce4] mt-0.5">{r.accountHolderName}</p>
                     )}
                     {r.accountNumber && (
-                      <p className="text-[14px] text-[#9a9aa2] mt-0.5">A/C {r.accountNumber}</p>
+                      <p className="text-[14px] text-[#b0b0b8] mt-0.5">A/C {r.accountNumber}</p>
                     )}
                   </div>
                   <div className="sm:text-right sm:shrink-0">
-                    <p className="text-[14px] text-[#9a9aa2]">Added {formatDate(r.createdAt)}</p>
+                    <p className="text-[14px] text-[#b0b0b8]">Added {formatDate(r.createdAt)}</p>
                     {r.statementFromDate && r.statementToDate && (
-                      <p className="text-[14px] text-[#9a9aa2] mt-0.5">
+                      <p className="text-[14px] text-[#b0b0b8] mt-0.5">
                         {formatDate(r.statementFromDate)} – {formatDate(r.statementToDate)}
                       </p>
                     )}
                   </div>
                 </div>
                 <div className="flex items-center gap-3 mt-3 flex-wrap">
-                  <span className="text-[14px] text-[#c8c8d2]">{fdCount} FD{fdCount !== 1 ? "s" : ""}</span>
+                  <span className="text-[14px] text-[#dcdce4]">{fdCount} FD{fdCount !== 1 ? "s" : ""}</span>
                   {maturedCount > 0 && (
                     <span className="text-[13px] px-2.5 py-0.5 rounded-full bg-[#0f2a1a] border border-[#1a4a2e] text-[#4ade80]">
                       {maturedCount} matured

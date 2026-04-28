@@ -35,13 +35,13 @@ export default async function StatementReportPage({
         <div>
           <Link
             href="/dashboard/fd/statement-reports"
-            className="inline-flex items-center gap-1.5 text-[13px] text-[#9a9aa2] hover:text-[#c8c8d2] transition-colors mb-2"
+            className="inline-flex items-center gap-1.5 text-[13px] text-[#b0b0b8] hover:text-[#dcdce4] transition-colors mb-2"
           >
             <ArrowLeft size={12} />
             Past FD Interest
           </Link>
           <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">{report.bankName}</h1>
-          <p className="text-[14px] text-[#a0a0a5] mt-1">
+          <p className="text-[14px] text-[#dcdce4] mt-1">
             {report.accountHolderName && <span>{report.accountHolderName} · </span>}
             {report.accountNumber && <span>A/C {report.accountNumber} · </span>}
             Added {formatDate(report.createdAt)}

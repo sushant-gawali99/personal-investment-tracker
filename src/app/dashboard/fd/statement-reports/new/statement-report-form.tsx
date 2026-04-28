@@ -41,12 +41,12 @@ function FDRow({ fd }: { fd: FDEntry }) {
         className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left cursor-pointer"
       >
         {expanded
-          ? <ChevronDown size={16} className="text-[#9a9aa2] shrink-0 mt-0.5" />
-          : <ChevronRight size={16} className="text-[#9a9aa2] shrink-0 mt-0.5" />}
+          ? <ChevronDown size={16} className="text-[#b0b0b8] shrink-0 mt-0.5" />
+          : <ChevronRight size={16} className="text-[#b0b0b8] shrink-0 mt-0.5" />}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[15px] font-semibold text-[#ededed] truncate">
-              <span className="text-[#9a9aa2] font-normal">FD No.: </span>{fd.fdNumber}
+              <span className="text-[#b0b0b8] font-normal">FD No.: </span>{fd.fdNumber}
             </span>
             <span className={`text-[13px] px-2.5 py-0.5 rounded-full border ${colorClass} shrink-0`}>
               {fd.closureType}
@@ -55,10 +55,10 @@ function FDRow({ fd }: { fd: FDEntry }) {
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[15px] text-[#4ade80] font-semibold">+{formatINR(fd.totalInterest)}</span>
             {fd.principalReturned != null && (
-              <span className="text-[14px] text-[#c8c8d2]">P: {formatINR(fd.principalReturned)}</span>
+              <span className="text-[14px] text-[#dcdce4]">P: {formatINR(fd.principalReturned)}</span>
             )}
             {fd.closureDate && (
-              <span className="text-[13px] text-[#9a9aa2]">{formatDate(fd.closureDate)}</span>
+              <span className="text-[13px] text-[#b0b0b8]">{formatDate(fd.closureDate)}</span>
             )}
             {fd.linkedFdId && (
               <Link
@@ -80,19 +80,19 @@ function FDRow({ fd }: { fd: FDEntry }) {
             <table className="w-full text-[13px]">
               <thead>
                 <tr className="bg-[#0d0d0f]">
-                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium whitespace-nowrap">Date</th>
-                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium hidden sm:table-cell">Description</th>
-                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium">Type</th>
-                  <th className="text-right px-3 py-2.5 text-[#9a9aa2] font-medium whitespace-nowrap">Amount</th>
+                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium whitespace-nowrap">Date</th>
+                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium hidden sm:table-cell">Description</th>
+                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium">Type</th>
+                  <th className="text-right px-3 py-2.5 text-[#b0b0b8] font-medium whitespace-nowrap">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {fd.transactions.map((t, i) => (
                   <tr key={i} className="border-t border-[#1e1e21]">
-                    <td className="px-3 py-2.5 text-[#c8c8d2] whitespace-nowrap">{t.date}</td>
-                    <td className="px-3 py-2.5 text-[#dcdce2] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
+                    <td className="px-3 py-2.5 text-[#dcdce4] whitespace-nowrap">{t.date}</td>
+                    <td className="px-3 py-2.5 text-[#dcdce4] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
                     <td className="px-3 py-2.5">
-                      <span className="text-[12px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#c8c8d2] whitespace-nowrap">
+                      <span className="text-[12px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#dcdce4] whitespace-nowrap">
                         {TXN_TYPE_LABELS[t.type] ?? t.type}
                       </span>
                     </td>
@@ -105,7 +105,7 @@ function FDRow({ fd }: { fd: FDEntry }) {
             </table>
           </div>
           <div className="px-3 py-2.5 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[13px]">
-            <span className="text-[#9a9aa2]">Total interest earned</span>
+            <span className="text-[#b0b0b8]">Total interest earned</span>
             <span className="text-[#4ade80] font-semibold">{formatINR(fd.totalInterest)}</span>
           </div>
         </div>
@@ -252,42 +252,42 @@ export function StatementReportForm() {
             <div>
               <p className="text-[18px] font-bold text-[#ededed]">{reportData.bankName}</p>
               {reportData.accountHolderName && (
-                <p className="text-[15px] text-[#c8c8d2] mt-0.5">{reportData.accountHolderName}</p>
+                <p className="text-[15px] text-[#dcdce4] mt-0.5">{reportData.accountHolderName}</p>
               )}
               {reportData.accountNumber && (
-                <p className="text-[14px] text-[#9a9aa2] mt-0.5">A/C {reportData.accountNumber}</p>
+                <p className="text-[14px] text-[#b0b0b8] mt-0.5">A/C {reportData.accountNumber}</p>
               )}
             </div>
             {reportData.statementFromDate && reportData.statementToDate && (
-              <p className="text-[14px] text-[#9a9aa2]">
+              <p className="text-[14px] text-[#b0b0b8]">
                 {formatDate(reportData.statementFromDate)} – {formatDate(reportData.statementToDate)}
               </p>
             )}
           </div>
           <div className="flex gap-5 flex-wrap pt-2 border-t border-[#1e1e21]">
             <div>
-              <p className="text-[13px] text-[#9a9aa2]">Total FDs</p>
+              <p className="text-[13px] text-[#b0b0b8]">Total FDs</p>
               <p className="text-[22px] font-bold text-[#ededed]">{reportData.fds.length}</p>
             </div>
             <div>
-              <p className="text-[13px] text-[#9a9aa2]">Total Interest</p>
+              <p className="text-[13px] text-[#b0b0b8]">Total Interest</p>
               <p className="text-[22px] font-bold text-[#4ade80]">{formatINR(totalInterest)}</p>
             </div>
             {maturedCount > 0 && (
               <div>
-                <p className="text-[13px] text-[#9a9aa2]">Matured</p>
+                <p className="text-[13px] text-[#b0b0b8]">Matured</p>
                 <p className="text-[22px] font-bold text-[#ededed]">{maturedCount}</p>
               </div>
             )}
             {prematureCount > 0 && (
               <div>
-                <p className="text-[13px] text-[#9a9aa2]">Premature</p>
+                <p className="text-[13px] text-[#b0b0b8]">Premature</p>
                 <p className="text-[22px] font-bold text-[#fb923c]">{prematureCount}</p>
               </div>
             )}
             {ongoingCount > 0 && (
               <div>
-                <p className="text-[13px] text-[#9a9aa2]">Ongoing</p>
+                <p className="text-[13px] text-[#b0b0b8]">Ongoing</p>
                 <p className="text-[22px] font-bold text-[#818cf8]">{ongoingCount}</p>
               </div>
             )}
