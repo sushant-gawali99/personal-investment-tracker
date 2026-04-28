@@ -8,7 +8,7 @@ export default function NewStatementReportPage() {
       <div>
         <Link
           href="/dashboard/fd/statement-reports"
-          className="inline-flex items-center gap-1.5 text-[12px] text-[#606065] hover:text-[#a0a0a5] transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-[13px] text-[#9a9aa2] hover:text-[#c8c8d2] transition-colors mb-2"
         >
           <ArrowLeft size={12} />
           Past FD Interest

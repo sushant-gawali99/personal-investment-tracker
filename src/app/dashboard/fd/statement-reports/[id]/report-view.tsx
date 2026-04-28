@@ -34,32 +34,32 @@ function FDRow({ fd }: { fd: FDEntry }) {
         className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left"
       >
         {expanded
-          ? <ChevronDown size={14} className="text-[#606065] shrink-0 mt-0.5" />
-          : <ChevronRight size={14} className="text-[#606065] shrink-0 mt-0.5" />}
-        <div className="flex-1 min-w-0 space-y-1">
+          ? <ChevronDown size={16} className="text-[#9a9aa2] shrink-0 mt-0.5" />
+          : <ChevronRight size={16} className="text-[#9a9aa2] shrink-0 mt-0.5" />}
+        <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[13px] font-semibold text-[#ededed] truncate">
-              <span className="text-[#606065] font-normal">FD No.: </span>{fd.fdNumber}
+            <span className="text-[15px] font-semibold text-[#ededed] truncate">
+              <span className="text-[#9a9aa2] font-normal">FD No.: </span>{fd.fdNumber}
             </span>
-            <span className={`text-[11px] px-2 py-0.5 rounded-full border ${colorClass} shrink-0`}>
+            <span className={`text-[13px] px-2.5 py-0.5 rounded-full border ${colorClass} shrink-0`}>
               {fd.closureType}
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[13px] text-[#4ade80] font-semibold">+{formatINR(fd.totalInterest)}</span>
+            <span className="text-[15px] text-[#4ade80] font-semibold">+{formatINR(fd.totalInterest)}</span>
             {fd.principalReturned != null && (
-              <span className="text-[12px] text-[#a0a0a5]">P: {formatINR(fd.principalReturned)}</span>
+              <span className="text-[14px] text-[#c8c8d2]">P: {formatINR(fd.principalReturned)}</span>
             )}
             {fd.closureDate && (
-              <span className="text-[11px] text-[#606065]">{formatDate(fd.closureDate)}</span>
+              <span className="text-[13px] text-[#9a9aa2]">{formatDate(fd.closureDate)}</span>
             )}
             {fd.linkedFdId && (
               <Link
                 href={`/dashboard/fd/${fd.linkedFdId}`}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[#ff385c] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors"
+                className="inline-flex items-center gap-1 text-[13px] px-2.5 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[#ff385c] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors"
               >
-                <Link2 size={10} />
+                <Link2 size={11} />
                 In system
               </Link>
             )}
@@ -70,26 +70,26 @@ function FDRow({ fd }: { fd: FDEntry }) {
       {expanded && (
         <div className="border-t border-[#2a2a2d]">
           <div className="overflow-x-auto">
-            <table className="w-full text-[12px]">
+            <table className="w-full text-[13px]">
               <thead>
                 <tr className="bg-[#0d0d0f]">
-                  <th className="text-left px-3 py-2 text-[#606065] font-medium whitespace-nowrap">Date</th>
-                  <th className="text-left px-3 py-2 text-[#606065] font-medium hidden sm:table-cell">Description</th>
-                  <th className="text-left px-3 py-2 text-[#606065] font-medium">Type</th>
-                  <th className="text-right px-3 py-2 text-[#606065] font-medium whitespace-nowrap">Amount</th>
+                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium whitespace-nowrap">Date</th>
+                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium hidden sm:table-cell">Description</th>
+                  <th className="text-left px-3 py-2.5 text-[#9a9aa2] font-medium">Type</th>
+                  <th className="text-right px-3 py-2.5 text-[#9a9aa2] font-medium whitespace-nowrap">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {fd.transactions.map((t, i) => (
                   <tr key={i} className="border-t border-[#1e1e21]">
-                    <td className="px-3 py-2 text-[#a0a0a5] whitespace-nowrap">{t.date}</td>
-                    <td className="px-3 py-2 text-[#c8c8cc] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
-                    <td className="px-3 py-2">
-                      <span className="text-[11px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#a0a0a5] whitespace-nowrap">
+                    <td className="px-3 py-2.5 text-[#c8c8d2] whitespace-nowrap">{t.date}</td>
+                    <td className="px-3 py-2.5 text-[#dcdce2] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
+                    <td className="px-3 py-2.5">
+                      <span className="text-[12px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#c8c8d2] whitespace-nowrap">
                         {TXN_TYPE_LABELS[t.type] ?? t.type}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-right text-[#ededed] font-medium whitespace-nowrap">
+                    <td className="px-3 py-2.5 text-right text-[#ededed] font-medium whitespace-nowrap">
                       {formatINR(t.amount)}
                     </td>
                   </tr>
@@ -97,8 +97,8 @@ function FDRow({ fd }: { fd: FDEntry }) {
               </tbody>
             </table>
           </div>
-          <div className="px-3 py-2 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[12px]">
-            <span className="text-[#606065]">Total interest earned</span>
+          <div className="px-3 py-2.5 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[13px]">
+            <span className="text-[#9a9aa2]">Total interest earned</span>
             <span className="text-[#4ade80] font-semibold">{formatINR(fd.totalInterest)}</span>
           </div>
         </div>
@@ -210,43 +210,43 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
       <div className="bg-[#0d0d0f] border border-[#2a2a2d] rounded-xl p-5 space-y-3">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            {accountHolderName && <p className="text-[13px] text-[#a0a0a5]">{accountHolderName}</p>}
-            {accountNumber && <p className="text-[12px] text-[#606065] mt-0.5">A/C {accountNumber}</p>}
+            {accountHolderName && <p className="text-[15px] text-[#c8c8d2]">{accountHolderName}</p>}
+            {accountNumber && <p className="text-[14px] text-[#9a9aa2] mt-0.5">A/C {accountNumber}</p>}
           </div>
           <div className="text-right">
             {statementFromDate && statementToDate && (
-              <p className="text-[12px] text-[#606065]">
+              <p className="text-[14px] text-[#9a9aa2]">
                 {formatDate(statementFromDate)} – {formatDate(statementToDate)}
               </p>
             )}
-            <p className="text-[11px] text-[#484850] mt-0.5">Added {formatDate(createdAt)}</p>
+            <p className="text-[13px] text-[#9a9aa2] mt-0.5">Added {formatDate(createdAt)}</p>
           </div>
         </div>
-        <div className="flex gap-4 flex-wrap pt-1 border-t border-[#1e1e21]">
+        <div className="flex gap-5 flex-wrap pt-2 border-t border-[#1e1e21]">
           <div>
-            <p className="text-[11px] text-[#606065]">Total FDs</p>
-            <p className="text-[18px] font-bold text-[#ededed]">{reportData.fds.length}</p>
+            <p className="text-[13px] text-[#9a9aa2]">Total FDs</p>
+            <p className="text-[22px] font-bold text-[#ededed]">{reportData.fds.length}</p>
           </div>
           <div>
-            <p className="text-[11px] text-[#606065]">Total Interest</p>
-            <p className="text-[18px] font-bold text-[#4ade80]">{formatINR(totalInterest)}</p>
+            <p className="text-[13px] text-[#9a9aa2]">Total Interest</p>
+            <p className="text-[22px] font-bold text-[#4ade80]">{formatINR(totalInterest)}</p>
           </div>
           {maturedCount > 0 && (
             <div>
-              <p className="text-[11px] text-[#606065]">Matured</p>
-              <p className="text-[18px] font-bold text-[#ededed]">{maturedCount}</p>
+              <p className="text-[13px] text-[#9a9aa2]">Matured</p>
+              <p className="text-[22px] font-bold text-[#ededed]">{maturedCount}</p>
             </div>
           )}
           {prematureCount > 0 && (
             <div>
-              <p className="text-[11px] text-[#606065]">Premature</p>
-              <p className="text-[18px] font-bold text-[#fb923c]">{prematureCount}</p>
+              <p className="text-[13px] text-[#9a9aa2]">Premature</p>
+              <p className="text-[22px] font-bold text-[#fb923c]">{prematureCount}</p>
             </div>
           )}
           {ongoingCount > 0 && (
             <div>
-              <p className="text-[11px] text-[#606065]">Ongoing</p>
-              <p className="text-[18px] font-bold text-[#818cf8]">{ongoingCount}</p>
+              <p className="text-[13px] text-[#9a9aa2]">Ongoing</p>
+              <p className="text-[22px] font-bold text-[#818cf8]">{ongoingCount}</p>
             </div>
           )}
         </div>
@@ -266,8 +266,8 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           </button>
         )}
         {reuploadError && (
-          <span className="text-[12px] text-[#fb923c] flex items-center gap-1">
-            <AlertTriangle size={12} />
+          <span className="text-[13px] text-[#fb923c] flex items-center gap-1">
+            <AlertTriangle size={13} />
             {reuploadError}
           </span>
         )}
@@ -292,7 +292,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           </button>
         ) : (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[12px] text-[#a0a0a5]">Delete this report?</span>
+            <span className="text-[13px] text-[#c8c8d2]">Delete this report?</span>
             <div className="flex items-center gap-2">
               <button
                 type="button"
