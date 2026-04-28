@@ -37,7 +37,8 @@ function FDRow({ fd }: { fd: FDEntry }) {
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
-        className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left"
+        title={expanded ? undefined : "Open for details"}
+        className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left cursor-pointer"
       >
         {expanded
           ? <ChevronDown size={16} className="text-[#9a9aa2] shrink-0 mt-0.5" />
