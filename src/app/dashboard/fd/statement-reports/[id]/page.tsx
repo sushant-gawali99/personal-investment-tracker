@@ -2,7 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { getSessionUserId } from "@/lib/session";
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/lib/auth";
+import { getSessionUserId, isSupAdmin } from "@/lib/session";
 import { formatDate } from "@/lib/format";
 import type { FDReportData } from "@/lib/fd-statement-report/types";
 import { ReportView } from "./report-view";
@@ -13,7 +15,11 @@ export default async function StatementReportPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const userId = await getSessionUserId();
+  const [userId, session] = await Promise.all([
+    getSessionUserId(),
+    getServerSession(authOptions),
+  ]);
+  const superAdmin = isSupAdmin(session?.user?.email ?? null);
 
   const report = await prisma.fDStatementReport.findFirst({
     where: { id, userId: userId ?? "" },
@@ -46,6 +52,7 @@ export default async function StatementReportPage({
       <ReportView
         reportData={reportData}
         reportId={id}
+        isSuperAdmin={superAdmin}
         statementPdfUrl={report.statementPdfUrl ?? undefined}
         bankName={report.bankName}
         accountHolderName={report.accountHolderName ?? undefined}
