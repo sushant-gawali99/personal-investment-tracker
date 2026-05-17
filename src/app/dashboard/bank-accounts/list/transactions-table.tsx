@@ -250,15 +250,15 @@ export function TransactionsTable({
           <div className="flex items-center gap-2 min-w-max">
             {/* Date range pills */}
             <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] shrink-0">
-              <Calendar size={12} className="ml-2 mr-0.5 text-[var(--text-tertiary)] shrink-0" />
+              <Calendar size={13} className="ml-2 mr-0.5 text-[var(--text-secondary)] shrink-0" />
               {RANGE_PRESETS.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => applyRangePreset(p)}
                   className={
                     activePreset === p.id
-                      ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[var(--primary)] border border-[rgba(255,56,92,0.25)] transition-all"
-                      : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
+                      ? "px-3 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(255,56,92,0.18)] text-[var(--primary)] border border-[rgba(255,56,92,0.4)] transition-all"
+                      : "px-3 py-1.5 rounded-full text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
                   }
                 >
                   {p.label}
@@ -268,8 +268,8 @@ export function TransactionsTable({
                 onClick={toggleCustomRange}
                 className={
                   activePreset === "custom" || showCustomRange
-                    ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[var(--primary)] border border-[rgba(255,56,92,0.25)] transition-all"
-                    : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
+                    ? "px-3 py-1.5 rounded-full text-[13px] font-bold bg-[rgba(255,56,92,0.18)] text-[var(--primary)] border border-[rgba(255,56,92,0.4)] transition-all"
+                    : "px-3 py-1.5 rounded-full text-[13px] font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
                 }
               >
                 Custom
@@ -446,7 +446,7 @@ export function TransactionsTable({
                 const catName = r.category?.name ?? null;
                 return (
                 <tr key={r.id} className="border-t border-[var(--border)] hover:bg-[var(--surface-muted)]/60 transition-colors group">
-                  <td className="px-3 py-2.5 mono text-[12px] text-[var(--text-secondary)] whitespace-nowrap align-middle">
+                  <td className="px-3 py-2.5 mono text-[13px] font-medium text-[var(--text-primary)] whitespace-nowrap align-middle">
                     {formatDate(r.txnDate)}
                   </td>
                   <td className="px-3 py-2.5 max-w-[160px] sm:max-w-[280px] md:max-w-[380px] align-middle" title={r.description}>
@@ -479,7 +479,7 @@ export function TransactionsTable({
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5 text-[12px] text-[var(--text-secondary)] whitespace-nowrap align-middle hidden sm:table-cell">
+                  <td className="px-3 py-2.5 text-[13px] text-[var(--text-secondary)] whitespace-nowrap align-middle hidden sm:table-cell">
                     {r.account.label}
                   </td>
                   <td className="px-3 py-2.5 align-middle hidden md:table-cell">
@@ -594,14 +594,14 @@ function FacetSelect({
       <div
         className={
           active
-            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-[rgba(255,56,92,0.14)] text-[var(--primary)] border border-[rgba(255,56,92,0.3)] transition-colors"
-            : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--surface-muted)] border border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
+            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[rgba(255,56,92,0.18)] text-[var(--primary)] border border-[rgba(255,56,92,0.4)] transition-colors"
+            : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold text-[var(--text-primary)] bg-[var(--surface-raised)] border border-[var(--border-strong)] hover:border-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] transition-colors"
         }
       >
         {icon}
-        <span className="text-[10px] uppercase tracking-wider font-semibold opacity-70">{label}:</span>
+        <span className="text-[11px] uppercase tracking-wider font-bold text-[var(--text-secondary)]">{label}:</span>
         <span>{selectedLabel}</span>
-        <ChevronRight size={11} className="rotate-90 opacity-60 -mr-0.5" />
+        <ChevronRight size={11} className="rotate-90 opacity-70 -mr-0.5" />
       </div>
       {/* Native <select> stacked on top, invisible but clickable. */}
       <select
