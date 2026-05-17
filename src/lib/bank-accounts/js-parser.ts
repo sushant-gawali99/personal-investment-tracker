@@ -17,7 +17,7 @@ export interface JsParseResult {
  * last result with confident=false (empty) if no parser recognised the text.
  */
 export function parseStatementText(text: string): JsParseResult {
-  const parsers = [parseAxis];
+  const parsers: Array<(text: string) => JsParseResult> = [];
   for (const p of parsers) {
     const r = p(text);
     if (r.confident) return r;
