@@ -20,20 +20,33 @@ export default async function AccountsPage() {
   });
   const byId = new Map(counts.map((c) => [c.accountId, c]));
 
-  // Latest *saved* import with a non-null closing balance, per account.
-  // We rank by statementPeriodEnd desc (fall back to createdAt) so the
-  // most recent statement drives the "current balance" display.
-  const latestImports = await prisma.statementImport.findMany({
-    where: { userId, status: "saved", closingBalance: { not: null } },
-    orderBy: [{ statementPeriodEnd: "desc" }, { createdAt: "desc" }],
-    select: { accountId: true, closingBalance: true, statementPeriodEnd: true, createdAt: true },
-  });
+  // Current balance per account = the running balance of the most recent
+  // transaction, ordered by (txnDate, statementSeq, createdAt). Sourcing it
+  // from transactions (not StatementImport.closingBalance) correctly handles
+  // overlapping imports — e.g. a wide statement covering Apr–May alongside a
+  // single-day statement for the latest day: the one-day import has the truly
+  // latest activity, so its last transaction's runningBalance wins.
+  const latestTxnPerAccount = await prisma.$queryRaw<
+    Array<{ accountId: string; runningBalance: number | null; txnDate: Date }>
+  >`
+    SELECT t1.accountId, t1.runningBalance, t1.txnDate
+    FROM "Transaction" t1
+    WHERE t1.userId = ${userId}
+      AND t1.runningBalance IS NOT NULL
+      AND t1.id = (
+        SELECT t2.id FROM "Transaction" t2
+        WHERE t2.accountId = t1.accountId AND t2.userId = ${userId}
+          AND t2.runningBalance IS NOT NULL
+        ORDER BY t2.txnDate DESC, t2.statementSeq DESC, t2.createdAt DESC
+        LIMIT 1
+      )
+  `;
   const latestClosingByAccount = new Map<string, { closingBalance: number; asOf: string }>();
-  for (const imp of latestImports) {
-    if (latestClosingByAccount.has(imp.accountId)) continue;
-    latestClosingByAccount.set(imp.accountId, {
-      closingBalance: imp.closingBalance!,
-      asOf: (imp.statementPeriodEnd ?? imp.createdAt).toISOString(),
+  for (const t of latestTxnPerAccount) {
+    if (t.runningBalance == null) continue;
+    latestClosingByAccount.set(t.accountId, {
+      closingBalance: t.runningBalance,
+      asOf: t.txnDate.toISOString(),
     });
   }
 
