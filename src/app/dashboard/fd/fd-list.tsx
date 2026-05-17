@@ -45,16 +45,8 @@ function normalizeBankName(name: string) {
  * Branch is part of the key so HDFC Pune and HDFC Mumbai stay separate
  * filter entries.
  */
-function bankKey(fd: {
-  bankId?: string | null;
-  bankName: string;
-  branchId?: string | null;
-  branchName: string | null;
-}): string {
-  const bankPart = fd.bankId ?? `name:${normalizeBankName(fd.bankName)}`;
-  const branchPart = fd.branchId
-    ?? (fd.branchName ? `name:${fd.branchName.trim().toLowerCase().replace(/\s+/g, " ")}` : "");
-  return `${bankPart}|${branchPart}`;
+function bankKey(fd: { bankId?: string | null; bankName: string }): string {
+  return fd.bankId ?? `name:${normalizeBankName(fd.bankName)}`;
 }
 
 type Resolved = ReturnType<typeof resolveCurrent>;
@@ -146,7 +138,7 @@ export function FDList({ fds }: { fds: FD[] }) {
   for (const fd of fds) {
     const key = bankKey(fd);
     const entry = bankMap.get(key);
-    const label = fd.bankName.trim() + (fd.branchName ? ", " + fd.branchName.trim() : "");
+    const label = fd.bankName.trim();
     if (!entry) {
       bankMap.set(key, { label, count: 1 });
     } else {
