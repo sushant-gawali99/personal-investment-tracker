@@ -170,7 +170,7 @@ export function parseAxis(text: string): JsParseResult {
     statementPeriodStart,
     statementPeriodEnd,
     openingBalance,
-    closingBalance,
+    closingBalance: closingBalance ?? transactions.at(-1)?.runningBalance ?? null,
     transactions,
     confident: transactions.length > 0,
     unparsedBlocks,

@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
 import path from "node:path";
-import { parseStatementText } from "./js-parser";
+import { parseAxis } from "./js-parser";
 import { extractPdfText } from "./pdf-text";
 
 describe("js-parser on real Axis statement (5265324706)", () => {
@@ -10,7 +10,7 @@ describe("js-parser on real Axis statement (5265324706)", () => {
     const { text } = await extractPdfText(pdf);
 
     const t0 = Date.now();
-    const r = parseStatementText(text);
+    const r = parseAxis(text);
     const elapsed = Date.now() - t0;
 
     console.log(`js-parser: ${elapsed}ms, ${r.transactions.length} txns, ${r.unparsedBlocks.length} unparsed`);
