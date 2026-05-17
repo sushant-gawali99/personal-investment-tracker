@@ -176,6 +176,7 @@ model Transaction {
   direction               String   // "debit" | "credit"
   runningBalance          Float?
   bankRef                 String?
+  statementSeq            Int?
   categoryId              String?
   category                TransactionCategory? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categorySource          String?  // "claude" | "rule" | "user" | "transfer-detect"

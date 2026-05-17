@@ -30,7 +30,7 @@ export async function commitImport(
   // round-trip is ~50–100ms, so the old per-row loop inside $transaction
   // blew the default 5s timeout on even modest statements. createMany sends
   // a single statement, and skipDuplicates handles the rare dedup race.
-  const rows = kept.map((t) => ({
+  const rows = kept.map((t, seq) => ({
     userId,
     accountId: imp.accountId,
     txnDate: new Date(t.txnDate),
@@ -42,6 +42,7 @@ export async function commitImport(
     direction: t.direction,
     runningBalance: t.runningBalance,
     bankRef: t.bankRef,
+    statementSeq: seq,
     categoryId: t.categoryId,
     categorySource: t.categorySource,
     importId: imp.id,

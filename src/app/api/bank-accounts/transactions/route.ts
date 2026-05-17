@@ -53,7 +53,7 @@ export async function GET(req: NextRequest) {
       orderBy:
         sortField === "amount"
           ? [{ amount: sortOrder }, { txnDate: "desc" }]
-          : [{ txnDate: sortOrder }, { createdAt: "desc" }],
+          : [{ txnDate: sortOrder }, { statementSeq: sortOrder }, { createdAt: "desc" }],
       skip: (page - 1) * pageSize,
       take: pageSize,
       include: {
