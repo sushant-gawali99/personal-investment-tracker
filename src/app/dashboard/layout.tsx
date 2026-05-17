@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { isSupAdmin, IMPERSONATE_COOKIE } from "@/lib/session";
 import { TopNav } from "@/components/top-nav";
+import { ActivityTracker } from "@/components/activity-tracker";
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -20,6 +21,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   return (
     <div className="min-h-screen" style={{ background: "var(--background)" }}>
+      <ActivityTracker />
       <TopNav impersonatedUser={impersonatedUser} />
       <main className="max-w-[1440px] mx-auto px-8 py-8">{children}</main>
     </div>
