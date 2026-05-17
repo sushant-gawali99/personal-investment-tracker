@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 minutes
+const INACTIVITY_LIMIT_MS = 60 * 60 * 1000; // 1 hour
 const COOKIE_NAME = "pit-last-activity";
 
 export async function middleware(req: NextRequest) {
@@ -18,6 +18,9 @@ export async function middleware(req: NextRequest) {
   const lastActivity = Number(lastActivityRaw);
 
   if (isNaN(lastActivity) || lastActivity > Date.now() || Date.now() - lastActivity > INACTIVITY_LIMIT_MS) {
+    if (req.nextUrl.pathname.startsWith("/api")) {
+      return NextResponse.json({ error: "Session expired" }, { status: 401 });
+    }
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("reason", "timeout");
     loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
@@ -28,5 +31,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: [
+    "/((?!login|api/auth|_next/static|_next/image|favicon\\.ico).*)",
+  ],
 };
