@@ -85,24 +85,34 @@ async function getData(userId: string | null) {
 
 async function getBankBalances(userId: string | null) {
   if (!userId) return [] as { id: string; label: string; bankName: string; closingBalance: number | null; asOf: string | null }[];
-  const [accounts, latestImports] = await Promise.all([
+  // Current balance = latest transaction's runningBalance (handles overlapping
+  // imports correctly — see comment in accounts/page.tsx for full reasoning).
+  const [accounts, latestTxnPerAccount] = await Promise.all([
     prisma.bankAccount.findMany({
       where: { userId, disabled: false },
       orderBy: { label: "asc" },
       select: { id: true, label: true, bankName: true },
     }),
-    prisma.statementImport.findMany({
-      where: { userId, status: "saved", closingBalance: { not: null } },
-      orderBy: [{ statementPeriodEnd: "desc" }, { createdAt: "desc" }],
-      select: { accountId: true, closingBalance: true, statementPeriodEnd: true, createdAt: true },
-    }),
+    prisma.$queryRaw<Array<{ accountId: string; runningBalance: number | null; txnDate: Date }>>`
+      SELECT t1.accountId, t1.runningBalance, t1.txnDate
+      FROM "Transaction" t1
+      WHERE t1.userId = ${userId}
+        AND t1.runningBalance IS NOT NULL
+        AND t1.id = (
+          SELECT t2.id FROM "Transaction" t2
+          WHERE t2.accountId = t1.accountId AND t2.userId = ${userId}
+            AND t2.runningBalance IS NOT NULL
+          ORDER BY t2.txnDate DESC, t2.statementSeq DESC, t2.createdAt DESC
+          LIMIT 1
+        )
+    `,
   ]);
   const latest = new Map<string, { closingBalance: number; asOf: string }>();
-  for (const imp of latestImports) {
-    if (latest.has(imp.accountId)) continue;
-    latest.set(imp.accountId, {
-      closingBalance: imp.closingBalance!,
-      asOf: (imp.statementPeriodEnd ?? imp.createdAt).toISOString(),
+  for (const t of latestTxnPerAccount) {
+    if (t.runningBalance == null) continue;
+    latest.set(t.accountId, {
+      closingBalance: t.runningBalance,
+      asOf: t.txnDate.toISOString(),
     });
   }
   return accounts.map((a) => ({

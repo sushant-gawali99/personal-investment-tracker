@@ -14,20 +14,32 @@ export default async function BankAccountsOverview() {
     where: { userId, disabled: false }, orderBy: { label: "asc" },
   });
 
-  // Compute the latest closing balance per account (from the most recent
-  // saved import that reported one) so the overview can show a per-bank
-  // current-balance strip.
-  const latestImports = await prisma.statementImport.findMany({
-    where: { userId, status: "saved", closingBalance: { not: null } },
-    orderBy: [{ statementPeriodEnd: "desc" }, { createdAt: "desc" }],
-    select: { accountId: true, closingBalance: true, statementPeriodEnd: true, createdAt: true },
-  });
+  // Current balance per account = the running balance of the most recent
+  // transaction. Sourcing it from transactions (not StatementImport.closingBalance)
+  // correctly handles overlapping imports — e.g. a wide statement covering
+  // Apr–May alongside a single-day statement for May 17: the one-day import has
+  // the truly latest activity, so its last transaction's runningBalance wins.
+  const latestTxnPerAccount = await prisma.$queryRaw<
+    Array<{ accountId: string; runningBalance: number | null; txnDate: Date }>
+  >`
+    SELECT t1.accountId, t1.runningBalance, t1.txnDate
+    FROM "Transaction" t1
+    WHERE t1.userId = ${userId}
+      AND t1.runningBalance IS NOT NULL
+      AND t1.id = (
+        SELECT t2.id FROM "Transaction" t2
+        WHERE t2.accountId = t1.accountId AND t2.userId = ${userId}
+          AND t2.runningBalance IS NOT NULL
+        ORDER BY t2.txnDate DESC, t2.statementSeq DESC, t2.createdAt DESC
+        LIMIT 1
+      )
+  `;
   const latestByAccount = new Map<string, { closingBalance: number; asOf: string }>();
-  for (const imp of latestImports) {
-    if (latestByAccount.has(imp.accountId)) continue;
-    latestByAccount.set(imp.accountId, {
-      closingBalance: imp.closingBalance!,
-      asOf: (imp.statementPeriodEnd ?? imp.createdAt).toISOString(),
+  for (const t of latestTxnPerAccount) {
+    if (t.runningBalance == null) continue;
+    latestByAccount.set(t.accountId, {
+      closingBalance: t.runningBalance,
+      asOf: t.txnDate.toISOString(),
     });
   }
   const balances = accounts.map((a) => ({
