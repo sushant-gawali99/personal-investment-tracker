@@ -403,6 +403,10 @@ select.ab-input:focus {
   background-repeat: no-repeat;
   background-position: right 12px center;
 }
+/* Native <select> dropdown options use the OS default styling (white
+   in Windows / non-macOS Chromium). Force theme colors so the open
+   dropdown matches the rest of the app in both light and dark mode. */
+select option,
 select.ab-input option {
   background-color: var(--surface-raised);
   color: var(--text-primary);
