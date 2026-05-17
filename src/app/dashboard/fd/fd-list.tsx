@@ -40,15 +40,21 @@ function normalizeBankName(name: string) {
 }
 
 /**
- * Stable filter key for a deposit. Prefers the resolved bankId (post-backfill);
- * falls back to the normalised bankName for rows that haven't been linked yet.
- * Branch is included so multiple branches of the same bank stay separate
- * filter entries (matches the previous behaviour).
+ * Stable filter key for a deposit. Prefers resolved bankId / branchId
+ * (post-backfill); falls back to normalised names for un-linked rows.
+ * Branch is part of the key so HDFC Pune and HDFC Mumbai stay separate
+ * filter entries.
  */
-function bankKey(fd: { bankId?: string | null; bankName: string; branchName: string | null }): string {
-  const branch = (fd.branchName ?? "").trim().toLowerCase();
+function bankKey(fd: {
+  bankId?: string | null;
+  bankName: string;
+  branchId?: string | null;
+  branchName: string | null;
+}): string {
   const bankPart = fd.bankId ?? `name:${normalizeBankName(fd.bankName)}`;
-  return `${bankPart}|${branch}`;
+  const branchPart = fd.branchId
+    ?? (fd.branchName ? `name:${fd.branchName.trim().toLowerCase().replace(/\s+/g, " ")}` : "");
+  return `${bankPart}|${branchPart}`;
 }
 
 type Resolved = ReturnType<typeof resolveCurrent>;

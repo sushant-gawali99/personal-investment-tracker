@@ -27,6 +27,8 @@ export interface FDDetailData {
   /** Set after the backfill. New code should prefer bankId for filters. */
   bankId?: string | null;
   branchName: string | null;
+  /** Set after the branch backfill. */
+  branchId?: string | null;
   fdNumber: string | null;
   accountNumber: string | null;
   principal: number;

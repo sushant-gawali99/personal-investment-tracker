@@ -6,6 +6,7 @@ import { useDropzone } from "react-dropzone";
 import { Upload, Loader2, Sparkles, ChevronDown, X, Camera, RefreshCw, AlertTriangle } from "lucide-react";
 import { DatePicker } from "@/components/ui/date-picker";
 import { BankCombobox } from "@/components/fd/bank-combobox";
+import { BranchCombobox } from "@/components/fd/branch-combobox";
 import { cn } from "@/lib/utils";
 
 function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onClose: () => void }) {
@@ -830,7 +831,13 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           </div>
           <div>
             <label htmlFor="branchName" className="ab-label">Branch Name</label>
-            <input id="branchName" className="ab-input" value={form.branchName} onChange={(e) => set("branchName", e.target.value)} placeholder="Main Branch / मुख्य शाखा" />
+            <BranchCombobox
+              id="branchName"
+              value={form.branchName}
+              onChange={(v) => set("branchName", v)}
+              bankName={form.bankName}
+              placeholder="Main Branch / मुख्य शाखा"
+            />
           </div>
 
           <div>

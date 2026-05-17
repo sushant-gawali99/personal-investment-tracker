@@ -41,6 +41,53 @@ export async function findOrCreateFdBank(
   }
 }
 
+/**
+ * Normalise a branch name for de-dup. Branch names can be much shorter
+ * than bank names ("MG Road", "Main", "Branch 1") so we don't truncate
+ * to two words — we just trim + lower-case + collapse whitespace.
+ */
+export function normalizeBranchName(name: string): string {
+  return name.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/**
+ * Find an FdBranch for this bank by normalized name, or create one if
+ * none matches. Returns null when rawName is empty (branch is optional
+ * on an FD). Race-safe — relies on the @@unique([bankId, normalizedName])
+ * constraint with a re-read fallback on collision.
+ */
+export async function findOrCreateFdBranch(
+  prisma: PrismaClient,
+  userId: string,
+  bankId: string,
+  rawName: string | null | undefined,
+): Promise<{ id: string; name: string; normalizedName: string } | null> {
+  const name = (rawName ?? "").trim();
+  if (!name) return null;
+  const normalizedName = normalizeBranchName(name);
+  if (!normalizedName) return null;
+
+  const existing = await prisma.fdBranch.findUnique({
+    where: { bankId_normalizedName: { bankId, normalizedName } },
+    select: { id: true, name: true, normalizedName: true },
+  });
+  if (existing) return existing;
+
+  try {
+    return await prisma.fdBranch.create({
+      data: { userId, bankId, name, normalizedName },
+      select: { id: true, name: true, normalizedName: true },
+    });
+  } catch {
+    const row = await prisma.fdBranch.findUnique({
+      where: { bankId_normalizedName: { bankId, normalizedName } },
+      select: { id: true, name: true, normalizedName: true },
+    });
+    if (!row) throw new Error("Failed to find-or-create FdBranch");
+    return row;
+  }
+}
+
 export interface BankGroup {
   key: string;
   label: string;
