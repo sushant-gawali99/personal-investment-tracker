@@ -224,8 +224,8 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
         />
         <StatCard
           label="Fixed Deposits"
-          value={hasFD ? formatINR(fd.totalMaturity) : "—"}
-          sub={hasFD ? `${fd.weightedRate.toFixed(2)}% avg rate` : "No FDs added"}
+          value={hasFD ? formatINR(fd.totalPrincipal) : "—"}
+          sub={hasFD ? `→ ${formatINR(fd.totalMaturity)} @ ${fd.weightedRate.toFixed(2)}%` : "No FDs added"}
           Icon={PiggyBank}
         />
         <Link href="/dashboard/equity-mf" className="block hover:brightness-110 transition h-full">
