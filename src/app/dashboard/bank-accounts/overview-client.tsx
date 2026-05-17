@@ -183,11 +183,11 @@ function monthName(year: number, month: number): string {
 }
 
 const NAV_ITEMS = [
-  { href: "/dashboard/bank-accounts/list",         label: "Transactions", icon: <ArrowLeftRight size={12} /> },
-  { href: "/dashboard/bank-accounts/accounts",     label: "Accounts",     icon: <Landmark size={12} /> },
-  { href: "/dashboard/bank-accounts/categories",   label: "Categories",   icon: <Tag size={12} /> },
-  { href: "/dashboard/bank-accounts/imports",      label: "Statements",   icon: <Files size={12} /> },
-  { href: "/dashboard/bank-accounts/export/tally", label: "Tally",        icon: <FileOutput size={12} /> },
+  { href: "/dashboard/bank-accounts/list",         label: "Transactions", icon: <ArrowLeftRight size={14} strokeWidth={2.2} /> },
+  { href: "/dashboard/bank-accounts/accounts",     label: "Accounts",     icon: <Landmark size={14} strokeWidth={2.2} /> },
+  { href: "/dashboard/bank-accounts/categories",   label: "Categories",   icon: <Tag size={14} strokeWidth={2.2} /> },
+  { href: "/dashboard/bank-accounts/imports",      label: "Statements",   icon: <Files size={14} strokeWidth={2.2} /> },
+  { href: "/dashboard/bank-accounts/export/tally", label: "Tally",        icon: <FileOutput size={14} strokeWidth={2.2} /> },
 ];
 
 function Toolbar({
@@ -233,10 +233,10 @@ function Toolbar({
               key={href}
               href={href}
               className={[
-                "flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-[14px] font-semibold whitespace-nowrap transition-all",
                 active
-                  ? "bg-[var(--primary)]/10 text-[var(--primary)] ring-1 ring-inset ring-[var(--primary)]/20"
-                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]",
+                  ? "bg-[var(--primary)]/[0.12] text-[var(--primary)] ring-2 ring-inset ring-[var(--primary)]/[0.35]"
+                  : "text-[var(--text-primary)] hover:bg-[var(--surface-muted)]",
               ].join(" ")}
             >
               {icon}
