@@ -72,6 +72,15 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         alert(body.error ?? `Re-import failed (${res.status})`);
+        return;
+      }
+      // Poll until extraction finishes (status leaves "extracting").
+      while (true) {
+        await new Promise((r) => setTimeout(r, 2000));
+        const poll = await fetch(`/api/bank-accounts/import/${id}`);
+        if (!poll.ok) break;
+        const data = await poll.json();
+        if (data.status !== "extracting") break;
       }
     } finally {
       setReimportingIds((prev) => {
