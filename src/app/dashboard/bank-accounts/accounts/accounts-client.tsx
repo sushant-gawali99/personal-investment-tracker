@@ -90,10 +90,10 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <p className="text-[14px] text-[var(--text-secondary)]">
+          <p className="text-[15px] font-medium text-[var(--text-primary)]">
             {accounts.length} account{accounts.length === 1 ? "" : "s"}
-            {" · "}
-            {accounts.filter((a) => !a.disabled).length} active
+            <span className="text-[var(--text-tertiary)] mx-2">·</span>
+            <span className="text-[var(--accent-success)] font-semibold">{accounts.filter((a) => !a.disabled).length} active</span>
           </p>
         </div>
         <button
@@ -179,13 +179,13 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
             <table className="w-full text-[14px]">
               <thead>
                 <tr className="border-b border-[var(--border)] bg-[var(--surface-muted)] text-left">
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Account</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden sm:table-cell">Type</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden md:table-cell">Number</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] text-right">Balance</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] text-right hidden sm:table-cell">Txns</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden lg:table-cell">Last Txn</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden sm:table-cell">Status</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)]">Account</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] hidden sm:table-cell">Type</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] hidden md:table-cell">Number</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right">Balance</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] text-right hidden sm:table-cell">Txns</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] hidden lg:table-cell">Last Txn</th>
+                  <th className="px-5 py-4 text-[12px] font-bold uppercase tracking-wider text-[var(--text-secondary)] hidden sm:table-cell">Status</th>
                   <th className="px-5 py-4" />
                 </tr>
               </thead>
@@ -207,8 +207,8 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                             <CreditCard size={18} />
                           </span>
                           <div className="min-w-0">
-                            <p className="text-[14px] font-semibold text-[var(--text-primary)] truncate">{a.label}</p>
-                            <p className="text-[12px] text-[var(--text-tertiary)] truncate mt-0.5">{a.bankName}</p>
+                            <p className="text-[15px] font-semibold text-[var(--text-primary)] truncate">{a.label}</p>
+                            <p className="text-[13px] font-medium text-[var(--text-secondary)] truncate mt-0.5">{a.bankName}</p>
                           </div>
                         </div>
                       </td>
@@ -223,11 +223,11 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                       {/* Account number */}
                       <td className="px-5 py-4 hidden md:table-cell">
                         {a.accountNumberLast4 ? (
-                          <span className="mono text-[13px] text-[var(--text-secondary)] tracking-widest">
+                          <span className="mono text-[14px] font-medium text-[var(--text-primary)] tracking-widest">
                             ···· {a.accountNumberLast4}
                           </span>
                         ) : (
-                          <span className="text-[var(--border-strong)]">—</span>
+                          <span className="text-[var(--text-tertiary)]">—</span>
                         )}
                       </td>
 
@@ -235,29 +235,29 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                       <td className="px-5 py-4 text-right">
                         {a.closingBalance != null ? (
                           <div>
-                            <p className={`mono text-[14px] font-semibold ${a.closingBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
+                            <p className={`mono text-[15px] font-bold ${a.closingBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
                               {formatINR(a.closingBalance)}
                             </p>
                             {a.balanceAsOf && (
-                              <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
+                              <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
                                 {formatDate(a.balanceAsOf)}
                               </p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[var(--border-strong)]">—</span>
+                          <span className="text-[var(--text-tertiary)]">—</span>
                         )}
                       </td>
 
                       {/* Txn count */}
                       <td className="px-5 py-4 text-right hidden sm:table-cell">
-                        <span className="mono text-[14px] font-semibold text-[var(--text-primary)]">{a.txnCount}</span>
+                        <span className="mono text-[15px] font-bold text-[var(--text-primary)]">{a.txnCount}</span>
                       </td>
 
                       {/* Last txn */}
                       <td className="px-5 py-4 hidden lg:table-cell">
-                        <span className="text-[13px] text-[var(--text-secondary)]">
-                          {a.lastTxnDate ? formatDate(a.lastTxnDate) : "—"}
+                        <span className="text-[14px] font-medium text-[var(--text-primary)]">
+                          {a.lastTxnDate ? formatDate(a.lastTxnDate) : <span className="text-[var(--text-tertiary)]">—</span>}
                         </span>
                       </td>
 
@@ -277,18 +277,18 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => toggleDisabled(a)}
-                            className="p-2 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
+                            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
                             title={a.disabled ? "Enable" : "Disable"}
                           >
-                            {a.disabled ? <Eye size={15} /> : <EyeOff size={15} />}
+                            {a.disabled ? <Eye size={16} /> : <EyeOff size={16} />}
                           </button>
                           <button
                             onClick={() => remove(a)}
-                            className="p-2 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--accent-error)] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent-error)] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             title={a.txnCount > 0 ? "Can't delete — has transactions" : "Delete"}
                             disabled={a.txnCount > 0}
                           >
-                            <Trash2 size={15} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
