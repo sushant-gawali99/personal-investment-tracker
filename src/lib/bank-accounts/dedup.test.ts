@@ -18,7 +18,7 @@ describe("markDuplicates", () => {
     { id: "e2", bankRef: null,     txnDate: "2026-04-02", amount: 250, normalizedDescription: "DMART",  direction: "debit" },
   ];
 
-  it("flags bankRef match for same direction", () => {
+  it("flags bankRef match for same direction, date and amount", () => {
     const staged = [
       { bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "SWIGGY", direction: "debit" },
       { bankRef: "UPI999", txnDate: "2026-04-03", amount: 500, normalizedDescription: "AMAZON", direction: "debit" },
@@ -35,6 +35,19 @@ describe("markDuplicates", () => {
     ];
     const out = markDuplicates(staged, existing);
     expect(out[0].isDuplicate).toBe(false);
+  });
+
+  it("does not flag bankRef match when same bankRef but different date/amount (SBI loan ref reuse)", () => {
+    const existing2 = [
+      { id: "s1", bankRef: "K580035", txnDate: "2026-04-07", amount: 440000, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const staged = [
+      { bankRef: "K580035", txnDate: "2026-04-20", amount: 500000, normalizedDescription: "WDL TFR FD", direction: "debit" },
+      { bankRef: "K580035", txnDate: "2026-04-07", amount: 440000, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const out = markDuplicates(staged, existing2);
+    expect(out[0].isDuplicate).toBe(false); // different date+amount — genuinely new
+    expect(out[1].isDuplicate).toBe(true);  // exact match — true re-import
   });
 
   it("flags fallback key when bankRef is null", () => {

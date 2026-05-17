@@ -21,13 +21,13 @@ export function markDuplicates<T extends StagedKey>(
   const byRef = new Map<string, string>();
   const byFallback = new Map<string, string>();
   for (const e of existing) {
-    if (e.bankRef) byRef.set(`${e.bankRef}|${e.direction}`, e.id);
+    if (e.bankRef) byRef.set(`${e.bankRef}|${e.direction}|${e.txnDate}|${amountToPaise(e.amount)}`, e.id);
     const fk = `${e.txnDate}|${amountToPaise(e.amount)}|${e.normalizedDescription}|${e.bankRef ?? ""}`;
     byFallback.set(fk, e.id);
   }
   return staged.map((s) => {
     let matchId: string | null = null;
-    const refKey = `${s.bankRef}|${s.direction}`;
+    const refKey = `${s.bankRef}|${s.direction}|${s.txnDate}|${amountToPaise(s.amount)}`;
     if (s.bankRef && byRef.has(refKey)) matchId = byRef.get(refKey)!;
     else {
       const fk = `${s.txnDate}|${amountToPaise(s.amount)}|${s.normalizedDescription}|${s.bankRef ?? ""}`;
