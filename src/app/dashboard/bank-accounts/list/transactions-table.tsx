@@ -548,7 +548,7 @@ export function TransactionsTable({
                         {rowBalance >= 0 ? "" : "-"}{formatINR(Math.abs(rowBalance))}
                       </span>
                     ) : (
-                      <span className="text-[var(--text-tertiary)]" title="Balance is shown only when filtered to a single account">—</span>
+                      <span className="text-[var(--text-tertiary)]" title="No running balance recorded for this transaction">—</span>
                     )}
                   </td>
                 </tr>
