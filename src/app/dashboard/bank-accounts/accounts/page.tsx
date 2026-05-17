@@ -50,8 +50,8 @@ export default async function AccountsPage() {
     <div className="space-y-6">
       <div className="space-y-2">
         <BackLink />
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
-        <p className="text-[14px] text-[#a0a0a5]">Manage accounts linked to imported statements.</p>
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Bank Accounts</h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">Manage accounts linked to imported statements.</p>
       </div>
       <AccountsClient accounts={enriched} />
     </div>

@@ -41,11 +41,11 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
       <div className="ab-card overflow-hidden w-full max-w-lg">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2e]">
-          <p className="text-[16px] font-semibold text-[#ededed] tracking-tight">Take Photo</p>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
+          <p className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Take Photo</p>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#a0a0a5] hover:bg-[#1c1c20] transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
             aria-label="Close"
           >
             <X size={16} />
@@ -53,7 +53,7 @@ function CameraModal({ onCapture, onClose }: { onCapture: (f: File) => void; onC
         </div>
         <div className="p-5 space-y-4">
           {error ? (
-            <p className="ab-card-flat text-[13px] px-3 py-2" style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}>{error}</p>
+            <p className="ab-card-flat text-[13px] px-3 py-2" style={{ background: "var(--chip-error-bg)", color: "var(--accent-error)", borderColor: "var(--chip-error-border)" }}>{error}</p>
           ) : (
             <video ref={videoRef} autoPlay playsInline className="w-full rounded-xl aspect-[4/3] bg-black object-cover" />
           )}
@@ -122,7 +122,7 @@ function ImageDropZone({
     <div className="space-y-2">
       <p className="ab-label">{label}</p>
       {preview ? (
-        <div className="relative rounded-xl border border-[#2a2a2e] overflow-hidden group bg-[#17171a]">
+        <div className="relative rounded-xl border border-[var(--border)] overflow-hidden group bg-[var(--surface-raised)]">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={preview} alt={label} className="w-full h-40 object-cover" />
           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
@@ -141,22 +141,22 @@ function ImageDropZone({
           <div
             {...getRootProps()}
             className={cn(
-              "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[#17171a]",
+              "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[var(--surface-raised)]",
               isDragActive
-                ? "border-[#ff385c] bg-[#2a1218]"
-                : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",
+                ? "border-[var(--primary)] bg-[var(--primary-tint)]"
+                : "border-[var(--border-strong)] hover:border-[var(--primary)] hover:bg-[var(--primary-tint)]",
               disabled && "pointer-events-none opacity-40"
             )}
           >
             <input {...getInputProps()} />
-            <Upload size={18} className="mx-auto mb-2 text-[#a0a0a5]" />
-            <p className="text-[13px] text-[#a0a0a5]">{isDragActive ? "Drop here" : hint}</p>
+            <Upload size={18} className="mx-auto mb-2 text-[var(--text-secondary)]" />
+            <p className="text-[13px] text-[var(--text-secondary)]">{isDragActive ? "Drop here" : hint}</p>
           </div>
           <button
             type="button"
             onClick={() => setShowCamera(true)}
             disabled={disabled}
-            className="ab-btn ab-btn-ghost w-full border border-[#2a2a2e]"
+            className="ab-btn ab-btn-ghost w-full border border-[var(--border)]"
             style={{ fontSize: "13px" }}
           >
             <Camera size={14} /> Use Camera
@@ -191,16 +191,16 @@ function PdfDropZone({
 
   if (file) {
     return (
-      <div className="rounded-xl border border-[#2a2a2e] px-4 py-3 flex items-center justify-between bg-[#17171a]">
-        <div className="flex items-center gap-2 text-[13px] text-[#ededed] truncate">
-          <Upload size={14} className="text-[#a0a0a5] shrink-0" />
+      <div className="rounded-xl border border-[var(--border)] px-4 py-3 flex items-center justify-between bg-[var(--surface-raised)]">
+        <div className="flex items-center gap-2 text-[13px] text-[var(--text-primary)] truncate">
+          <Upload size={14} className="text-[var(--text-secondary)] shrink-0" />
           <span className="truncate">{file.name}</span>
-          <span className="text-[#a0a0a5] shrink-0">({(file.size / 1024).toFixed(0)} KB)</span>
+          <span className="text-[var(--text-secondary)] shrink-0">({(file.size / 1024).toFixed(0)} KB)</span>
         </div>
         <button
           type="button"
           onClick={onClear}
-          className="ml-3 w-7 h-7 rounded-full flex items-center justify-center text-[#a0a0a5] hover:bg-[#2a2a2e] transition-colors shrink-0"
+          className="ml-3 w-7 h-7 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors shrink-0"
           aria-label="Remove PDF"
         >
           <X size={14} />
@@ -213,16 +213,16 @@ function PdfDropZone({
     <div
       {...getRootProps()}
       className={cn(
-        "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[#17171a]",
+        "rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-colors bg-[var(--surface-raised)]",
         isDragActive
-          ? "border-[#ff385c] bg-[#2a1218]"
-          : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",
+          ? "border-[var(--primary)] bg-[var(--primary-tint)]"
+          : "border-[var(--border-strong)] hover:border-[var(--primary)] hover:bg-[var(--primary-tint)]",
         disabled && "pointer-events-none opacity-40"
       )}
     >
       <input {...getInputProps()} />
-      <Upload size={18} className="mx-auto mb-2 text-[#a0a0a5]" />
-      <p className="text-[13px] text-[#a0a0a5]">
+      <Upload size={18} className="mx-auto mb-2 text-[var(--text-secondary)]" />
+      <p className="text-[13px] text-[var(--text-secondary)]">
         {isDragActive ? "Drop PDF here" : "Click or drag — PDF only, max 5 MB"}
       </p>
     </div>
@@ -536,15 +536,15 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
     {pendingOverrideBody && (
       <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4">
         <div
-          className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-[#2a2a2e] overflow-hidden"
-          style={{ background: "#131316" }}
+          className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-[var(--border)] overflow-hidden"
+          style={{ background: "var(--surface-deep)" }}
         >
-          <div className="flex items-center gap-2 px-5 py-4 border-b border-[#2a2a2e]">
-            <AlertTriangle size={16} style={{ color: "#f5a524" }} />
-            <p className="text-[15px] font-semibold text-[#ededed] tracking-tight">FD already exists</p>
+          <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--border)]">
+            <AlertTriangle size={16} style={{ color: "var(--accent-warning)" }} />
+            <p className="text-[15px] font-semibold text-[var(--text-primary)] tracking-tight">FD already exists</p>
           </div>
           <div className="px-5 py-4">
-            <p className="text-[13px] text-[#a0a0a5]">
+            <p className="text-[13px] text-[var(--text-secondary)]">
               A Fixed Deposit with the same details already exists in your account. Do you want to override it with this new data?
             </p>
           </div>
@@ -572,7 +572,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {renewedFrom && (
         <div
           className="ab-card-flat flex items-center gap-2 px-4 py-3 text-[13px]"
-          style={{ background: "#2a1218", color: "#e00b41", borderColor: "#3a1820" }}
+          style={{ background: "var(--primary-tint)", color: "var(--primary-deep)", borderColor: "var(--chip-error-border)" }}
         >
           <RefreshCw size={14} />
           <span>
@@ -594,7 +594,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
               <span className="ab-chip ab-chip-accent shrink-0">
                 <Sparkles size={12} /> AI Extracted
               </span>
-              <span className="text-[13px] text-[#a0a0a5] truncate">
+              <span className="text-[13px] text-[var(--text-secondary)] truncate">
                 from {uploadMode === "pdf" ? (pdfFile?.name ?? "receipt.pdf") : (frontFile?.name ?? "receipt")}
               </span>
             </div>
@@ -610,17 +610,17 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         ) : (
           <>
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2a1218" }}>
-                <Sparkles size={18} className="text-[#ff385c]" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "var(--primary-tint)" }}>
+                <Sparkles size={18} className="text-[var(--primary)]" />
               </div>
               <div>
-                <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Digitize Receipt with AI</p>
-                <p className="text-[13px] text-[#a0a0a5] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
+                <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Digitize Receipt with AI</p>
+                <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">Upload your FD certificate - AI extracts all details automatically.</p>
               </div>
             </div>
 
             {/* Image / PDF mode toggle */}
-            <div className="flex gap-1 p-1 rounded-lg bg-[#17171a] w-fit">
+            <div className="flex gap-1 p-1 rounded-lg bg-[var(--surface-raised)] w-fit">
               {(["image", "pdf"] as const).map((mode) => (
                 <button
                   key={mode}
@@ -637,8 +637,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
                   className={cn(
                     "px-4 py-1.5 rounded-md text-[13px] font-medium transition-colors",
                     uploadMode === mode
-                      ? "bg-[#2a2a2e] text-[#ededed]"
-                      : "text-[#a0a0a5] hover:text-[#ededed]"
+                      ? "bg-[var(--surface-muted)] text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
                   )}
                 >
                   {mode === "image" ? "Image" : "PDF"}
@@ -678,7 +678,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             {extractError && (
               <div
                 className="ab-card-flat px-3 py-2 text-[13px]"
-                style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
+                style={{ background: "var(--chip-error-bg)", color: "var(--accent-error)", borderColor: "var(--chip-error-border)" }}
               >
                 {extractError}
               </div>
@@ -702,7 +702,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             {extracted && (
               <div
                 className="ab-card-flat flex items-center gap-2 px-3 py-2 text-[13px]"
-                style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
+                style={{ background: "var(--chip-success-bg)", color: "var(--accent-success)", borderColor: "var(--chip-success-border)" }}
               >
                 <span className="ab-chip ab-chip-accent">
                   <Sparkles size={12} /> AI Extracted
@@ -714,7 +714,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             {extracted && renewalNumber !== null && renewalNumber > 0 && (
               <div
                 className="ab-card-flat px-3 py-2"
-                style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
+                style={{ background: "var(--chip-warning-bg)", color: "var(--accent-warning)", borderColor: "var(--chip-warning-border)" }}
               >
                 <p className="text-[13px] font-semibold">Renewal #{renewalNumber} detected - fill in previous periods below</p>
               </div>
@@ -736,7 +736,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
             <span className={i === 0 ? "ab-chip ab-chip-info" : "ab-chip ab-chip-accent"}>
               {i === 0 ? "Original FD" : `Renewal #${i}`}
             </span>
-            <p className="text-[13px] text-[#a0a0a5]">Fill in the details for this period</p>
+            <p className="text-[13px] text-[var(--text-secondary)]">Fill in the details for this period</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {(["startDate", "maturityDate"] as (keyof PriorRenewal)[]).map((key) => (
@@ -805,7 +805,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
           {priorRenewals.length > 0 ? (
             <span className="ab-chip ab-chip-accent">Renewal #{priorRenewals.length} (Current)</span>
           ) : null}
-          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">FD Details</p>
+          <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">FD Details</p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -909,8 +909,8 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {/* Renewal & nominee (from back of certificate) */}
       <section id="renewal" ref={(el) => { sectionRefs.current.renewal = el; }} className="ab-card p-4 sm:p-6 space-y-5">
         <div>
-          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal &amp; Nominee</p>
-          <p className="text-[13px] text-[#a0a0a5] mt-0.5">Usually printed on the back of the FD receipt.</p>
+          <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Renewal &amp; Nominee</p>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">Usually printed on the back of the FD receipt.</p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
@@ -950,7 +950,7 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
         ref={(el) => { sectionRefs.current.notes = el; }}
         className="ab-card p-4 sm:p-6 space-y-4"
       >
-        <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Notes</p>
+        <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Notes</p>
         <div>
           <label htmlFor="notes" className="ab-label">Notes</label>
           <textarea
@@ -967,14 +967,14 @@ export function FDNewForm({ renewedFrom, linkToId }: { renewedFrom?: RenewedFrom
       {saveError && (
         <div
           className="ab-card-flat px-3 py-2 text-[13px]"
-          style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
+          style={{ background: "var(--chip-error-bg)", color: "var(--accent-error)", borderColor: "var(--chip-error-border)" }}
         >
           {saveError}
         </div>
       )}
       </div>
 
-      <div className="fixed bottom-0 inset-x-0 z-30 bg-[#0e0e10]/95 backdrop-blur border-t border-[#2a2a2e]">
+      <div className="fixed bottom-0 inset-x-0 z-30 bg-[var(--background)]/95 backdrop-blur border-t border-[var(--border)]">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end gap-3">
           <button
             type="button"

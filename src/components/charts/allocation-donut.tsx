@@ -11,7 +11,7 @@ interface Props {
   centerValue?: string;
 }
 
-const COLORS = ["#ff385c", "#5aa9ff", "#5ee0a4", "#f5a524"];
+const COLORS = ["var(--primary)", "var(--accent-info)", "var(--accent-success)", "var(--accent-warning)"];
 
 function fmt(v: number) {
   return `₹${v.toLocaleString("en-IN", { maximumFractionDigits: 0 })}`;
@@ -26,7 +26,7 @@ export function AllocationDonut({ equityValue, fdValue, mfValue = 0, goldValue =
   ].filter((d) => d.value > 0);
 
   if (data.length === 0) {
-    return <div className="flex items-center justify-center h-full text-[#a0a0a5] text-sm">No data</div>;
+    return <div className="flex items-center justify-center h-full text-[var(--text-secondary)] text-sm">No data</div>;
   }
 
   return (
@@ -43,7 +43,7 @@ export function AllocationDonut({ equityValue, fdValue, mfValue = 0, goldValue =
             isAnimationActive={false}
           >
             {data.map((_, i) => (
-              <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="#17171a" strokeWidth={3} />
+              <Cell key={i} fill={COLORS[i % COLORS.length]} stroke="var(--surface-raised)" strokeWidth={3} />
             ))}
           </Pie>
           <Tooltip formatter={(value) => [fmt(Number(value)), ""]} />
@@ -51,8 +51,8 @@ export function AllocationDonut({ equityValue, fdValue, mfValue = 0, goldValue =
       </ResponsiveContainer>
       {(centerLabel || centerValue) && (
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-          {centerLabel && <p className="text-[10px] text-[#a0a0a5] uppercase tracking-widest font-semibold">{centerLabel}</p>}
-          {centerValue && <p className="mono text-[15px] font-bold text-[#ededed] mt-0.5">{centerValue}</p>}
+          {centerLabel && <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-widest font-semibold">{centerLabel}</p>}
+          {centerValue && <p className="mono text-[15px] font-bold text-[var(--text-primary)] mt-0.5">{centerValue}</p>}
         </div>
       )}
     </div>

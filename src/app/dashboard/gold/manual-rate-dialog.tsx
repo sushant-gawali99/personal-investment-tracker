@@ -57,16 +57,16 @@ export function ManualRateDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
       <div className="ab-card w-full max-w-[420px] p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between">
-          <h2 className="text-[18px] font-semibold text-[#ededed]">Set today's gold rate</h2>
+          <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Set today's gold rate</h2>
           <button onClick={onClose} className="ab-btn ab-btn-ghost"><X size={16} /></button>
         </div>
-        <label className="block text-[12px] text-[#a0a0a5]">22K ₹ per gram
+        <label className="block text-[12px] text-[var(--text-secondary)]">22K ₹ per gram
           <input type="number" step="0.01" min="0" className="ab-input mt-1 w-full" value={r22} onChange={(e) => setR22(e.target.value)} />
         </label>
-        <label className="block text-[12px] text-[#a0a0a5]">24K ₹ per gram
+        <label className="block text-[12px] text-[var(--text-secondary)]">24K ₹ per gram
           <input type="number" step="0.01" min="0" className="ab-input mt-1 w-full" value={r24} onChange={(e) => setR24(e.target.value)} />
         </label>
-        {error && <p className="text-[12px] text-[#ff6b7a]">{error}</p>}
+        {error && <p className="text-[12px] text-[var(--accent-error)]">{error}</p>}
         <div className="flex justify-between gap-2 pt-2">
           <button className="ab-btn ab-btn-ghost" onClick={clear} disabled={busy}>Clear override</button>
           <div className="flex gap-2">

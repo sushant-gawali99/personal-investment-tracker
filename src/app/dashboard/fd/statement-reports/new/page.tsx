@@ -8,13 +8,13 @@ export default function NewStatementReportPage() {
       <div>
         <Link
           href="/dashboard/fd/statement-reports"
-          className="inline-flex items-center gap-1.5 text-[13px] text-[#b0b0b8] hover:text-[#dcdce4] transition-colors mb-2"
+          className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-tertiary)] transition-colors mb-2"
         >
           <ArrowLeft size={12} />
           Past FD Interest
         </Link>
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">New Past FD Interest Report</h1>
-        <p className="text-[14px] text-[#dcdce4] mt-1">
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">New Past FD Interest Report</h1>
+        <p className="text-[14px] text-[var(--text-tertiary)] mt-1">
           Upload a bank passbook or savings account PDF to extract FD interest history.
         </p>
       </div>

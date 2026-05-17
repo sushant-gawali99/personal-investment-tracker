@@ -28,7 +28,7 @@ interface CustomDotProps {
 
 function MilestoneDot({ cx, cy, payload }: CustomDotProps) {
   if (!payload?.isMilestone) return null;
-  return <circle cx={cx} cy={cy} r={4} fill="#ff385c" stroke="#17171a" strokeWidth={2} />;
+  return <circle cx={cx} cy={cy} r={4} fill="var(--primary)" stroke="var(--surface-raised)" strokeWidth={2} />;
 }
 
 export function WealthProjectionChart({
@@ -46,8 +46,8 @@ export function WealthProjectionChart({
       <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
         {milestoneData.map((d) => (
           <div key={d.year} className="ab-card-flat p-2.5 text-center">
-            <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{d.year}</p>
-            <p className="mono text-xs font-bold text-[#ededed] mt-1">{formatINRCompact(d.value)}</p>
+            <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold">{d.year}</p>
+            <p className="mono text-xs font-bold text-[var(--text-primary)] mt-1">{formatINRCompact(d.value)}</p>
           </div>
         ))}
       </div>
@@ -56,29 +56,29 @@ export function WealthProjectionChart({
         <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
           <defs>
             <linearGradient id="wealthGrad" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor="#ff385c" stopOpacity={0.18} />
-              <stop offset="95%" stopColor="#ff385c" stopOpacity={0} />
+              <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.18} />
+              <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
-          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} />
-          <YAxis tickFormatter={(v) => formatINRCompact(v)} tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} width={56} />
+          <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+          <XAxis dataKey="year" tick={{ fontSize: 11, fill: "var(--text-secondary)" }} tickLine={false} axisLine={false} />
+          <YAxis tickFormatter={(v) => formatINRCompact(v)} tick={{ fontSize: 11, fill: "var(--text-secondary)" }} tickLine={false} axisLine={false} width={56} />
           <Tooltip formatter={(value) => [formatINRCompact(Number(value)), "Projected Wealth"]} />
-          <ReferenceLine x="Now" stroke="#3a3a3f" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#a0a0a5", position: "top" }} />
+          <ReferenceLine x="Now" stroke="var(--border-strong)" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "var(--text-secondary)", position: "top" }} />
           <Area
             type="monotone"
             dataKey="value"
-            stroke="#ff385c"
+            stroke="var(--primary)"
             strokeWidth={2}
             fill="url(#wealthGrad)"
             dot={<MilestoneDot />}
-            activeDot={{ r: 5, fill: "#ff385c" }}
+            activeDot={{ r: 5, fill: "var(--primary)" }}
             animationDuration={700}
           />
         </AreaChart>
       </ResponsiveContainer>
 
-      <p className="text-[11px] text-[#6e6e73] text-center">
+      <p className="text-[11px] text-[var(--text-tertiary)] text-center">
         Assumes {cagr.toFixed(2)}% CAGR maintained — actual returns may vary
       </p>
     </div>

@@ -45,19 +45,19 @@ export function BulkDropZone({
     <div
       {...getRootProps()}
       className={cn(
-        "rounded-xl border-2 border-dashed p-5 sm:p-8 text-center cursor-pointer transition-colors bg-[#17171a]",
+        "rounded-xl border-2 border-dashed p-5 sm:p-8 text-center cursor-pointer transition-colors bg-[var(--surface-raised)]",
         isDragActive
-          ? "border-[#ff385c] bg-[#2a1218]"
-          : "border-[#3a3a3f] hover:border-[#ff385c] hover:bg-[#2a1218]",
+          ? "border-[var(--primary)] bg-[var(--primary-tint)]"
+          : "border-[var(--border-strong)] hover:border-[var(--primary)] hover:bg-[var(--primary-tint)]",
         disabled && "pointer-events-none opacity-40",
       )}
     >
       <input {...getInputProps()} />
-      <Upload size={24} className="mx-auto mb-2 text-[#a0a0a5]" />
-      <p className="text-[14px] text-[#ededed]">
+      <Upload size={24} className="mx-auto mb-2 text-[var(--text-secondary)]" />
+      <p className="text-[14px] text-[var(--text-primary)]">
         {isDragActive ? "Drop here" : "Drop files or a .zip here, or click to browse"}
       </p>
-      <p className="text-[12px] text-[#a0a0a5] mt-1">
+      <p className="text-[12px] text-[var(--text-secondary)] mt-1">
         PDF, JPEG, PNG, WebP — up to {remaining} more file{remaining === 1 ? "" : "s"}, 5 MB each.
       </p>
     </div>

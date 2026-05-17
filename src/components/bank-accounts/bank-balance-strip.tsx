@@ -10,15 +10,15 @@ export interface BankBalance {
 
 function bankAccent(bankName: string): { fg: string; color: string } {
   const key = (bankName ?? "").toLowerCase();
-  if (key.includes("hdfc"))   return { fg: "#5aa9ff", color: "#5aa9ff" };
-  if (key.includes("axis"))   return { fg: "#ff7a8a", color: "#ff7a8a" };
+  if (key.includes("hdfc"))   return { fg: "var(--accent-info)", color: "var(--accent-info)" };
+  if (key.includes("axis"))   return { fg: "var(--accent-error)", color: "var(--accent-error)" };
   if (key.includes("icici"))  return { fg: "#ff8074", color: "#ff8074" };
   if (key.includes("sbi") || key.includes("state bank")) return { fg: "#7ab8ff", color: "#7ab8ff" };
   if (key.includes("kotak"))  return { fg: "#ff8090", color: "#ff8090" };
   if (key.includes("idfc"))   return { fg: "#ff7a90", color: "#ff7a90" };
   if (key.includes("tbsb") || key.includes("thane") || key.includes("bharat") || key.includes("lokmanya"))
-    return { fg: "#5ee0a4", color: "#5ee0a4" };
-  return { fg: "#ff385c", color: "#ff385c" };
+    return { fg: "var(--accent-success)", color: "var(--accent-success)" };
+  return { fg: "var(--primary)", color: "var(--primary)" };
 }
 
 export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
@@ -38,17 +38,17 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
             key={b.id}
             className="rounded-2xl overflow-hidden transition-all duration-200 hover:scale-[1.015]"
             style={{
-              background: "#0f0f11",
-              border: `1px solid ${accent.color}35`,
-              boxShadow: `0 0 20px ${accent.color}0a`,
+              background: "var(--background)",
+              border: `1px solid color-mix(in srgb, ${accent.color} 22%, transparent)`,
+              boxShadow: `0 0 20px color-mix(in srgb, ${accent.color} 4%, transparent)`,
             }}
           >
             {/* Header zone — colored wash */}
             <div
               className="px-4 pt-4 pb-3"
               style={{
-                background: `linear-gradient(135deg, ${accent.color}20 0%, ${accent.color}08 100%)`,
-                borderBottom: `1px solid ${accent.color}18`,
+                background: `linear-gradient(135deg, color-mix(in srgb, ${accent.color} 13%, transparent) 0%, color-mix(in srgb, ${accent.color} 3%, transparent) 100%)`,
+                borderBottom: `1px solid color-mix(in srgb, ${accent.color} 9%, transparent)`,
               }}
             >
               <div className="flex items-center gap-1.5 mb-1.5">
@@ -63,19 +63,19 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
             <div className="px-4 py-4">
               {hasBalance ? (
                 <>
-                  <p className={`mono text-[24px] font-bold leading-none tracking-tight ${b.closingBalance! >= 0 ? "text-[#f0f0f2]" : "text-[#ff7a6e]"}`}>
+                  <p className={`mono text-[24px] font-bold leading-none tracking-tight ${b.closingBalance! >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
                     {formatINR(b.closingBalance!)}
                   </p>
                   {b.asOf && (
-                    <p className="text-[11px] mt-2.5 uppercase tracking-[0.1em] font-bold" style={{ color: `${accent.color}60` }}>
+                    <p className="text-[11px] mt-2.5 uppercase tracking-[0.1em] font-bold" style={{ color: `color-mix(in srgb, ${accent.color} 38%, transparent)` }}>
                       {formatDate(b.asOf)}
                     </p>
                   )}
                 </>
               ) : (
                 <>
-                  <p className="mono text-[24px] font-bold leading-none text-[#222226]">₹ —,—,—</p>
-                  <p className="text-[11px] mt-2.5 font-semibold" style={{ color: `${accent.color}70` }}>
+                  <p className="mono text-[24px] font-bold leading-none text-[var(--surface-subtle)]">₹ —,—,—</p>
+                  <p className="text-[11px] mt-2.5 font-semibold" style={{ color: `color-mix(in srgb, ${accent.color} 44%, transparent)` }}>
                     Import statement →
                   </p>
                 </>
@@ -90,7 +90,7 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
         <div
           className="rounded-2xl overflow-hidden transition-all duration-200 hover:scale-[1.015]"
           style={{
-            background: "#0f0f11",
+            background: "var(--background)",
             border: "1px solid rgba(94,224,164,0.3)",
             boxShadow: "0 0 20px rgba(94,224,164,0.05)",
           }}
@@ -103,17 +103,17 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
             }}
           >
             <div className="flex items-center gap-1.5 mb-1.5">
-              <div className="w-[6px] h-[6px] rounded-full bg-[#5ee0a4] shrink-0" />
-              <p className="text-[12px] font-black uppercase tracking-[0.14em] leading-none text-[#5ee0a4]">
+              <div className="w-[6px] h-[6px] rounded-full bg-[var(--accent-success)] shrink-0" />
+              <p className="text-[12px] font-black uppercase tracking-[0.14em] leading-none text-[var(--accent-success)]">
                 Net Total
               </p>
             </div>
-            <p className="text-[12px] text-[#505055] font-medium">
+            <p className="text-[12px] text-[var(--text-secondary)] font-medium">
               {allKnown ? "All accounts" : `${knownBalances.length} / ${balances.length}`}
             </p>
           </div>
           <div className="px-4 py-4">
-            <p className={`mono text-[24px] font-bold leading-none tracking-tight ${netTotal >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+            <p className={`mono text-[24px] font-bold leading-none tracking-tight ${netTotal >= 0 ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}`}>
               {netTotal >= 0 ? "+" : ""}{formatINR(netTotal)}
             </p>
             {!allKnown && (

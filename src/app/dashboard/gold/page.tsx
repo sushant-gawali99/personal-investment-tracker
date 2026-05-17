@@ -25,8 +25,8 @@ export default async function GoldPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Gold</h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">Track jewellery and see live IBJA gold valuation.</p>
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Gold</h1>
+        <p className="text-[14px] text-[var(--text-secondary)] mt-1">Track jewellery and see live IBJA gold valuation.</p>
       </div>
 
       <RateChip initial={rate as GoldRatePayload | null} />

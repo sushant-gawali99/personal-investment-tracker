@@ -3,7 +3,7 @@
 import { PieChart as PieIcon, TrendingDown } from "lucide-react";
 import { formatINR, formatINRCompact } from "@/lib/format";
 
-const CAT_COLORS = ["#ff385c", "#5aa9ff", "#5ee0a4", "#f5a524", "#a78bfa", "#ff8aa0", "#22d3ee", "#facc15"];
+const CAT_COLORS = ["var(--primary)", "var(--accent-info)", "var(--accent-success)", "var(--accent-warning)", "#a78bfa", "#ff8aa0", "#22d3ee", "#facc15"];
 
 interface Item {
   categoryId: string | null;
@@ -36,18 +36,18 @@ export function CategoryBreakdownChart({
     >
       <div className="flex items-start justify-between mb-5 shrink-0">
         <div>
-          <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Spending by Category</h3>
-          <p className="text-[12px] text-[#a0a0a5] mt-0.5">
+          <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Spending by Category</h3>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
             {data.length} categor{data.length === 1 ? "y" : "ies"} · {formatINRCompact(grandTotal)} total
           </p>
         </div>
         <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgba(255,56,92,0.12)]">
-          <PieIcon size={15} className="text-[#ff385c]" />
+          <PieIcon size={15} className="text-[var(--primary)]" />
         </span>
       </div>
 
       {sorted.length === 0 ? (
-        <div className="flex-1 flex flex-col items-center justify-center py-10 text-[#6e6e73]">
+        <div className="flex-1 flex flex-col items-center justify-center py-10 text-[var(--text-tertiary)]">
           <TrendingDown size={28} className="mb-2 opacity-40" />
           <p className="text-[13px]">No spending this period</p>
         </div>
@@ -66,17 +66,17 @@ export function CategoryBreakdownChart({
                 >
                   <div className="flex items-center gap-3 mb-1.5">
                     <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: color }} />
-                    <span className="flex-1 text-[13px] font-semibold text-[#ededed] truncate group-hover:text-[#ff385c] transition-colors">
+                    <span className="flex-1 text-[13px] font-semibold text-[var(--text-primary)] truncate group-hover:text-[var(--primary)] transition-colors">
                       {item.name}
                     </span>
-                    <span className="mono text-[13px] font-semibold text-[#ededed]">
+                    <span className="mono text-[13px] font-semibold text-[var(--text-primary)]">
                       {formatINR(item.total)}
                     </span>
-                    <span className="mono text-[11px] text-[#a0a0a5] w-[42px] text-right">
+                    <span className="mono text-[11px] text-[var(--text-secondary)] w-[42px] text-right">
                       {sharePct.toFixed(1)}%
                     </span>
                   </div>
-                  <div className="h-[6px] rounded-full bg-[#1c1c20] overflow-hidden ml-5">
+                  <div className="h-[6px] rounded-full bg-[var(--surface-muted)] overflow-hidden ml-5">
                     <div
                       className="h-full rounded-full transition-all duration-500 ease-out group-hover:brightness-125"
                       style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${color} 0%, ${color}99 100%)` }}

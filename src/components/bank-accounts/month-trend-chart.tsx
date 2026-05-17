@@ -26,20 +26,20 @@ export function MonthTrendChart({ data, onMonthClick }: {
     <div className="ab-card p-6">
       <div className="flex items-start justify-between mb-4">
         <div>
-          <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Month-over-Month</h3>
-          <p className="text-[12px] text-[#a0a0a5] mt-0.5">Click a bar to jump to that month</p>
+          <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Month-over-Month</h3>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">Click a bar to jump to that month</p>
         </div>
         <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgba(90,169,255,0.12)]">
-          <BarChart3 size={15} className="text-[#5aa9ff]" />
+          <BarChart3 size={15} className="text-[var(--accent-info)]" />
         </span>
       </div>
-      <div className="flex items-center gap-4 text-[11px] text-[#a0a0a5] mb-3 font-medium">
+      <div className="flex items-center gap-4 text-[11px] text-[var(--text-secondary)] mb-3 font-medium">
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#5ee0a4" }} />
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "var(--accent-success)" }} />
           Income
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "#ff7a6e" }} />
+          <span className="w-2.5 h-2.5 rounded-sm" style={{ background: "var(--accent-error)" }} />
           Spending
         </span>
       </div>
@@ -48,25 +48,25 @@ export function MonthTrendChart({ data, onMonthClick }: {
           <BarChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="mtrend-spend" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ff7a6e" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#ff7a6e" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="var(--accent-error)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="var(--accent-error)" stopOpacity={0.5} />
               </linearGradient>
               <linearGradient id="mtrend-income" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#5ee0a4" stopOpacity={0.9} />
-                <stop offset="100%" stopColor="#5ee0a4" stopOpacity={0.5} />
+                <stop offset="0%" stopColor="var(--accent-success)" stopOpacity={0.9} />
+                <stop offset="100%" stopColor="var(--accent-success)" stopOpacity={0.5} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="month"
               tickFormatter={formatMonthLabel}
-              tick={{ fontSize: 11, fill: "#a0a0a5" }}
+              tick={{ fontSize: 11, fill: "var(--text-secondary)" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               tickFormatter={(v) => formatINRCompact(Number(v))}
-              tick={{ fontSize: 11, fill: "#a0a0a5" }}
+              tick={{ fontSize: 11, fill: "var(--text-secondary)" }}
               tickLine={false}
               axisLine={false}
               width={52}
@@ -76,8 +76,8 @@ export function MonthTrendChart({ data, onMonthClick }: {
               content={(
                 <ChartTooltip
                   series={[
-                    { dataKey: "income", label: "Income", color: "#5ee0a4" },
-                    { dataKey: "spending", label: "Spending", color: "#ff7a6e" },
+                    { dataKey: "income", label: "Income", color: "var(--accent-success)" },
+                    { dataKey: "spending", label: "Spending", color: "var(--accent-error)" },
                   ]}
                   title={(l) => formatMonthLabel(String(l ?? ""))}
                 />

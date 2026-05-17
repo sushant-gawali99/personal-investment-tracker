@@ -37,7 +37,7 @@ function StatusPill({ status, error }: { status: RowStatus; error?: string }) {
       <span
         className="ab-chip"
         title="Already exists — confirm override"
-        style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
+        style={{ background: "var(--chip-warning-bg)", color: "var(--accent-warning)", borderColor: "var(--chip-warning-border)" }}
       >
         <AlertTriangle size={12} /> Already exists
       </span>
@@ -47,7 +47,7 @@ function StatusPill({ status, error }: { status: RowStatus; error?: string }) {
     <span
       className="ab-chip"
       title={error ?? status}
-      style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
+      style={{ background: "var(--chip-error-bg)", color: "var(--accent-error)", borderColor: "var(--chip-error-border)" }}
     >
       <X size={12} /> {status === "extract_failed" ? "Extract failed" : "Save failed"}
     </span>
@@ -85,7 +85,7 @@ export function BulkRowTable({
       <div className="overflow-x-auto">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#2a2a2e] text-left text-[12px] text-[#a0a0a5] uppercase tracking-wider">
+            <tr className="border-b border-[var(--border)] text-left text-[12px] text-[var(--text-secondary)] uppercase tracking-wider">
               <th className="px-3 py-2 w-[40px]"></th>
               <th className="px-3 py-2 w-[40px]"></th>
               <th className="px-3 py-2">Status</th>
@@ -113,15 +113,15 @@ export function BulkRowTable({
                 <Fragment key={row.id}>
                   <tr
                     className={cn(
-                      "border-b border-[#2a2a2e] hover:bg-[#17171a]/50",
-                      row.isDuplicate && "bg-[#2a1f0d]/30",
+                      "border-b border-[var(--border)] hover:bg-[var(--surface-raised)]/50",
+                      row.isDuplicate && "bg-[var(--chip-warning-bg)]/30",
                     )}
                   >
                     <td className="px-3 py-2">
                       <button
                         type="button"
                         onClick={() => toggleExpand(row.id)}
-                        className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#2a2a2e]"
+                        className="w-6 h-6 flex items-center justify-center rounded hover:bg-[var(--surface-muted)]"
                         aria-label={isExpanded ? "Collapse" : "Expand"}
                         disabled={!canEdit}
                       >
@@ -144,32 +144,32 @@ export function BulkRowTable({
                           <span
                             className="ab-chip"
                             title="An FD with this bank + FD number already exists"
-                            style={{ background: "#2a1f0d", color: "#f5a524", borderColor: "#3a2d0f" }}
+                            style={{ background: "var(--chip-warning-bg)", color: "var(--accent-warning)", borderColor: "var(--chip-warning-border)" }}
                           >
                             <AlertTriangle size={12} /> Duplicate
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-2 text-[#a0a0a5] max-w-[120px] sm:max-w-[180px]">
+                    <td className="px-3 py-2 text-[var(--text-secondary)] max-w-[120px] sm:max-w-[180px]">
                       <div className="flex items-center gap-1.5 truncate">
                         {row.kind === "pdf" ? <FileText size={12} /> : <ImageIcon size={12} />}
                         <span className="truncate" title={row.file.name}>{row.file.name}</span>
                       </div>
                     </td>
                     <td className="px-3 py-2">{f.bankName ?? ""}</td>
-                    <td className="px-3 py-2 text-[#a0a0a5]">{f.fdNumber ?? "—"}</td>
+                    <td className="px-3 py-2 text-[var(--text-secondary)]">{f.fdNumber ?? "—"}</td>
                     <td className="px-3 py-2 text-right mono">{f.principal ?? ""}</td>
                     <td className="px-3 py-2 text-right mono">{f.interestRate ?? ""}</td>
-                    <td className="px-3 py-2 mono text-[#a0a0a5]">{f.startDate ?? ""}</td>
-                    <td className="px-3 py-2 mono text-[#a0a0a5]">{f.maturityDate ?? ""}</td>
+                    <td className="px-3 py-2 mono text-[var(--text-secondary)]">{f.startDate ?? ""}</td>
+                    <td className="px-3 py-2 mono text-[var(--text-secondary)]">{f.maturityDate ?? ""}</td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1 justify-end">
                         {row.status === "extract_failed" && (
                           <button
                             type="button"
                             onClick={() => onRetryExtract(row.id)}
-                            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#2a2a2e] text-[#a0a0a5]"
+                            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--surface-muted)] text-[var(--text-secondary)]"
                             title="Retry extraction"
                           >
                             <RefreshCw size={13} />
@@ -179,7 +179,7 @@ export function BulkRowTable({
                           <button
                             type="button"
                             onClick={() => onRetrySave(row.id)}
-                            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#2a2a2e] text-[#a0a0a5]"
+                            className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--surface-muted)] text-[var(--text-secondary)]"
                             title="Retry save"
                           >
                             <RefreshCw size={13} />
@@ -188,7 +188,7 @@ export function BulkRowTable({
                         <button
                           type="button"
                           onClick={() => onRemove(row.id)}
-                          className="w-7 h-7 flex items-center justify-center rounded hover:bg-[#2a2a2e] text-[#a0a0a5]"
+                          className="w-7 h-7 flex items-center justify-center rounded hover:bg-[var(--surface-muted)] text-[var(--text-secondary)]"
                           title="Remove"
                         >
                           <Trash2 size={13} />
@@ -197,7 +197,7 @@ export function BulkRowTable({
                     </td>
                   </tr>
                   {isExpanded && canEdit && (
-                    <tr className="border-b border-[#2a2a2e] bg-[#0e0e10]">
+                    <tr className="border-b border-[var(--border)] bg-[var(--background)]">
                       <td colSpan={11} className="px-3 sm:px-6 py-2 sm:py-4">
                         <BulkRowEditor
                           row={row}

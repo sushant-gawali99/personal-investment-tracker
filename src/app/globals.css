@@ -39,7 +39,7 @@
 }
 
 :root {
-  /* ── Dark Airbnb-inspired palette ── */
+  /* ── Dark Airbnb-inspired palette (default) ── */
   --background: #0e0e11;
   --foreground: #ededed;
 
@@ -94,6 +94,123 @@
   --shadow-card: 0 0 0 1px rgba(255,255,255,0.04), 0 2px 6px rgba(0,0,0,0.5), 0 4px 12px rgba(0,0,0,0.4);
   --shadow-hover: 0 0 0 1px rgba(255,255,255,0.08), 0 6px 20px rgba(0,0,0,0.55);
   --shadow-focus-ring: 0 0 0 2px #ededed;
+
+  /* Chip / alert tinted backgrounds */
+  --chip-success-bg: #0f2a19;
+  --chip-error-bg: #2a1613;
+  --chip-warning-bg: #2a1f0d;
+  --chip-info-bg: #0f1a2d;
+  --chip-success-border: #1a3d2e;
+  --chip-error-border: #3a1a16;
+  --chip-warning-border: #3a2d0f;
+  --chip-info-border: #173152;
+
+  /* CAGR / P&L tinted backgrounds */
+  --gain-bg: #091a10;
+  --gain-border: #1c3d24;
+  --loss-bg: #1a0909;
+  --loss-border: #3d1c1c;
+
+  /* Subtle surface — slightly deeper than --background */
+  --surface-deep: #0a0a0d;
+
+  /* Statement report status */
+  --status-matured: #4ade80;
+  --status-matured-bg: #0f2a1a;
+  --status-matured-border: #1a4a2e;
+  --status-premature: #fb923c;
+  --status-premature-bg: #2a1a0a;
+  --status-premature-border: #4a2e0f;
+  --status-ongoing: #818cf8;
+  --status-ongoing-bg: #1a1a2a;
+  --status-ongoing-border: #2e2e4a;
+}
+
+/* ── Bright / Light theme ── */
+[data-theme="light"] {
+  --background: #f5f5f7;
+  --foreground: #111113;
+
+  --surface-page: #f5f5f7;
+  --surface-raised: #ffffff;
+  --surface-muted: #ebebee;
+  --surface-subtle: #e0e0e4;
+
+  --card: #ffffff;
+  --card-foreground: #111113;
+  --popover: #ffffff;
+  --popover-foreground: #111113;
+
+  --primary: #ff385c;
+  --primary-foreground: #ffffff;
+  --primary-deep: #d90b3a;
+  --primary-tint: #fff0f2;
+
+  --secondary: #111113;
+  --secondary-foreground: #ffffff;
+
+  --text-primary: #111113;
+  --text-secondary: #505055;
+  --text-tertiary: #8a8a90;
+  --text-disabled: rgba(0, 0, 0, 0.24);
+
+  --accent-success: #1a7a4a;
+  --accent-error: #c22d1f;
+  --accent-warning: #9a6200;
+  --accent-info: #1a5fa0;
+
+  --muted: #ebebee;
+  --muted-foreground: #505055;
+  --accent: #e8e8eb;
+  --accent-foreground: #111113;
+  --destructive: #c22d1f;
+  --border: #dcdce0;
+  --border-strong: #c5c5ca;
+  --input: #ffffff;
+  --ring: #111113;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #111113;
+  --sidebar-primary: #ff385c;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #ebebee;
+  --sidebar-accent-foreground: #111113;
+  --sidebar-border: #dcdce0;
+  --sidebar-ring: #111113;
+
+  --shadow-card: 0 0 0 1px rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.06);
+  --shadow-hover: 0 0 0 1px rgba(0,0,0,0.08), 0 6px 20px rgba(0,0,0,0.12);
+  --shadow-focus-ring: 0 0 0 2px #111113;
+
+  /* Chip / alert tinted backgrounds */
+  --chip-success-bg: #e8faf3;
+  --chip-error-bg: #fff0ee;
+  --chip-warning-bg: #fff8e8;
+  --chip-info-bg: #eef5ff;
+  --chip-success-border: #a3d9bc;
+  --chip-error-border: #f4b5ad;
+  --chip-warning-border: #f0d08a;
+  --chip-info-border: #93c5fd;
+
+  /* CAGR / P&L tinted backgrounds */
+  --gain-bg: #e8faf3;
+  --gain-border: #a3d9bc;
+  --loss-bg: #fff0ee;
+  --loss-border: #f4b5ad;
+
+  /* Subtle surface */
+  --surface-deep: #ebebee;
+
+  /* Statement report status */
+  --status-matured: #15803d;
+  --status-matured-bg: #dcfce7;
+  --status-matured-border: #86efac;
+  --status-premature: #c2410c;
+  --status-premature-bg: #fff7ed;
+  --status-premature-border: #fed7aa;
+  --status-ongoing: #4338ca;
+  --status-ongoing-bg: #eef2ff;
+  --status-ongoing-border: #c7d2fe;
 }
 
 @layer base {
@@ -119,32 +236,32 @@
 
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: #3a3a3f; border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #4a4a4f; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
 }
 
-/* ── Airbnb-inspired utilities (dark) ── */
+/* ── Airbnb-inspired utilities (theme-aware) ── */
 .ab-card {
-  background: #17171a;
-  border: 1px solid #2a2a2e;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 16px;
   box-shadow: var(--shadow-card);
   transition: box-shadow 160ms ease, transform 160ms ease, border-color 160ms ease;
 }
 .ab-card-interactive:hover {
   box-shadow: var(--shadow-hover);
-  border-color: #3a3a3f;
+  border-color: var(--border-strong);
   transform: translateY(-1px);
 }
 
 .ab-card-flat {
-  background: #17171a;
-  border: 1px solid #2a2a2e;
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
   border-radius: 16px;
 }
 
 .ab-divider {
-  border-color: #2a2a2e;
+  border-color: var(--border);
 }
 
 .ab-btn {
@@ -171,18 +288,17 @@
 .ab-btn:disabled { opacity: 0.45; cursor: not-allowed; }
 .ab-btn:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px #0e0e11, 0 0 0 4px rgba(255,56,92,0.55);
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px rgba(255,56,92,0.55);
 }
 .ab-btn:active:not(:disabled) { transform: translateY(1px); }
 
 .ab-btn-primary {
-  background: #ededed;
-  color: #0e0e11;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.08) inset, 0 1px 2px rgba(0,0,0,0.35);
+  background: var(--foreground);
+  color: var(--background);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.2);
 }
 .ab-btn-primary:hover:not(:disabled) {
-  background: #ffffff;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.12) inset, 0 4px 12px rgba(0,0,0,0.45);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
   transform: translateY(-1px);
 }
 
@@ -204,34 +320,34 @@
 }
 
 .ab-btn-secondary {
-  background: #17171a;
-  color: #ededed;
-  border: 1px solid #3a3a3f;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset;
+  background: var(--surface-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--border-strong);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
 }
 .ab-btn-secondary:hover:not(:disabled) {
-  background: #1c1c20;
-  border-color: #4a4a4f;
-  box-shadow: 0 1px 0 rgba(255,255,255,0.03) inset, 0 2px 8px rgba(0,0,0,0.35);
+  background: var(--surface-muted);
+  border-color: var(--text-tertiary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .ab-btn-ghost {
   background: transparent;
-  color: #a0a0a5;
+  color: var(--text-secondary);
 }
 .ab-btn-ghost:hover:not(:disabled) {
-  background: #1c1c20;
-  color: #ededed;
+  background: var(--surface-muted);
+  color: var(--text-primary);
 }
 
 .ab-btn-danger {
   background: transparent;
-  color: #ff7a6e;
-  border: 1px solid rgba(255,122,110,0.3);
+  color: var(--accent-error);
+  border: 1px solid color-mix(in srgb, var(--accent-error) 30%, transparent);
 }
 .ab-btn-danger:hover:not(:disabled) {
-  background: rgba(255,122,110,0.08);
-  border-color: rgba(255,122,110,0.5);
+  background: color-mix(in srgb, var(--accent-error) 8%, transparent);
+  border-color: color-mix(in srgb, var(--accent-error) 50%, transparent);
 }
 
 .ab-input {
@@ -239,19 +355,19 @@
   /* IMPORTANT: use background-color (longhand) not `background` shorthand.
      Shorthand resets background-image/repeat/position — which would wipe
      the custom chevron painted on <select> elements below. */
-  background-color: #17171a;
-  color: #ededed;
-  border: 1px solid #2a2a2e;
+  background-color: var(--surface-raised);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
   border-radius: 10px;
   padding: 11px 14px;
   font-size: 14px;
   transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
-.ab-input::placeholder { color: #6e6e73; }
-.ab-input:hover:not(:focus):not(:disabled) { border-color: #3a3a3f; }
+.ab-input::placeholder { color: var(--text-tertiary); }
+.ab-input:hover:not(:focus):not(:disabled) { border-color: var(--border-strong); }
 .ab-input:focus {
   outline: none;
-  background-color: #1a1a1e;
+  background-color: var(--surface-muted);
   border-color: #ff385c;
   box-shadow: 0 0 0 3px rgba(255,56,92,0.18);
 }
@@ -285,8 +401,8 @@ select.ab-input:focus {
   background-position: right 12px center;
 }
 select.ab-input option {
-  background-color: #17171a;
-  color: #ededed;
+  background-color: var(--surface-raised);
+  color: var(--text-primary);
   padding: 8px;
 }
 
@@ -294,7 +410,7 @@ select.ab-input option {
   display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #ededed;
+  color: var(--text-primary);
   margin-bottom: 6px;
   letter-spacing: 0;
 }
@@ -308,14 +424,23 @@ select.ab-input option {
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
-  background: #222226;
-  color: #ededed;
+  background: var(--surface-subtle);
+  color: var(--text-primary);
 }
-.ab-chip-accent { background: #2a1218; color: #ff8aa0; }
+
+/* Dark chip variants */
+.ab-chip-accent  { background: #2a1218; color: #ff8aa0; }
 .ab-chip-success { background: #0f2a19; color: #5ee0a4; }
 .ab-chip-warning { background: #2a1f0d; color: #f5a524; }
 .ab-chip-error   { background: #2a1613; color: #ff7a6e; }
 .ab-chip-info    { background: #0f1a2d; color: #5aa9ff; }
+
+/* Light chip variants */
+[data-theme="light"] .ab-chip-accent  { background: #fff0f2; color: #cc1e3f; }
+[data-theme="light"] .ab-chip-success { background: #e8faf3; color: #1a7a4a; }
+[data-theme="light"] .ab-chip-warning { background: #fff8e8; color: #9a6200; }
+[data-theme="light"] .ab-chip-error   { background: #fff0ee; color: #c22d1f; }
+[data-theme="light"] .ab-chip-info    { background: #eef5ff; color: #1a5fa0; }
 
 .mono {
   font-family: var(--font-mono), "SF Mono", Menlo, Consolas, monospace;
@@ -324,26 +449,26 @@ select.ab-input option {
 
 /* Recharts tooltip */
 .recharts-tooltip-wrapper .recharts-default-tooltip {
-  background: #17171a !important;
-  border: 1px solid #2a2a2e !important;
-  color: #ededed !important;
+  background: var(--surface-raised) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text-primary) !important;
   border-radius: 12px !important;
   box-shadow: var(--shadow-card) !important;
   padding: 10px 12px !important;
 }
 
-/* React day picker overrides (dark theme) */
+/* React day picker overrides */
 .rdp-root { --rdp-accent-color: #ff385c; }
 
-/* Subtle dark scrollbar used on scrollable card interiors. */
+/* Subtle scrollbar used on scrollable card interiors. */
 .ab-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #3a3a3f transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 .ab-scroll::-webkit-scrollbar { width: 6px; }
 .ab-scroll::-webkit-scrollbar-track { background: transparent; }
 .ab-scroll::-webkit-scrollbar-thumb {
-  background: #2a2a2e;
+  background: var(--border);
   border-radius: 3px;
 }
-.ab-scroll::-webkit-scrollbar-thumb:hover { background: #3a3a3f; }
+.ab-scroll::-webkit-scrollbar-thumb:hover { background: var(--border-strong); }

@@ -18,8 +18,8 @@ export default async function ListPage() {
     <div className="space-y-6">
       <div className="space-y-2">
         <BackLink />
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Transactions</h1>
-        <p className="text-[14px] text-[#a0a0a5]">All imported transactions across your accounts.</p>
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Transactions</h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">All imported transactions across your accounts.</p>
       </div>
       <TransactionsTable
         accounts={accounts.map((a) => ({ id: a.id, label: a.label }))}

@@ -31,14 +31,14 @@ interface Account {
 /** Stable accent color per bank name. */
 function bankAccent(bankName: string): { bg: string; fg: string; border: string } {
   const key = (bankName ?? "").toLowerCase();
-  if (key.includes("hdfc")) return { bg: "rgba(0,79,159,0.15)", fg: "#5aa9ff", border: "rgba(0,79,159,0.35)" };
-  if (key.includes("axis")) return { bg: "rgba(174,35,61,0.15)", fg: "#ff7a8a", border: "rgba(174,35,61,0.35)" };
+  if (key.includes("hdfc")) return { bg: "rgba(0,79,159,0.15)", fg: "var(--accent-info)", border: "rgba(0,79,159,0.35)" };
+  if (key.includes("axis")) return { bg: "rgba(174,35,61,0.15)", fg: "var(--accent-error)", border: "rgba(174,35,61,0.35)" };
   if (key.includes("icici")) return { bg: "rgba(175,27,45,0.15)", fg: "#ff8074", border: "rgba(175,27,45,0.35)" };
   if (key.includes("sbi") || key.includes("state bank")) return { bg: "rgba(30,77,163,0.15)", fg: "#7ab8ff", border: "rgba(30,77,163,0.35)" };
   if (key.includes("kotak")) return { bg: "rgba(208,29,47,0.15)", fg: "#ff8090", border: "rgba(208,29,47,0.35)" };
   if (key.includes("idfc")) return { bg: "rgba(234,60,83,0.15)", fg: "#ff7a90", border: "rgba(234,60,83,0.35)" };
   // Default: accent primary
-  return { bg: "rgba(255,56,92,0.12)", fg: "#ff385c", border: "rgba(255,56,92,0.25)" };
+  return { bg: "rgba(255,56,92,0.12)", fg: "var(--primary)", border: "rgba(255,56,92,0.25)" };
 }
 
 function typeBadgeClass(t: string): string {
@@ -90,7 +90,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <p className="text-[14px] text-[#a0a0a5]">
+          <p className="text-[14px] text-[var(--text-secondary)]">
             {accounts.length} account{accounts.length === 1 ? "" : "s"}
             {" · "}
             {accounts.filter((a) => !a.disabled).length} active
@@ -106,7 +106,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
 
       {showForm && (
         <form onSubmit={add} className="ab-card p-5 space-y-4">
-          <h3 className="text-[15px] font-semibold text-[#ededed]">New account</h3>
+          <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">New account</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div>
               <label className="ab-label">Label</label>
@@ -154,7 +154,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
             </button>
           </div>
           {error && (
-            <div className="flex items-start gap-2 text-[13px] text-[#ff7a6e]">
+            <div className="flex items-start gap-2 text-[13px] text-[var(--accent-error)]">
               <XCircle size={14} className="shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
@@ -164,11 +164,11 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
 
       {accounts.length === 0 ? (
         <div className="ab-card p-10 text-center">
-          <div className="w-14 h-14 rounded-full bg-[#2a1218] flex items-center justify-center mx-auto mb-4">
-            <Building2 size={22} className="text-[#ff385c]" />
+          <div className="w-14 h-14 rounded-full bg-[var(--primary-tint)] flex items-center justify-center mx-auto mb-4">
+            <Building2 size={22} className="text-[var(--primary)]" />
           </div>
-          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">No accounts yet</p>
-          <p className="text-[13px] text-[#a0a0a5] mt-1 mb-4">Add a bank account to start importing statements.</p>
+          <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">No accounts yet</p>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-1 mb-4">Add a bank account to start importing statements.</p>
           <button onClick={() => setShowForm(true)} className="ab-btn ab-btn-accent inline-flex">
             <Plus size={14} /> Add First Account
           </button>
@@ -178,14 +178,14 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
           <div className="overflow-x-auto">
             <table className="w-full text-[14px]">
               <thead>
-                <tr className="border-b border-[#2a2a2e] bg-[#1c1c20] text-left">
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73]">Account</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden sm:table-cell">Type</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden md:table-cell">Number</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] text-right">Balance</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] text-right hidden sm:table-cell">Txns</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden lg:table-cell">Last Txn</th>
-                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[#6e6e73] hidden sm:table-cell">Status</th>
+                <tr className="border-b border-[var(--border)] bg-[var(--surface-muted)] text-left">
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)]">Account</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden sm:table-cell">Type</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden md:table-cell">Number</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] text-right">Balance</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] text-right hidden sm:table-cell">Txns</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden lg:table-cell">Last Txn</th>
+                  <th className="px-5 py-4 text-[11px] font-semibold uppercase tracking-wider text-[var(--text-tertiary)] hidden sm:table-cell">Status</th>
                   <th className="px-5 py-4" />
                 </tr>
               </thead>
@@ -195,7 +195,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                   return (
                     <tr
                       key={a.id}
-                      className={`border-t border-[#2a2a2e] hover:bg-[#1c1c20]/60 transition-colors group ${a.disabled ? "opacity-50" : ""}`}
+                      className={`border-t border-[var(--border)] hover:bg-[var(--surface-muted)]/60 transition-colors group ${a.disabled ? "opacity-50" : ""}`}
                     >
                       {/* Account name + bank */}
                       <td className="px-5 py-4">
@@ -207,8 +207,8 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                             <CreditCard size={18} />
                           </span>
                           <div className="min-w-0">
-                            <p className="text-[14px] font-semibold text-[#ededed] truncate">{a.label}</p>
-                            <p className="text-[12px] text-[#6e6e73] truncate mt-0.5">{a.bankName}</p>
+                            <p className="text-[14px] font-semibold text-[var(--text-primary)] truncate">{a.label}</p>
+                            <p className="text-[12px] text-[var(--text-tertiary)] truncate mt-0.5">{a.bankName}</p>
                           </div>
                         </div>
                       </td>
@@ -223,11 +223,11 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                       {/* Account number */}
                       <td className="px-5 py-4 hidden md:table-cell">
                         {a.accountNumberLast4 ? (
-                          <span className="mono text-[13px] text-[#a0a0a5] tracking-widest">
+                          <span className="mono text-[13px] text-[var(--text-secondary)] tracking-widest">
                             ···· {a.accountNumberLast4}
                           </span>
                         ) : (
-                          <span className="text-[#3a3a3e]">—</span>
+                          <span className="text-[var(--border-strong)]">—</span>
                         )}
                       </td>
 
@@ -235,28 +235,28 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                       <td className="px-5 py-4 text-right">
                         {a.closingBalance != null ? (
                           <div>
-                            <p className={`mono text-[14px] font-semibold ${a.closingBalance >= 0 ? "text-[#ededed]" : "text-[#ff7a6e]"}`}>
+                            <p className={`mono text-[14px] font-semibold ${a.closingBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
                               {formatINR(a.closingBalance)}
                             </p>
                             {a.balanceAsOf && (
-                              <p className="text-[11px] text-[#6e6e73] mt-0.5">
+                              <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5">
                                 {formatDate(a.balanceAsOf)}
                               </p>
                             )}
                           </div>
                         ) : (
-                          <span className="text-[#3a3a3e]">—</span>
+                          <span className="text-[var(--border-strong)]">—</span>
                         )}
                       </td>
 
                       {/* Txn count */}
                       <td className="px-5 py-4 text-right hidden sm:table-cell">
-                        <span className="mono text-[14px] font-semibold text-[#ededed]">{a.txnCount}</span>
+                        <span className="mono text-[14px] font-semibold text-[var(--text-primary)]">{a.txnCount}</span>
                       </td>
 
                       {/* Last txn */}
                       <td className="px-5 py-4 hidden lg:table-cell">
-                        <span className="text-[13px] text-[#a0a0a5]">
+                        <span className="text-[13px] text-[var(--text-secondary)]">
                           {a.lastTxnDate ? formatDate(a.lastTxnDate) : "—"}
                         </span>
                       </td>
@@ -265,7 +265,7 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                       <td className="px-5 py-4 hidden sm:table-cell">
                         <span
                           className={`ab-chip ${a.disabled ? "" : "ab-chip-success"}`}
-                          style={a.disabled ? { background: "#222226", color: "#a0a0a5" } : undefined}
+                          style={a.disabled ? { background: "var(--surface-subtle)", color: "var(--text-secondary)" } : undefined}
                         >
                           {a.disabled ? <AlertTriangle size={11} /> : <CheckCircle2 size={11} />}
                           {a.disabled ? "Disabled" : "Active"}
@@ -277,14 +277,14 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => toggleDisabled(a)}
-                            className="p-2 rounded-lg text-[#6e6e73] hover:text-[#ededed] hover:bg-[#2a2a2e] transition-colors"
+                            className="p-2 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
                             title={a.disabled ? "Enable" : "Disable"}
                           >
                             {a.disabled ? <Eye size={15} /> : <EyeOff size={15} />}
                           </button>
                           <button
                             onClick={() => remove(a)}
-                            className="p-2 rounded-lg text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-2 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--accent-error)] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             title={a.txnCount > 0 ? "Can't delete — has transactions" : "Delete"}
                             disabled={a.txnCount > 0}
                           >

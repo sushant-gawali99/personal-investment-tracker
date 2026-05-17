@@ -383,7 +383,7 @@ export function BulkUploadForm() {
       {counts.saved > 0 && !inFlight && (
         <div
           className="ab-card-flat flex items-center justify-between flex-wrap gap-3 px-4 py-3"
-          style={{ background: "#0f2a19", color: "#5ee0a4", borderColor: "#1a3a24" }}
+          style={{ background: "var(--chip-success-bg)", color: "var(--accent-success)", borderColor: "var(--chip-success-border)" }}
         >
           <div className="flex items-center gap-2 text-[13px]">
             <CheckCircle2 size={16} />
@@ -391,10 +391,10 @@ export function BulkUploadForm() {
               {counts.saved} saved
             </span>
             {counts.failedSave > 0 && (
-              <span className="text-[#ff7a6e]">· {counts.failedSave} failed to save</span>
+              <span className="text-[var(--accent-error)]">· {counts.failedSave} failed to save</span>
             )}
             {counts.failedExtract > 0 && (
-              <span className="text-[#ff7a6e]">· {counts.failedExtract} failed to extract</span>
+              <span className="text-[var(--accent-error)]">· {counts.failedExtract} failed to extract</span>
             )}
           </div>
           <div className="flex items-center gap-2">
@@ -416,7 +416,7 @@ export function BulkUploadForm() {
       {state.rows.length > 0 && (
         <>
           <div className="flex items-center justify-between flex-wrap gap-3">
-            <p className="text-[13px] text-[#a0a0a5]">
+            <p className="text-[13px] text-[var(--text-secondary)]">
               Files ({counts.total} / {MAX_FILES})
               {counts.saved > 0 && <> · {counts.saved} saved</>}
               {counts.failedSave > 0 && <> · {counts.failedSave} failed to save</>}
@@ -457,7 +457,7 @@ export function BulkUploadForm() {
       )}
 
       {state.rows.length > 0 && (
-        <div className="fixed bottom-0 inset-x-0 z-30 bg-[#0e0e10]/95 backdrop-blur border-t border-[#2a2a2e]">
+        <div className="fixed bottom-0 inset-x-0 z-30 bg-[var(--background)]/95 backdrop-blur border-t border-[var(--border)]">
           <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end gap-3">
             <button
               type="button"

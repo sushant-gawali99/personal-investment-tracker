@@ -30,7 +30,7 @@ export function FDDisableButton({ id, disabled }: { id: string; disabled: boolea
   const Icon = disabled ? RotateCcw : Archive;
   const styleProps = disabled
     ? undefined
-    : { color: "#f5a524", borderColor: "rgba(245, 165, 36, 0.3)" };
+    : { color: "var(--accent-warning)", borderColor: "rgba(245, 165, 36, 0.3)" };
 
   return (
     <button

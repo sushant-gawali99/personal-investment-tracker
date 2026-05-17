@@ -30,8 +30,8 @@ export default async function ImportsPage() {
       <div className="flex items-start justify-between gap-4 flex-wrap">
         <div className="space-y-2">
           <BackLink />
-          <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Imports</h1>
-          <p className="text-[14px] text-[#a0a0a5]">
+          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Imports</h1>
+          <p className="text-[14px] text-[var(--text-secondary)]">
             {total > 0
               ? <>{coverage}% of {total} transactions auto-categorized by merchant rules</>
               : "No transactions imported yet"}

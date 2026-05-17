@@ -218,14 +218,14 @@ export function TransactionsTable({
     <div className="space-y-4">
       {/* Filter bar */}
       <div
-        className="rounded-2xl border border-[#252528]"
-        style={{ background: "#0f0f11" }}
+        className="rounded-2xl border border-[var(--border)]"
+        style={{ background: "var(--background)" }}
       >
         {/* Search — borderless command-bar style */}
-        <div className="flex items-center gap-3 px-5 py-4 border-b border-[#1e1e21]">
-          <Search size={15} className="text-[#606065] shrink-0 pointer-events-none" />
+        <div className="flex items-center gap-3 px-5 py-4 border-b border-[var(--border)]">
+          <Search size={15} className="text-[var(--text-tertiary)] shrink-0 pointer-events-none" />
           <input
-            className="flex-1 bg-transparent text-[14px] font-medium text-[#ededed] placeholder:text-[#505055] outline-none min-w-0"
+            className="flex-1 bg-transparent text-[14px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none min-w-0"
             placeholder="Search transactions by description…"
             value={searchInput}
             onChange={(e) => {
@@ -237,7 +237,7 @@ export function TransactionsTable({
           {searchInput && (
             <button
               onClick={() => { setSearchInput(""); updateFilter("q", ""); }}
-              className="p-1 rounded-full hover:bg-[#1e1e22] text-[#505055] hover:text-[#c0c0c5] transition-colors shrink-0"
+              className="p-1 rounded-full hover:bg-[var(--surface-muted)] text-[var(--text-secondary)] hover:text-[var(--text-secondary)] transition-colors shrink-0"
               aria-label="Clear search"
             >
               <X size={13} />
@@ -249,16 +249,16 @@ export function TransactionsTable({
         <div className="px-4 py-3 overflow-x-auto">
           <div className="flex items-center gap-2 min-w-max">
             {/* Date range pills */}
-            <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-[#111113] border border-[#232325] shrink-0">
-              <Calendar size={12} className="ml-2 mr-0.5 text-[#606065] shrink-0" />
+            <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] shrink-0">
+              <Calendar size={12} className="ml-2 mr-0.5 text-[var(--text-tertiary)] shrink-0" />
               {RANGE_PRESETS.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => applyRangePreset(p)}
                   className={
                     activePreset === p.id
-                      ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[#ff385c] border border-[rgba(255,56,92,0.25)] transition-all"
-                      : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#808088] hover:text-[#d0d0d5] hover:bg-[#1e1e22] transition-all"
+                      ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[var(--primary)] border border-[rgba(255,56,92,0.25)] transition-all"
+                      : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
                   }
                 >
                   {p.label}
@@ -268,8 +268,8 @@ export function TransactionsTable({
                 onClick={toggleCustomRange}
                 className={
                   activePreset === "custom" || showCustomRange
-                    ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[#ff385c] border border-[rgba(255,56,92,0.25)] transition-all"
-                    : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[#808088] hover:text-[#d0d0d5] hover:bg-[#1e1e22] transition-all"
+                    ? "px-3 py-1.5 rounded-full text-[12px] font-bold bg-[rgba(255,56,92,0.15)] text-[var(--primary)] border border-[rgba(255,56,92,0.25)] transition-all"
+                    : "px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-all"
                 }
               >
                 Custom
@@ -277,7 +277,7 @@ export function TransactionsTable({
             </div>
 
             {/* Divider */}
-            <div className="w-px h-5 bg-[#252528] shrink-0" />
+            <div className="w-px h-5 bg-[var(--border)] shrink-0" />
 
             {/* Facet pills */}
             <FacetSelect
@@ -308,14 +308,14 @@ export function TransactionsTable({
 
         {/* Custom date pickers */}
         {(showCustomRange || activePreset === "custom") && (
-          <div className="px-5 pb-4 border-t border-[#1e1e21] pt-3">
+          <div className="px-5 pb-4 border-t border-[var(--border)] pt-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-w-full sm:max-w-md">
               <div>
-                <label className="text-[10px] text-[#707075] uppercase tracking-wider font-bold block mb-1">From</label>
+                <label className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">From</label>
                 <DatePicker value={from} onChange={(v) => updateFilter("from", v)} placeholder="Start date" />
               </div>
               <div>
-                <label className="text-[10px] text-[#707075] uppercase tracking-wider font-bold block mb-1">To</label>
+                <label className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider font-bold block mb-1">To</label>
                 <DatePicker value={to} onChange={(v) => updateFilter("to", v)} placeholder="End date" />
               </div>
             </div>
@@ -324,7 +324,7 @@ export function TransactionsTable({
 
         {/* Active filter chips + totals */}
         {hasActiveFilters && (
-          <div className="px-5 pb-4 border-t border-[#1e1e21] pt-3 space-y-3">
+          <div className="px-5 pb-4 border-t border-[var(--border)] pt-3 space-y-3">
             <div className="flex items-center gap-1.5 flex-wrap">
               {from && <ActiveChip label={`From ${formatDate(from)}`} onRemove={() => updateFilter("from", "")} />}
               {to && <ActiveChip label={`To ${formatDate(to)}`} onRemove={() => updateFilter("to", "")} />}
@@ -352,41 +352,41 @@ export function TransactionsTable({
               {q && <ActiveChip label={`"${q}"`} icon="search" onRemove={() => updateFilter("q", "")} />}
               <button
                 onClick={clearAllFilters}
-                className="ml-1 text-[12px] text-[#707075] hover:text-[#b0b0b5] flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-[#1a1a1e] transition-colors"
+                className="ml-1 text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] flex items-center gap-1 px-2.5 py-1 rounded-full hover:bg-[var(--surface-muted)] transition-colors"
               >
                 <X size={11} /> Clear all
               </button>
             </div>
 
             {!loading && total > 0 && (
-              <div className="flex items-center gap-x-5 gap-y-1.5 flex-wrap text-[12px] bg-[#111113] border border-[#1e1e21] rounded-xl px-4 py-2.5">
-                <span className="text-[#808088]">
-                  <span className="text-[#d0d0d5] font-bold">{total}</span> transaction{total === 1 ? "" : "s"}
+              <div className="flex items-center gap-x-5 gap-y-1.5 flex-wrap text-[12px] bg-[var(--surface-deep)] border border-[var(--border)] rounded-xl px-4 py-2.5">
+                <span className="text-[var(--text-tertiary)]">
+                  <span className="text-[var(--text-primary)] font-bold">{total}</span> transaction{total === 1 ? "" : "s"}
                 </span>
                 {totalDebit > 0 && (
                   <span className="flex items-center gap-1">
-                    <ArrowUpRight size={11} className="text-[#ff7a6e]" />
-                    <span className="text-[#ff7a6e] font-bold mono">{formatINR(totalDebit)}</span>
-                    <span className="text-[#707075]">spent</span>
+                    <ArrowUpRight size={11} className="text-[var(--accent-error)]" />
+                    <span className="text-[var(--accent-error)] font-bold mono">{formatINR(totalDebit)}</span>
+                    <span className="text-[var(--text-tertiary)]">spent</span>
                   </span>
                 )}
                 {totalCredit > 0 && (
                   <span className="flex items-center gap-1">
-                    <ArrowDownLeft size={11} className="text-[#5ee0a4]" />
-                    <span className="text-[#5ee0a4] font-bold mono">{formatINR(totalCredit)}</span>
-                    <span className="text-[#707075]">received</span>
+                    <ArrowDownLeft size={11} className="text-[var(--accent-success)]" />
+                    <span className="text-[var(--accent-success)] font-bold mono">{formatINR(totalCredit)}</span>
+                    <span className="text-[var(--text-tertiary)]">received</span>
                   </span>
                 )}
                 {totalDebit > 0 && totalCredit > 0 && (
-                  <span className="text-[#707075]">
+                  <span className="text-[var(--text-tertiary)]">
                     net{" "}
-                    <span className={`font-bold mono ${totalCredit >= totalDebit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+                    <span className={`font-bold mono ${totalCredit >= totalDebit ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}`}>
                       {totalCredit >= totalDebit ? "+" : "-"}{formatINR(Math.abs(totalCredit - totalDebit))}
                     </span>
                   </span>
                 )}
                 {transferCount > 0 && (
-                  <span className="text-[#707075]" title="Transfers between your own accounts don't count as income or spending.">
+                  <span className="text-[var(--text-tertiary)]" title="Transfers between your own accounts don't count as income or spending.">
                     · excl. {transferCount} transfer{transferCount === 1 ? "" : "s"}
                   </span>
                 )}
@@ -400,8 +400,8 @@ export function TransactionsTable({
       <div className="ab-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
-            <thead className="bg-[#1c1c20] sticky top-0 z-10">
-              <tr className="text-left text-[#a0a0a5] border-b border-[#2a2a2e]">
+            <thead className="bg-[var(--surface-muted)] sticky top-0 z-10">
+              <tr className="text-left text-[var(--text-secondary)] border-b border-[var(--border)]">
                 <th className="px-3 py-2.5 font-semibold uppercase tracking-wider text-[10px]">
                   <SortHeader
                     label="Date"
@@ -428,12 +428,12 @@ export function TransactionsTable({
             </thead>
             <tbody>
               {loading && rows.length === 0 ? (
-                <tr><td colSpan={5} className="p-10 text-center text-[#a0a0a5]">Loading…</td></tr>
+                <tr><td colSpan={5} className="p-10 text-center text-[var(--text-secondary)]">Loading…</td></tr>
               ) : rows.length === 0 ? (
                 <tr><td colSpan={5} className="p-10 text-center">
-                  <p className="text-[14px] font-semibold text-[#ededed]">No transactions match your filters</p>
+                  <p className="text-[14px] font-semibold text-[var(--text-primary)]">No transactions match your filters</p>
                   {hasActiveFilters && (
-                    <button onClick={clearAllFilters} className="text-[12px] text-[#ff385c] mt-2 underline">Clear filters</button>
+                    <button onClick={clearAllFilters} className="text-[12px] text-[var(--primary)] mt-2 underline">Clear filters</button>
                   )}
                 </td></tr>
               ) : rows.map((r) => {
@@ -445,31 +445,31 @@ export function TransactionsTable({
                 const isEditingCategory = editingCategoryId === r.id;
                 const catName = r.category?.name ?? null;
                 return (
-                <tr key={r.id} className="border-t border-[#2a2a2e] hover:bg-[#1c1c20]/60 transition-colors group">
-                  <td className="px-3 py-2.5 mono text-[12px] text-[#a0a0a5] whitespace-nowrap align-middle">
+                <tr key={r.id} className="border-t border-[var(--border)] hover:bg-[var(--surface-muted)]/60 transition-colors group">
+                  <td className="px-3 py-2.5 mono text-[12px] text-[var(--text-secondary)] whitespace-nowrap align-middle">
                     {formatDate(r.txnDate)}
                   </td>
                   <td className="px-3 py-2.5 max-w-[160px] sm:max-w-[280px] md:max-w-[380px] align-middle" title={r.description}>
                     <div className="flex items-center gap-2 flex-wrap">
                       {pretty.transferDir && (
-                        <span className="text-[10px] font-semibold uppercase tracking-wide text-[#6e6e73]">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
                           {pretty.transferDir === "to" ? "To" : "From"}
                         </span>
                       )}
-                      <span className="text-[#ededed] font-medium truncate">{displayLabel}</span>
+                      <span className="text-[var(--text-primary)] font-medium truncate">{displayLabel}</span>
                       {pretty.method && (
                         <span className={`ab-chip ${methodChipClass(pretty.method)}`} style={{ fontSize: 10, padding: "1px 7px", lineHeight: 1.5 }}>
                           {pretty.method}
                         </span>
                       )}
                       {pretty.counterBank && !r.prettyDescription && (
-                        <span className="text-[11px] text-[#6e6e73]">· {pretty.counterBank}</span>
+                        <span className="text-[11px] text-[var(--text-tertiary)]">· {pretty.counterBank}</span>
                       )}
                       {r.fd && (
                         <Link
                           href={`/dashboard/fd/${r.fd.id}`}
                           onClick={(e) => e.stopPropagation()}
-                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-[#2a1218] text-[#ff385c] border-[#3a1a22] hover:bg-[#3a1a22] transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-[var(--primary-tint)] text-[var(--primary)] border-[var(--chip-error-border)] hover:bg-[var(--chip-error-border)] transition-colors"
                           title={`Linked to FD at ${r.fd.bankName}`}
                         >
                           <Link2 size={10} />
@@ -479,7 +479,7 @@ export function TransactionsTable({
                       )}
                     </div>
                   </td>
-                  <td className="px-3 py-2.5 text-[12px] text-[#a0a0a5] whitespace-nowrap align-middle hidden sm:table-cell">
+                  <td className="px-3 py-2.5 text-[12px] text-[var(--text-secondary)] whitespace-nowrap align-middle hidden sm:table-cell">
                     {r.account.label}
                   </td>
                   <td className="px-3 py-2.5 align-middle hidden md:table-cell">
@@ -502,24 +502,24 @@ export function TransactionsTable({
                       <button
                         type="button"
                         onClick={() => setEditingCategoryId(r.id)}
-                        className="inline-flex items-center gap-1.5 text-[12px] text-left px-2 py-1 rounded-md hover:bg-[#1c1c20] transition-colors"
+                        className="inline-flex items-center gap-1.5 text-[12px] text-left px-2 py-1 rounded-md hover:bg-[var(--surface-muted)] transition-colors"
                         title="Click to change category"
                       >
                         {catName ? (
-                          <span className="text-[#ededed]">{catName}</span>
+                          <span className="text-[var(--text-primary)]">{catName}</span>
                         ) : (
-                          <span className="text-[#6e6e73] italic">Uncategorized</span>
+                          <span className="text-[var(--text-tertiary)] italic">Uncategorized</span>
                         )}
                         <Pencil
                           size={11}
-                          className="text-[#6e6e73] opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="text-[var(--text-tertiary)] opacity-0 group-hover:opacity-100 transition-opacity"
                         />
                       </button>
                     )}
                   </td>
                   <td className="px-3 py-2.5 text-right whitespace-nowrap align-middle">
                     <div
-                      className={`inline-flex items-center gap-1 mono font-semibold ${isCredit ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}
+                      className={`inline-flex items-center gap-1 mono font-semibold ${isCredit ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}`}
                     >
                       {isCredit ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
                       {isCredit ? "+" : "-"}{formatINR(r.amount)}
@@ -534,10 +534,10 @@ export function TransactionsTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between text-[12px] text-[#a0a0a5]">
+      <div className="flex items-center justify-between text-[12px] text-[var(--text-secondary)]">
         <span>
           {total > 0 ? (
-            <>Showing <span className="text-[#ededed] font-semibold">{showingFrom}–{showingTo}</span> of <span className="text-[#ededed] font-semibold">{total}</span></>
+            <>Showing <span className="text-[var(--text-primary)] font-semibold">{showingFrom}–{showingTo}</span> of <span className="text-[var(--text-primary)] font-semibold">{total}</span></>
           ) : (
             "0 results"
           )}
@@ -550,7 +550,7 @@ export function TransactionsTable({
           >
             <ChevronLeft size={14} /> Prev
           </button>
-          <span className="px-3 text-[#ededed] font-semibold">Page {page}</span>
+          <span className="px-3 text-[var(--text-primary)] font-semibold">Page {page}</span>
           <button
             className="ab-btn ab-btn-ghost px-3 py-2.5 min-h-[40px]"
             disabled={page * pageSize >= total}
@@ -594,8 +594,8 @@ function FacetSelect({
       <div
         className={
           active
-            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-[rgba(255,56,92,0.14)] text-[#ff385c] border border-[rgba(255,56,92,0.3)] transition-colors"
-            : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium text-[#a0a0a5] bg-[#1c1c20] border border-[#2a2a2e] hover:text-[#ededed] hover:border-[#3a3a3f] transition-colors"
+            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold bg-[rgba(255,56,92,0.14)] text-[var(--primary)] border border-[rgba(255,56,92,0.3)] transition-colors"
+            : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-medium text-[var(--text-secondary)] bg-[var(--surface-muted)] border border-[var(--border)] hover:text-[var(--text-primary)] hover:border-[var(--border-strong)] transition-colors"
         }
       >
         {icon}
@@ -634,9 +634,9 @@ function ActiveChip({
   // Colour by semantic meaning: debit = red, credit = green, rest = accent
   const isDebit = icon === "debit";
   const isCredit = icon === "credit";
-  const bg   = isDebit  ? "bg-[rgba(255,122,110,0.12)] border-[rgba(255,122,110,0.3)] text-[#ff7a6e]"
-             : isCredit ? "bg-[rgba(94,224,164,0.12)] border-[rgba(94,224,164,0.3)] text-[#5ee0a4]"
-             :            "bg-[rgba(255,56,92,0.1)] border-[rgba(255,56,92,0.25)] text-[#ff6b85]";
+  const bg   = isDebit  ? "bg-[rgba(255,122,110,0.12)] border-[rgba(255,122,110,0.3)] text-[var(--accent-error)]"
+             : isCredit ? "bg-[rgba(94,224,164,0.12)] border-[rgba(94,224,164,0.3)] text-[var(--accent-success)]"
+             :            "bg-[rgba(255,56,92,0.1)] border-[rgba(255,56,92,0.25)] text-[var(--accent-error)]";
   const hover = isDebit  ? "hover:bg-[rgba(255,122,110,0.22)]"
               : isCredit ? "hover:bg-[rgba(94,224,164,0.22)]"
               :            "hover:bg-[rgba(255,56,92,0.2)]";
@@ -679,8 +679,8 @@ function SortHeader({
       type="button"
       onClick={() => onToggle(field)}
       className={
-        "inline-flex items-center gap-1 hover:text-[#ededed] transition-colors " +
-        (isActive ? "text-[#ededed]" : "text-[#a0a0a5]") +
+        "inline-flex items-center gap-1 hover:text-[var(--text-primary)] transition-colors " +
+        (isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]") +
         (align === "right" ? " ml-auto" : "")
       }
       title={`Sort by ${label}`}

@@ -83,17 +83,17 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
 
   return (
     <div className="space-y-5">
-      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-[13px] text-[#a0a0a5] hover:text-[#ededed] transition-colors font-medium">
+      <Link href="/dashboard/fd" className="inline-flex items-center gap-1.5 text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors font-medium">
         <ArrowLeft size={13} /> Back to Fixed Deposits
       </Link>
 
       {isMatured && (
-        <div className="ab-card-flat bg-[#2a1f0d] border-[#3a2d0f] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
+        <div className="ab-card-flat bg-[var(--chip-warning-bg)] border-[var(--chip-warning-border)] px-5 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={20} className="text-[#f5a524] shrink-0" />
+            <CheckCircle2 size={20} className="text-[var(--accent-warning)] shrink-0" />
             <div>
-              <p className="text-[14px] text-[#f5a524] font-semibold">This FD has matured</p>
-              <p className="text-[12px] text-[#a0a0a5] mt-0.5">
+              <p className="text-[14px] text-[var(--accent-warning)] font-semibold">This FD has matured</p>
+              <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
                 Matured on {formatDate(activeMaturity)} · {Math.floor((now.getTime() - activeMaturity.getTime()) / 86400000)} days ago · {formatINR(maturityValue)} available
               </p>
             </div>
@@ -110,11 +110,11 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       )}
 
       {addPrevious && fd.renewals.length === 0 && (
-        <div className="ab-card-flat bg-[#2a1f0d] border-[#3a2d0f] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
+        <div className="ab-card-flat bg-[var(--chip-warning-bg)] border-[var(--chip-warning-border)] px-5 py-4 flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <p className="text-[14px] text-[#f5a524] font-semibold">Complete the renewal history</p>
-            <p className="text-[12px] text-[#a0a0a5] mt-1 leading-relaxed">
-              This FD was previously renewed. Use the <strong className="text-[#ededed]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
+            <p className="text-[14px] text-[var(--accent-warning)] font-semibold">Complete the renewal history</p>
+            <p className="text-[12px] text-[var(--text-secondary)] mt-1 leading-relaxed">
+              This FD was previously renewed. Use the <strong className="text-[var(--text-primary)]">Renew</strong> button to add each previous renewal in order — starting from the earliest one.
             </p>
           </div>
           <Link
@@ -129,16 +129,16 @@ export default async function FDDetailPage({ params, searchParams }: { params: P
       <div className="ab-card p-6">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-              <span className="font-bold text-[14px] text-[#ff385c]">
+            <div className="w-12 h-12 rounded-full bg-[var(--primary-tint)] flex items-center justify-center shrink-0">
+              <span className="font-bold text-[14px] text-[var(--primary)]">
                 {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
               </span>
             </div>
             <div>
-              <h1 className={cn("text-[22px] font-semibold text-[#ededed] tracking-tight")}>{fd.bankName}</h1>
+              <h1 className={cn("text-[22px] font-semibold text-[var(--text-primary)] tracking-tight")}>{fd.bankName}</h1>
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                {fd.fdNumber && <span className="text-[12px] text-[#a0a0a5] mono">FD #{fd.fdNumber}</span>}
-                {fd.accountNumber && <span className="text-[12px] text-[#a0a0a5] mono">A/c {fd.accountNumber}</span>}
+                {fd.fdNumber && <span className="text-[12px] text-[var(--text-secondary)] mono">FD #{fd.fdNumber}</span>}
+                {fd.accountNumber && <span className="text-[12px] text-[var(--text-secondary)] mono">A/c {fd.accountNumber}</span>}
                 {fd.renewals.length > 0 && (
                   <span className="ab-chip ab-chip-accent">
                     Renewal #{fd.renewals.length}

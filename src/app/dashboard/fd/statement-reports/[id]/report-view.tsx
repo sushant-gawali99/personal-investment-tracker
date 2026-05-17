@@ -17,10 +17,19 @@ const TXN_TYPE_LABELS: Record<string, string> = {
   other: "Other",
 };
 
+const TXN_TYPE_COLORS: Record<string, string> = {
+  interest_payout:    "bg-[var(--chip-success-bg)] text-[var(--accent-success)] border border-[var(--chip-success-border)]",
+  maturity_interest:  "bg-[var(--chip-success-bg)] text-[var(--accent-success)] border border-[var(--chip-success-border)]",
+  maturity_principal: "bg-[var(--chip-info-bg)] text-[var(--accent-info)] border border-[var(--chip-info-border)]",
+  premature_principal:"bg-[var(--chip-warning-bg)] text-[var(--accent-warning)] border border-[var(--chip-warning-border)]",
+  premature_interest: "bg-[var(--chip-warning-bg)] text-[var(--accent-warning)] border border-[var(--chip-warning-border)]",
+  other:              "bg-[var(--surface-muted)] text-[var(--text-secondary)] border border-[var(--border)]",
+};
+
 const CLOSURE_COLORS: Record<string, string> = {
-  matured: "text-[#4ade80] bg-[#0f2a1a] border-[#1a4a2e]",
-  premature: "text-[#fb923c] bg-[#2a1a0a] border-[#4a2e0f]",
-  ongoing: "text-[#818cf8] bg-[#1a1a2a] border-[#2e2e4a]",
+  matured: "text-[var(--status-matured)] bg-[var(--status-matured-bg)] border-[var(--status-matured-border)]",
+  premature: "text-[var(--status-premature)] bg-[var(--status-premature-bg)] border-[var(--status-premature-border)]",
+  ongoing: "text-[var(--status-ongoing)] bg-[var(--status-ongoing-bg)] border-[var(--status-ongoing-border)]",
 };
 
 function FDRow({ fd }: { fd: FDEntry }) {
@@ -28,38 +37,38 @@ function FDRow({ fd }: { fd: FDEntry }) {
   const colorClass = CLOSURE_COLORS[fd.closureType] ?? CLOSURE_COLORS.ongoing;
 
   return (
-    <div className="border border-[#2a2a2d] rounded-lg overflow-hidden">
+    <div className="border border-[var(--border)] rounded-lg overflow-hidden">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
         title={expanded ? undefined : "Open for details"}
-        className="w-full flex items-start gap-2 px-4 py-3 bg-[#111114] hover:bg-[#161618] transition-colors text-left cursor-pointer"
+        className="w-full flex items-start gap-2 px-4 py-3 bg-[var(--surface-deep)] hover:bg-[var(--surface-raised)] transition-colors text-left cursor-pointer"
       >
         {expanded
-          ? <ChevronDown size={16} className="text-[#b0b0b8] shrink-0 mt-0.5" />
-          : <ChevronRight size={16} className="text-[#b0b0b8] shrink-0 mt-0.5" />}
+          ? <ChevronDown size={16} className="text-[var(--text-secondary)] shrink-0 mt-0.5" />
+          : <ChevronRight size={16} className="text-[var(--text-secondary)] shrink-0 mt-0.5" />}
         <div className="flex-1 min-w-0 space-y-1.5">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[15px] font-semibold text-[#ededed] truncate">
-              <span className="text-[#b0b0b8] font-normal">FD No.: </span>{fd.fdNumber}
+            <span className="text-[15px] font-semibold text-[var(--text-primary)] truncate">
+              <span className="text-[var(--text-secondary)] font-normal">FD No.: </span>{fd.fdNumber}
             </span>
             <span className={`text-[13px] px-2.5 py-0.5 rounded-full border ${colorClass} shrink-0`}>
               {fd.closureType}
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-[15px] text-[#4ade80] font-semibold">+{formatINR(fd.totalInterest)}</span>
+            <span className="text-[15px] text-[var(--status-matured)] font-semibold">+{formatINR(fd.totalInterest)}</span>
             {fd.principalReturned != null && (
-              <span className="text-[14px] text-[#dcdce4]">P: {formatINR(fd.principalReturned)}</span>
+              <span className="text-[14px] text-[var(--text-tertiary)]">P: {formatINR(fd.principalReturned)}</span>
             )}
             {fd.closureDate && (
-              <span className="text-[13px] text-[#b0b0b8]">{formatDate(fd.closureDate)}</span>
+              <span className="text-[13px] text-[var(--text-secondary)]">{formatDate(fd.closureDate)}</span>
             )}
             {fd.linkedFdId && (
               <Link
                 href={`/dashboard/fd/${fd.linkedFdId}`}
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1 text-[13px] px-2.5 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[#ff385c] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors"
+                className="inline-flex items-center gap-1 text-[13px] px-2.5 py-0.5 rounded-full border border-[rgba(255,56,92,0.35)] text-[var(--primary)] bg-[rgba(255,56,92,0.08)] hover:bg-[rgba(255,56,92,0.15)] transition-colors"
               >
                 <Link2 size={11} />
                 In system
@@ -70,28 +79,28 @@ function FDRow({ fd }: { fd: FDEntry }) {
       </button>
 
       {expanded && (
-        <div className="border-t border-[#2a2a2d]">
+        <div className="border-t border-[var(--border)]">
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="bg-[#0d0d0f]">
-                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium whitespace-nowrap">Date</th>
-                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium hidden sm:table-cell">Description</th>
-                  <th className="text-left px-3 py-2.5 text-[#b0b0b8] font-medium">Type</th>
-                  <th className="text-right px-3 py-2.5 text-[#b0b0b8] font-medium whitespace-nowrap">Amount</th>
+                <tr className="bg-[var(--surface-deep)]">
+                  <th className="text-left px-3 py-2.5 text-[var(--text-secondary)] font-medium whitespace-nowrap">Date</th>
+                  <th className="text-left px-3 py-2.5 text-[var(--text-secondary)] font-medium hidden sm:table-cell">Description</th>
+                  <th className="text-left px-3 py-2.5 text-[var(--text-secondary)] font-medium">Type</th>
+                  <th className="text-right px-3 py-2.5 text-[var(--text-secondary)] font-medium whitespace-nowrap">Amount</th>
                 </tr>
               </thead>
               <tbody>
                 {fd.transactions.map((t, i) => (
-                  <tr key={i} className="border-t border-[#1e1e21]">
-                    <td className="px-3 py-2.5 text-[#dcdce4] whitespace-nowrap">{t.date}</td>
-                    <td className="px-3 py-2.5 text-[#dcdce4] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
+                  <tr key={i} className="border-t border-[var(--border)] hover:bg-[var(--surface-muted)] transition-colors">
+                    <td className="px-3 py-2.5 text-[var(--text-primary)] whitespace-nowrap font-medium">{t.date}</td>
+                    <td className="px-3 py-2.5 text-[var(--text-secondary)] max-w-[180px] truncate hidden sm:table-cell">{t.description}</td>
                     <td className="px-3 py-2.5">
-                      <span className="text-[12px] px-1.5 py-0.5 rounded bg-[#1e1e21] text-[#dcdce4] whitespace-nowrap">
+                      <span className={`text-[11px] font-medium px-2 py-0.5 rounded-full whitespace-nowrap ${TXN_TYPE_COLORS[t.type] ?? TXN_TYPE_COLORS.other}`}>
                         {TXN_TYPE_LABELS[t.type] ?? t.type}
                       </span>
                     </td>
-                    <td className="px-3 py-2.5 text-right text-[#ededed] font-medium whitespace-nowrap">
+                    <td className="px-3 py-2.5 text-right text-[var(--text-primary)] font-medium whitespace-nowrap">
                       {formatINR(t.amount)}
                     </td>
                   </tr>
@@ -99,9 +108,9 @@ function FDRow({ fd }: { fd: FDEntry }) {
               </tbody>
             </table>
           </div>
-          <div className="px-3 py-2.5 bg-[#0d0d0f] border-t border-[#2a2a2d] flex justify-between text-[13px]">
-            <span className="text-[#b0b0b8]">Total interest earned</span>
-            <span className="text-[#4ade80] font-semibold">{formatINR(fd.totalInterest)}</span>
+          <div className="px-3 py-2.5 bg-[var(--surface-deep)] border-t border-[var(--border)] flex justify-between text-[13px]">
+            <span className="text-[var(--text-secondary)]">Total interest earned</span>
+            <span className="text-[var(--status-matured)] font-semibold">{formatINR(fd.totalInterest)}</span>
           </div>
         </div>
       )}
@@ -209,46 +218,46 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
   return (
     <div className="space-y-5">
       {/* Summary card */}
-      <div className="bg-[#0d0d0f] border border-[#2a2a2d] rounded-xl p-5 space-y-3">
+      <div className="bg-[var(--surface-deep)] border border-[var(--border)] rounded-xl p-5 space-y-3">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            {accountHolderName && <p className="text-[15px] text-[#dcdce4]">{accountHolderName}</p>}
-            {accountNumber && <p className="text-[14px] text-[#b0b0b8] mt-0.5">A/C {accountNumber}</p>}
+            {accountHolderName && <p className="text-[15px] text-[var(--text-tertiary)]">{accountHolderName}</p>}
+            {accountNumber && <p className="text-[14px] text-[var(--text-secondary)] mt-0.5">A/C {accountNumber}</p>}
           </div>
           <div className="text-right">
             {statementFromDate && statementToDate && (
-              <p className="text-[14px] text-[#b0b0b8]">
+              <p className="text-[14px] text-[var(--text-secondary)]">
                 {formatDate(statementFromDate)} – {formatDate(statementToDate)}
               </p>
             )}
-            <p className="text-[13px] text-[#b0b0b8] mt-0.5">Added {formatDate(createdAt)}</p>
+            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">Added {formatDate(createdAt)}</p>
           </div>
         </div>
-        <div className="flex gap-5 flex-wrap pt-2 border-t border-[#1e1e21]">
+        <div className="flex gap-5 flex-wrap pt-2 border-t border-[var(--border)]">
           <div>
-            <p className="text-[13px] text-[#b0b0b8]">Total FDs</p>
-            <p className="text-[22px] font-bold text-[#ededed]">{reportData.fds.length}</p>
+            <p className="text-[13px] text-[var(--text-secondary)]">Total FDs</p>
+            <p className="text-[22px] font-bold text-[var(--text-primary)]">{reportData.fds.length}</p>
           </div>
           <div>
-            <p className="text-[13px] text-[#b0b0b8]">Total Interest</p>
-            <p className="text-[22px] font-bold text-[#4ade80]">{formatINR(totalInterest)}</p>
+            <p className="text-[13px] text-[var(--text-secondary)]">Total Interest</p>
+            <p className="text-[22px] font-bold text-[var(--status-matured)]">{formatINR(totalInterest)}</p>
           </div>
           {maturedCount > 0 && (
             <div>
-              <p className="text-[13px] text-[#b0b0b8]">Matured</p>
-              <p className="text-[22px] font-bold text-[#ededed]">{maturedCount}</p>
+              <p className="text-[13px] text-[var(--text-secondary)]">Matured</p>
+              <p className="text-[22px] font-bold text-[var(--text-primary)]">{maturedCount}</p>
             </div>
           )}
           {prematureCount > 0 && (
             <div>
-              <p className="text-[13px] text-[#b0b0b8]">Premature</p>
-              <p className="text-[22px] font-bold text-[#fb923c]">{prematureCount}</p>
+              <p className="text-[13px] text-[var(--text-secondary)]">Premature</p>
+              <p className="text-[22px] font-bold text-[var(--status-premature)]">{prematureCount}</p>
             </div>
           )}
           {ongoingCount > 0 && (
             <div>
-              <p className="text-[13px] text-[#b0b0b8]">Ongoing</p>
-              <p className="text-[22px] font-bold text-[#818cf8]">{ongoingCount}</p>
+              <p className="text-[13px] text-[var(--text-secondary)]">Ongoing</p>
+              <p className="text-[22px] font-bold text-[var(--status-ongoing)]">{ongoingCount}</p>
             </div>
           )}
         </div>
@@ -261,14 +270,14 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
             type="button"
             onClick={handleReextract}
             disabled={reuploading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#a0a0a5] text-[13px] font-semibold hover:border-[#3a3a3e] hover:text-[#e0e0e4] transition-all disabled:opacity-40"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] text-[var(--text-secondary)] text-[13px] font-semibold hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40"
           >
             {reuploading ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
             {reuploading ? "Re-extracting…" : "Re-extract"}
           </button>
         )}
         {reuploadError && (
-          <span className="text-[13px] text-[#fb923c] flex items-center gap-1">
+          <span className="text-[13px] text-[var(--status-premature)] flex items-center gap-1">
             <AlertTriangle size={13} />
             {reuploadError}
           </span>
@@ -277,7 +286,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           type="button"
           onClick={downloadPdf}
           disabled={printing}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#a0a0a5] text-[13px] font-semibold hover:border-[#3a3a3e] hover:text-[#e0e0e4] transition-all disabled:opacity-40"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] text-[var(--text-secondary)] text-[13px] font-semibold hover:border-[var(--border-strong)] hover:text-[var(--text-primary)] transition-all disabled:opacity-40"
         >
           {printing ? <Loader2 size={13} className="animate-spin" /> : <Printer size={13} />}
           {printing ? "Generating…" : "Download PDF"}
@@ -286,7 +295,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
           <button
             type="button"
             onClick={() => setConfirmDelete(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#0d0d0f] border border-[#2a2a2d] text-[#b0b0b8] text-[13px] font-semibold hover:border-[#ff385c] hover:text-[#ff385c] transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] text-[var(--text-secondary)] text-[13px] font-semibold hover:border-[var(--primary)] hover:text-[var(--primary)] transition-all"
           >
             <Trash2 size={13} />
             Delete
@@ -294,7 +303,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
       </div>
 
       {deleteError && (
-        <div className="flex items-center gap-2 text-[#fb923c] text-[13px] bg-[#2a1a0a] border border-[#4a2e0f] rounded-lg px-4 py-3">
+        <div className="flex items-center gap-2 text-[var(--status-premature)] text-[13px] bg-[var(--status-premature-bg)] border border-[var(--status-premature-border)] rounded-lg px-4 py-3">
           <AlertTriangle size={14} className="shrink-0" />
           {deleteError}
         </div>
@@ -302,23 +311,23 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
 
       {confirmDelete && createPortal(
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4">
-          <div className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border border-[#2a2a2e] overflow-hidden" style={{ background: "#131316" }}>
-            <div className="flex items-center gap-2 px-5 py-4 border-b border-[#2a2a2e]">
-              <AlertTriangle size={16} style={{ color: "#ff7a6e" }} />
-              <p className="text-[15px] font-semibold text-[#ededed] tracking-tight flex-1">Delete this report?</p>
+          <div className="w-full sm:max-w-sm rounded-t-2xl sm:rounded-2xl border border-[var(--border)] overflow-hidden" style={{ background: "var(--surface-deep)" }}>
+            <div className="flex items-center gap-2 px-5 py-4 border-b border-[var(--border)]">
+              <AlertTriangle size={16} style={{ color: "var(--accent-error)" }} />
+              <p className="text-[15px] font-semibold text-[var(--text-primary)] tracking-tight flex-1">Delete this report?</p>
               <button
                 onClick={() => setConfirmDelete(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center text-[#b0b0b8] hover:bg-[#1c1c20] transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
                 aria-label="Close"
               >
                 <X size={16} />
               </button>
             </div>
             <div className="px-5 py-4">
-              <p className="text-[14px] text-[#dcdce4]">
+              <p className="text-[14px] text-[var(--text-tertiary)]">
                 This will permanently delete this FD interest report. The original bank statement PDF will remain on the server.
               </p>
-              <p className="text-[13px] text-[#b0b0b8] mt-2">This action cannot be undone.</p>
+              <p className="text-[13px] text-[var(--text-secondary)] mt-2">This action cannot be undone.</p>
             </div>
             <div className="px-5 pb-5 flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
               <button
@@ -333,7 +342,7 @@ export function ReportView({ reportId, reportData, bankName, accountHolderName, 
                 onClick={deleteReport}
                 disabled={deleting}
                 className="ab-btn ab-btn-secondary w-full sm:w-auto"
-                style={{ color: "#ff7a6e", borderColor: "rgba(255, 122, 110, 0.3)" }}
+                style={{ color: "var(--accent-error)", borderColor: "rgba(255, 122, 110, 0.3)" }}
               >
                 {deleting
                   ? <><Loader2 size={13} className="animate-spin" /> Deleting…</>

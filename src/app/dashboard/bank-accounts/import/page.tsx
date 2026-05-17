@@ -25,16 +25,16 @@ export default async function ImportPage() {
       <div className="space-y-6">
         <div className="space-y-2">
           <BackLink href="/dashboard/bank-accounts/imports" label="Imports" />
-          <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Import Statement</h1>
-          <p className="text-[14px] text-[#a0a0a5]">Upload a PDF, review extracted rows, commit.</p>
+          <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Import Statement</h1>
+          <p className="text-[14px] text-[var(--text-secondary)]">Upload a PDF, review extracted rows, commit.</p>
         </div>
         <div className="ab-card flex flex-col items-center gap-4 p-10 text-center">
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[rgba(255,56,92,0.12)] border border-[rgba(255,56,92,0.25)]">
-            <Landmark size={26} className="text-[#ff385c]" />
+            <Landmark size={26} className="text-[var(--primary)]" />
           </div>
           <div className="space-y-1.5">
-            <h2 className="text-[18px] font-semibold text-[#ededed]">Add a bank account first</h2>
-            <p className="text-[13px] text-[#a0a0a5] max-w-sm">
+            <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">Add a bank account first</h2>
+            <p className="text-[13px] text-[var(--text-secondary)] max-w-sm">
               Statements are imported into a specific account. Create at least one
               bank account, then come back here to upload a PDF.
             </p>
@@ -54,8 +54,8 @@ export default async function ImportPage() {
     <div className="space-y-6">
       <div className="space-y-2">
         <BackLink href="/dashboard/bank-accounts/imports" label="Imports" />
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Import Statement</h1>
-        <p className="text-[14px] text-[#a0a0a5]">Upload a PDF, review extracted rows, commit.</p>
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Import Statement</h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">Upload a PDF, review extracted rows, commit.</p>
       </div>
       <ImportWizard accounts={accounts} categories={categories.map((c) => ({ id: c.id, name: c.name, kind: c.kind }))} />
     </div>

@@ -18,19 +18,19 @@ export function BulkConfirmModal({ rows, onOverride, onSkip }: Props) {
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 p-0 sm:p-4">
       <div
-        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-[#2a2a2e] overflow-hidden"
-        style={{ background: "#131316" }}
+        className="w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl border border-[var(--border)] overflow-hidden"
+        style={{ background: "var(--surface-deep)" }}
       >
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#2a2a2e]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--border)]">
           <div className="flex items-center gap-2">
-            <AlertTriangle size={16} style={{ color: "#f5a524" }} />
-            <p className="text-[15px] font-semibold text-[#ededed] tracking-tight">
+            <AlertTriangle size={16} style={{ color: "var(--accent-warning)" }} />
+            <p className="text-[15px] font-semibold text-[var(--text-primary)] tracking-tight">
               {rows.length === 1 ? "FD already exists" : `${rows.length} FDs already exist`}
             </p>
           </div>
           <button
             onClick={() => onSkip(ids)}
-            className="w-8 h-8 rounded-full flex items-center justify-center text-[#a0a0a5] hover:bg-[#1c1c20] transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center text-[var(--text-secondary)] hover:bg-[var(--surface-muted)] transition-colors"
             aria-label="Close"
           >
             <X size={16} />
@@ -38,7 +38,7 @@ export function BulkConfirmModal({ rows, onOverride, onSkip }: Props) {
         </div>
 
         <div className="px-5 py-4 space-y-3">
-          <p className="text-[13px] text-[#a0a0a5]">
+          <p className="text-[13px] text-[var(--text-secondary)]">
             {rows.length === 1
               ? "The following FD already exists in your account. Do you want to override it with the new data?"
               : "The following FDs already exist in your account. Do you want to override them with the new data?"}
@@ -51,14 +51,14 @@ export function BulkConfirmModal({ rows, onOverride, onSkip }: Props) {
                 <li
                   key={row.id}
                   className="ab-card-flat px-3 py-2 rounded-lg text-[13px]"
-                  style={{ background: "#1c1c20", borderColor: "#2a2a2e" }}
+                  style={{ background: "var(--surface-muted)", borderColor: "var(--border)" }}
                 >
-                  <span className="font-medium text-[#ededed]">{f.bankName || "Unknown Bank"}</span>
+                  <span className="font-medium text-[var(--text-primary)]">{f.bankName || "Unknown Bank"}</span>
                   {f.fdNumber && (
-                    <span className="text-[#a0a0a5]"> · {f.fdNumber}</span>
+                    <span className="text-[var(--text-secondary)]"> · {f.fdNumber}</span>
                   )}
                   {f.principal && (
-                    <span className="text-[#a0a0a5]"> · ₹{Number(f.principal).toLocaleString("en-IN")}</span>
+                    <span className="text-[var(--text-secondary)]"> · ₹{Number(f.principal).toLocaleString("en-IN")}</span>
                   )}
                 </li>
               );

@@ -59,8 +59,8 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
   return (
     <section className="ab-card p-6 space-y-4">
       <div>
-        <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Super Admin</p>
-        <p className="text-[13px] text-[#a0a0a5] mt-1">
+        <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Super Admin</p>
+        <p className="text-[13px] text-[var(--text-secondary)] mt-1">
           View the app as another user. All data shown will be theirs.
         </p>
       </div>
@@ -68,9 +68,9 @@ export function ImpersonationSelector({ isSuperAdmin, activeUserId }: Props) {
       <div className="space-y-2">
         <label className="ab-label">View as user</label>
         {loading ? (
-          <div className="h-8 w-64 rounded-lg bg-[#1c1c20] animate-pulse" />
+          <div className="h-8 w-64 rounded-lg bg-[var(--surface-muted)] animate-pulse" />
         ) : fetchError ? (
-          <p className="text-[13px] text-[#ff7a6e]">Failed to load users.</p>
+          <p className="text-[13px] text-[var(--accent-error)]">Failed to load users.</p>
         ) : (
           <Select value={selectValue} onValueChange={handleSelect}>
             <SelectTrigger className="w-72">

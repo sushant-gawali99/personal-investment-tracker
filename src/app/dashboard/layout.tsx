@@ -19,7 +19,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   }
 
   return (
-    <div className="min-h-screen bg-[#17171a]">
+    <div className="min-h-screen" style={{ background: "var(--background)" }}>
       <TopNav impersonatedUser={impersonatedUser} />
       <main className="max-w-6xl mx-auto px-6 py-8">{children}</main>
     </div>

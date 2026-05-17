@@ -26,13 +26,13 @@ export function RateChip({ initial }: { initial: GoldRatePayload | null }) {
   return (
     <div className="ab-card px-4 py-2.5 flex items-center gap-3 flex-wrap">
       <div className="flex items-center gap-2 shrink-0">
-        <Coins size={14} className="text-[#f5a524]" />
-        <span className="text-[12px] font-semibold text-[#ededed]">Gold Rate</span>
-        <span className="text-[11px] text-[#6c6c73]">
+        <Coins size={14} className="text-[var(--accent-warning)]" />
+        <span className="text-[12px] font-semibold text-[var(--text-primary)]">Gold Rate</span>
+        <span className="text-[11px] text-[var(--text-tertiary)]">
           {rate ? (
             <>
               {sourceLabel} · {rate.date}
-              {stale && <span className="ml-1 text-[#f5a524]">(stale)</span>}
+              {stale && <span className="ml-1 text-[var(--accent-warning)]">(stale)</span>}
             </>
           ) : (
             "—"
@@ -91,23 +91,23 @@ function KaratPill({
     <div
       className="rounded-full pl-2 pr-3 py-1 inline-flex items-center gap-2 border"
       style={{
-        borderColor: highlight ? "rgba(245,165,36,0.4)" : "#2a2a2e",
-        background: highlight ? "rgba(245,165,36,0.08)" : "#141418",
+        borderColor: highlight ? "rgba(245,165,36,0.4)" : "var(--border)",
+        background: highlight ? "rgba(245,165,36,0.08)" : "var(--surface-raised)",
       }}
     >
       <span
         className="text-[10px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded-full"
         style={{
-          color: highlight ? "#f5a524" : "#a0a0a5",
-          background: highlight ? "rgba(245,165,36,0.15)" : "#1c1c20",
+          color: highlight ? "var(--accent-warning)" : "var(--text-secondary)",
+          background: highlight ? "rgba(245,165,36,0.15)" : "var(--surface-muted)",
         }}
       >
         {label}
       </span>
-      <span className="mono text-[14px] font-bold text-[#ededed] leading-none">
+      <span className="mono text-[14px] font-bold text-[var(--text-primary)] leading-none">
         {value != null ? `₹${Math.round(value).toLocaleString("en-IN")}` : "—"}
       </span>
-      <span className="text-[10px] text-[#6c6c73] leading-none">/g</span>
+      <span className="text-[10px] text-[var(--text-tertiary)] leading-none">/g</span>
     </div>
   );
 }

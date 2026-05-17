@@ -93,9 +93,9 @@ export function FDRenewForm({ fd }: Props) {
     <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
       <section className="ab-card p-4 sm:p-6 space-y-5">
         <div>
-          <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">Renewal Details</p>
-          <p className="text-[13px] text-[#a0a0a5] mt-0.5">
-            Record a new renewal period for <span className="font-semibold text-[#ededed]">{fd.bankName}</span>.
+          <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Renewal Details</p>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
+            Record a new renewal period for <span className="font-semibold text-[var(--text-primary)]">{fd.bankName}</span>.
           </p>
         </div>
 
@@ -118,7 +118,7 @@ export function FDRenewForm({ fd }: Props) {
           </div>
           <div>
             <label className="ab-label">Tenure *</label>
-            <p className="text-[11px] text-[#a0a0a5] mb-1">Months and/or days — at least one must be &gt; 0.</p>
+            <p className="text-[11px] text-[var(--text-secondary)] mb-1">Months and/or days — at least one must be &gt; 0.</p>
             <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <input
                 type="number"
@@ -167,7 +167,7 @@ export function FDRenewForm({ fd }: Props) {
         {error && (
           <div
             className="ab-card-flat px-3 py-2 text-[13px]"
-            style={{ background: "#2a1613", color: "#ff7a6e", borderColor: "#3a1a16" }}
+            style={{ background: "var(--chip-error-bg)", color: "var(--accent-error)", borderColor: "var(--chip-error-border)" }}
           >
             {error}
           </div>

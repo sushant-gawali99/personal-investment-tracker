@@ -6,6 +6,7 @@ import { Menu, X, LogOut, Eye } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const TABS = [
   { href: "/dashboard", label: "Overview" },
@@ -36,7 +37,13 @@ export function TopNav({ impersonatedUser }: Props) {
   }
 
   return (
-    <header className="sticky top-0 z-50 bg-[#17171a] border-b border-[#2a2a2e]">
+    <header
+      className="sticky top-0 z-50"
+      style={{
+        background: "var(--surface-raised)",
+        borderBottom: "1px solid var(--border)",
+      }}
+    >
       {impersonatedUser && (
         <div className="bg-amber-500/10 border-b border-amber-500/20 px-6 py-1.5 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-amber-400 text-[13px] font-medium">
@@ -65,7 +72,12 @@ export function TopNav({ impersonatedUser }: Props) {
             >
               M
             </span>
-            <span className="text-[18px] font-semibold tracking-tight text-[#ededed]">MyFolio</span>
+            <span
+              className="text-[18px] font-semibold tracking-tight"
+              style={{ color: "var(--text-primary)" }}
+            >
+              MyFolio
+            </span>
           </Link>
 
           <nav className="hidden sm:flex items-center gap-1">
@@ -77,10 +89,25 @@ export function TopNav({ impersonatedUser }: Props) {
                   href={href}
                   className={cn(
                     "px-3 py-2 rounded-full text-sm font-medium transition-colors",
-                    active
-                      ? "bg-[#ff385c]/10 text-white ring-1 ring-inset ring-[#ff385c]/25"
-                      : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
+                    active ? "bg-[#ff385c]/10 ring-1 ring-inset ring-[#ff385c]/25" : ""
                   )}
+                  style={
+                    active
+                      ? { color: "var(--text-primary)" }
+                      : { color: "var(--text-secondary)" }
+                  }
+                  onMouseEnter={(e) => {
+                    if (!active) {
+                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface-muted)";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!active) {
+                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)";
+                      (e.currentTarget as HTMLAnchorElement).style.background = "";
+                    }
+                  }}
                 >
                   {label}
                 </Link>
@@ -89,19 +116,37 @@ export function TopNav({ impersonatedUser }: Props) {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
+          <ThemeToggle />
+
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors"
+            style={{ color: "var(--text-secondary)" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
+              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+            }}
           >
             <LogOut size={14} />
             Sign out
           </button>
 
           <button
-            className="sm:hidden p-2 rounded-full text-[#ededed] hover:bg-[#1c1c20] transition-colors"
+            className="sm:hidden p-2 rounded-full transition-colors"
+            style={{ color: "var(--text-primary)" }}
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+            }}
           >
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
@@ -109,7 +154,13 @@ export function TopNav({ impersonatedUser }: Props) {
       </div>
 
       {open && (
-        <div className="sm:hidden border-t border-[#2a2a2e] bg-[#17171a] px-4 py-3 space-y-1">
+        <div
+          className="sm:hidden px-4 py-3 space-y-1"
+          style={{
+            borderTop: "1px solid var(--border)",
+            background: "var(--surface-raised)",
+          }}
+        >
           {TABS.map(({ href, label }) => {
             const active = pathname === href || (href !== "/dashboard" && pathname.startsWith(href));
             return (
@@ -119,8 +170,9 @@ export function TopNav({ impersonatedUser }: Props) {
                 onClick={() => setOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors w-full",
-                  active ? "bg-[#ff385c]/10 text-white ring-1 ring-inset ring-[#ff385c]/25" : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
+                  active ? "bg-[#ff385c]/10 ring-1 ring-inset ring-[#ff385c]/25" : ""
                 )}
+                style={{ color: active ? "var(--text-primary)" : "var(--text-secondary)" }}
               >
                 {label}
               </Link>
@@ -128,7 +180,8 @@ export function TopNav({ impersonatedUser }: Props) {
           })}
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20] w-full transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium w-full transition-colors"
+            style={{ color: "var(--text-secondary)" }}
           >
             <LogOut size={15} />
             Sign out

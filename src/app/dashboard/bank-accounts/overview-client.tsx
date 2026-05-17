@@ -1,7 +1,7 @@
 // src/app/dashboard/bank-accounts/overview-client.tsx
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeftRight, Files, FileOutput, Landmark, Tag } from "lucide-react";
 import { MonthPicker } from "@/components/bank-accounts/month-picker";
@@ -111,11 +111,11 @@ export function OverviewClient({
           onAccountChange={setAccountId}
         />
         <div className="ab-card p-10 text-center max-w-md mx-auto">
-          <div className="w-14 h-14 rounded-full bg-[#2a1218] flex items-center justify-center mx-auto mb-5">
-            <Landmark size={22} className="text-[#ff385c]" />
+          <div className="w-14 h-14 rounded-full bg-[var(--primary-tint)] flex items-center justify-center mx-auto mb-5">
+            <Landmark size={22} className="text-[var(--primary)]" />
           </div>
-          <p className="text-[20px] font-semibold text-[#ededed] tracking-tight">No transactions for {monthName(year, month)}</p>
-          <p className="text-[14px] text-[#a0a0a5] mt-2 mb-6">Import a statement or pick a different month to see analytics.</p>
+          <p className="text-[20px] font-semibold text-[var(--text-primary)] tracking-tight">No transactions for {monthName(year, month)}</p>
+          <p className="text-[14px] text-[var(--text-secondary)] mt-2 mb-6">Import a statement or pick a different month to see analytics.</p>
           <a href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent inline-flex">Import Statement</a>
         </div>
       </div>
@@ -169,7 +169,7 @@ export function OverviewClient({
       <IncomeExpenseChart data={summary?.incomeExpense ?? []} />
 
       {/* Subtle indicator for the current month/account context */}
-      <p className="text-[11px] text-[#6e6e73] text-center">
+      <p className="text-[11px] text-[var(--text-tertiary)] text-center">
         Showing {monthName(year, month)}
         {accountId ? ` · ${accounts.find((a) => a.id === accountId)?.label ?? "Account"}` : " · all accounts"}
         {prevRow ? ` · compared to ${monthName(prevDate.getFullYear(), prevDate.getMonth() + 1)}` : ""}
@@ -205,13 +205,14 @@ function Toolbar({
   onMonthChange: (y: number, m: number) => void;
   onAccountChange: (id: string) => void;
 }) {
+  const pathname = usePathname();
   return (
     <div className="flex items-center gap-2">
       {/* Filters — left */}
       <MonthPicker year={year} month={month} onChange={onMonthChange} />
-      <div className="inline-flex items-center bg-[#17171a] border border-[#2a2a2e] rounded-full px-1 h-[42px] shrink-0">
+      <div className="inline-flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full px-1 h-[42px] shrink-0">
         <select
-          className="bg-transparent text-[14px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer min-w-[130px] max-w-[200px]"
+          className="bg-transparent text-[14px] font-medium text-[var(--text-primary)] outline-none px-3 h-full cursor-pointer min-w-[130px] max-w-[200px]"
           value={accountId}
           onChange={(e) => onAccountChange(e.target.value)}
         >
@@ -224,17 +225,25 @@ function Toolbar({
       <div className="flex-1" />
 
       {/* Nav — right */}
-      <nav className="flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full p-1 gap-0.5 shrink-0">
-        {NAV_ITEMS.map(({ href, label, icon }) => (
-          <Link
-            key={href}
-            href={href}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-full text-[#606065] hover:text-[#e0e0e4] hover:bg-[#1e1e22] border border-transparent hover:border-[#2e2e32] transition-all text-[12px] font-semibold whitespace-nowrap"
-          >
-            {icon}
-            {label}
-          </Link>
-        ))}
+      <nav className="flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full p-1 gap-0.5 shrink-0">
+        {NAV_ITEMS.map(({ href, label, icon }) => {
+          const active = pathname === href || pathname.startsWith(href + "/");
+          return (
+            <Link
+              key={href}
+              href={href}
+              className={[
+                "flex items-center gap-1.5 px-3 py-2 rounded-full text-[13px] font-semibold whitespace-nowrap transition-all",
+                active
+                  ? "bg-[var(--primary)]/10 text-[var(--primary)] ring-1 ring-inset ring-[var(--primary)]/20"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]",
+              ].join(" ")}
+            >
+              {icon}
+              {label}
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

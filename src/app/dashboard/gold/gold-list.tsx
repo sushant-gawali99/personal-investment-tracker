@@ -28,7 +28,7 @@ function PhotoModal({ url, onClose }: { url: string; onClose: () => void }) {
       <div className="relative max-w-xl w-full" onClick={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
-          className="absolute -top-3 -right-3 bg-[#1f1f23] rounded-full p-1.5 text-[#a0a0a5] hover:text-[#ededed] transition-colors"
+          className="absolute -top-3 -right-3 bg-[var(--surface-muted)] rounded-full p-1.5 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           <X size={16} />
         </button>
@@ -77,7 +77,7 @@ export function GoldList({
   }
 
   const gainColor = (v: number | null) =>
-    v == null ? "" : v >= 0 ? "text-[#5ee0a4]" : "text-[#ff6b7a]";
+    v == null ? "" : v >= 0 ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]";
 
   return (
     <>
@@ -99,8 +99,8 @@ export function GoldList({
             },
           ].map(({ label, value, color }) => (
             <div key={label} className="ab-card p-4">
-              <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
-              <p className={`mono text-[15px] sm:text-[17px] font-semibold text-[#ededed] ${color ?? ""}`}>{value}</p>
+              <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold mb-1">{label}</p>
+              <p className={`mono text-[15px] sm:text-[17px] font-semibold text-[var(--text-primary)] ${color ?? ""}`}>{value}</p>
             </div>
           ))}
         </div>
@@ -116,7 +116,7 @@ export function GoldList({
       </div>
 
       {items.length === 0 ? (
-        <div className="ab-card p-10 text-center text-[#a0a0a5]">No jewellery yet. Click "Add jewellery" to get started.</div>
+        <div className="ab-card p-10 text-center text-[var(--text-secondary)]">No jewellery yet. Click "Add jewellery" to get started.</div>
       ) : (
         <>
           {/* Mobile cards */}
@@ -129,9 +129,9 @@ export function GoldList({
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="text-[13px] font-semibold text-[#ededed] truncate leading-tight">{item.title}</p>
-                          <p className="text-[11px] text-[#6c6c73] mt-0.5 truncate leading-tight">{label}</p>
-                          <p className="text-[11px] text-[#6c6c73] mt-0.5 leading-tight">{item.karat}K · {item.weightGrams.toFixed(2)} g</p>
+                          <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate leading-tight">{item.title}</p>
+                          <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5 truncate leading-tight">{label}</p>
+                          <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5 leading-tight">{item.karat}K · {item.weightGrams.toFixed(2)} g</p>
                         </div>
                         <div className="flex items-center gap-1 flex-shrink-0">
                           {item.photoUrl && (
@@ -150,21 +150,21 @@ export function GoldList({
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-3 border-t border-[#1f1f23]">
-                    <div className="px-3 py-2 border-r border-[#1f1f23]">
-                      <p className="text-[10px] text-[#6c6c73] uppercase tracking-wide mb-0.5">Purchased</p>
-                      <p className="mono text-[12px] text-[#ededed]">
+                  <div className="grid grid-cols-3 border-t border-[var(--surface-muted)]">
+                    <div className="px-3 py-2 border-r border-[var(--surface-muted)]">
+                      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wide mb-0.5">Purchased</p>
+                      <p className="mono text-[12px] text-[var(--text-primary)]">
                         {item.purchasePrice != null ? formatINR(item.purchasePrice) : "—"}
                       </p>
                     </div>
-                    <div className="px-3 py-2 border-r border-[#1f1f23]">
-                      <p className="text-[10px] text-[#6c6c73] uppercase tracking-wide mb-0.5">Current</p>
-                      <p className="mono text-[12px] text-[#ededed]">
+                    <div className="px-3 py-2 border-r border-[var(--surface-muted)]">
+                      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wide mb-0.5">Current</p>
+                      <p className="mono text-[12px] text-[var(--text-primary)]">
                         {item.currentValue != null ? formatINR(item.currentValue) : "—"}
                       </p>
                     </div>
                     <div className="px-3 py-2">
-                      <p className="text-[10px] text-[#6c6c73] uppercase tracking-wide mb-0.5">Gain / Loss</p>
+                      <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wide mb-0.5">Gain / Loss</p>
                       <p className={`mono text-[12px] ${gainColor(item.gainLoss)}`}>
                         {item.gainLoss != null ? formatINR(item.gainLoss) : "—"}
                       </p>
@@ -172,7 +172,7 @@ export function GoldList({
                   </div>
 
                   {item.notes && (
-                    <div className="px-4 py-3 border-t border-[#1f1f23] text-[12px] text-[#a0a0a5] whitespace-pre-wrap">
+                    <div className="px-4 py-3 border-t border-[var(--surface-muted)] text-[12px] text-[var(--text-secondary)] whitespace-pre-wrap">
                       {item.notes}
                     </div>
                   )}
@@ -184,8 +184,8 @@ export function GoldList({
           {/* Desktop table */}
           <div className="hidden md:block ab-card overflow-hidden">
             <table className="w-full text-[13px]">
-              <thead className="text-[11px] text-[#a0a0a5] uppercase tracking-wider">
-                <tr className="border-b border-[#1f1f23]">
+              <thead className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider">
+                <tr className="border-b border-[var(--surface-muted)]">
                   <th className="text-left p-3 pl-4">Title</th>
                   <th className="text-right p-3">Weight</th>
                   <th className="text-right p-3">Karat</th>
@@ -199,21 +199,21 @@ export function GoldList({
                 {items.map((item) => {
                   const label = purchaseLabel(item);
                   return (
-                    <tr key={item.id} className="border-b border-[#1f1f23] hover:bg-[#15151a] transition-colors align-middle">
+                    <tr key={item.id} className="border-b border-[var(--surface-muted)] hover:bg-[var(--surface-raised)] transition-colors align-middle">
                       <td className="py-2 px-3 pl-4">
-                        <p className="text-[13px] text-[#ededed] font-medium leading-tight">{item.title}</p>
-                        <p className="text-[11px] text-[#6c6c73] mt-0.5 leading-tight">{label}</p>
+                        <p className="text-[13px] text-[var(--text-primary)] font-medium leading-tight">{item.title}</p>
+                        <p className="text-[11px] text-[var(--text-tertiary)] mt-0.5 leading-tight">{label}</p>
                       </td>
-                      <td className="py-2 px-3 mono text-right text-[13px] text-[#c0c0c6] whitespace-nowrap">{item.weightGrams.toFixed(2)} g</td>
+                      <td className="py-2 px-3 mono text-right text-[13px] text-[var(--text-secondary)] whitespace-nowrap">{item.weightGrams.toFixed(2)} g</td>
                       <td className="py-2 px-3 mono text-right whitespace-nowrap">
-                        <span className="bg-[#1f1f23] text-[#a0a0a5] text-[11px] px-1.5 py-0.5 rounded">
+                        <span className="bg-[var(--surface-muted)] text-[var(--text-secondary)] text-[11px] px-1.5 py-0.5 rounded">
                           {item.karat}K
                         </span>
                       </td>
-                      <td className="py-2 px-3 mono text-right text-[13px] text-[#c0c0c6] whitespace-nowrap">
+                      <td className="py-2 px-3 mono text-right text-[13px] text-[var(--text-secondary)] whitespace-nowrap">
                         {item.purchasePrice != null ? formatINR(item.purchasePrice) : "—"}
                       </td>
-                      <td className="py-2 px-3 mono text-right text-[13px] text-[#ededed] whitespace-nowrap">
+                      <td className="py-2 px-3 mono text-right text-[13px] text-[var(--text-primary)] whitespace-nowrap">
                         {item.currentValue != null ? formatINR(item.currentValue) : "—"}
                       </td>
                       <td className={`py-2 px-3 mono text-right text-[13px] font-medium whitespace-nowrap ${gainColor(item.gainLoss)}`}>

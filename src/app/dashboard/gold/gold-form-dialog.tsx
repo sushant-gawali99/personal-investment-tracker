@@ -98,20 +98,20 @@ export function GoldFormDialog({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={onClose}>
       <div className="ab-card w-full max-w-[520px] flex flex-col max-h-[calc(100dvh-2rem)]" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between px-6 pt-6 pb-4 shrink-0">
-          <h2 className="text-[18px] font-semibold text-[#ededed]">{initial ? "Edit jewellery" : "Add jewellery"}</h2>
+          <h2 className="text-[18px] font-semibold text-[var(--text-primary)]">{initial ? "Edit jewellery" : "Add jewellery"}</h2>
           <button onClick={onClose} className="ab-btn ab-btn-ghost"><X size={16} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 space-y-4 pb-2">
-          <label className="block text-[12px] text-[#a0a0a5]">Title *
+          <label className="block text-[12px] text-[var(--text-secondary)]">Title *
             <input className="ab-input mt-1 w-full" value={input.title} onChange={(e) => update("title", e.target.value)} />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
-            <label className="block text-[12px] text-[#a0a0a5]">Weight (g) *
+            <label className="block text-[12px] text-[var(--text-secondary)]">Weight (g) *
               <input type="number" step="0.001" min="0" className="ab-input mt-1 w-full" value={input.weightGrams} onChange={(e) => update("weightGrams", e.target.value)} />
             </label>
-            <label className="block text-[12px] text-[#a0a0a5]">Karat *
+            <label className="block text-[12px] text-[var(--text-secondary)]">Karat *
               <select className="ab-input mt-1 w-full" value={input.karat} onChange={(e) => update("karat", e.target.value as Input["karat"])}>
                 <option value="24">24K</option>
                 <option value="22">22K</option>
@@ -121,31 +121,31 @@ export function GoldFormDialog({
             </label>
           </div>
 
-          <label className="block text-[12px] text-[#a0a0a5]">Purchase price (₹)
+          <label className="block text-[12px] text-[var(--text-secondary)]">Purchase price (₹)
             <input type="number" step="0.01" min="0" className="ab-input mt-1 w-full" value={input.purchasePrice} onChange={(e) => update("purchasePrice", e.target.value)} />
           </label>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <p className="text-[12px] text-[#a0a0a5] mb-1">Purchased on</p>
+              <p className="text-[12px] text-[var(--text-secondary)] mb-1">Purchased on</p>
               <DatePicker value={input.purchasedOn} onChange={(v) => update("purchasedOn", v)} />
             </div>
-            <label className="block text-[12px] text-[#a0a0a5]">Purchased from
+            <label className="block text-[12px] text-[var(--text-secondary)]">Purchased from
               <input className="ab-input mt-1 w-full" value={input.purchasedFrom} onChange={(e) => update("purchasedFrom", e.target.value)} />
             </label>
           </div>
 
-          <label className="block text-[12px] text-[#a0a0a5]">Notes
+          <label className="block text-[12px] text-[var(--text-secondary)]">Notes
             <textarea rows={3} className="ab-input mt-1 w-full" value={input.notes} onChange={(e) => update("notes", e.target.value)} />
           </label>
 
           <div className="space-y-2">
-            <div className="text-[12px] text-[#a0a0a5]">Photo</div>
+            <div className="text-[12px] text-[var(--text-secondary)]">Photo</div>
             {input.photoUrl ? (
-              <div className="rounded-xl overflow-hidden border border-[#2a2a2e]">
+              <div className="rounded-xl overflow-hidden border border-[var(--border)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={input.photoUrl} alt="" className="w-full h-48 object-cover" />
-                <div className="flex gap-2 p-3 bg-[#17171a]">
+                <div className="flex gap-2 p-3 bg-[var(--surface-raised)]">
                   <label className="ab-btn ab-btn-ghost flex-1 justify-center cursor-pointer">
                     <Upload size={14} /> Replace photo
                     <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
@@ -165,13 +165,13 @@ export function GoldFormDialog({
                 <input type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])} />
               </label>
             )}
-            {uploading && <p className="text-[12px] text-[#a0a0a5]">Uploading…</p>}
+            {uploading && <p className="text-[12px] text-[var(--text-secondary)]">Uploading…</p>}
           </div>
 
-          {error && <p className="text-[12px] text-[#ff6b7a]">{error}</p>}
+          {error && <p className="text-[12px] text-[var(--accent-error)]">{error}</p>}
         </div>
 
-        <div className="flex justify-end gap-2 px-6 py-4 shrink-0 border-t border-[#2a2a2e]">
+        <div className="flex justify-end gap-2 px-6 py-4 shrink-0 border-t border-[var(--border)]">
           <button className="ab-btn ab-btn-ghost" onClick={onClose} disabled={saving}>Cancel</button>
           <button className="ab-btn ab-btn-accent" onClick={save} disabled={saving || !input.title || !input.weightGrams}>{saving ? "Saving…" : "Save"}</button>
         </div>

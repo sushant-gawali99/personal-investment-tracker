@@ -98,9 +98,9 @@ function CopyButton({ value, label }: { value: string; label: string }) {
       type="button"
       onClick={handleCopy}
       aria-label={label}
-      className="inline-flex items-center justify-center w-5 h-5 ml-2 rounded text-[#6e6e73] hover:text-[#ededed] transition-colors"
+      className="inline-flex items-center justify-center w-5 h-5 ml-2 rounded text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
     >
-      {copied ? <Check size={12} className="text-[#5ee0a4]" /> : <Copy size={12} />}
+      {copied ? <Check size={12} className="text-[var(--accent-success)]" /> : <Copy size={12} />}
     </button>
   );
 }
@@ -137,17 +137,17 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
       {/* Progress block */}
       <div className="ab-card p-4 sm:p-5">
         <div className="flex justify-between text-[12px] flex-wrap gap-2">
-          <span className="text-[#a0a0a5] mono">{formatDate(activeStart)}</span>
-          <span className="text-[#ededed] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
-          <span className="text-[#a0a0a5] mono">{formatDate(activeMaturity)}</span>
+          <span className="text-[var(--text-secondary)] mono">{formatDate(activeStart)}</span>
+          <span className="text-[var(--text-primary)] font-semibold">{activeRate}% p.a. · {fd.interestType}{fd.compoundFreq && fd.interestType === "compound" ? ` (${fd.compoundFreq})` : ""}</span>
+          <span className="text-[var(--text-secondary)] mono">{formatDate(activeMaturity)}</span>
         </div>
-        <div className="h-1 rounded-full bg-[#222226] overflow-hidden mt-3">
+        <div className="h-1 rounded-full bg-[var(--surface-subtle)] overflow-hidden mt-3">
           <div
-            className={cn("h-full rounded-full", isMatured ? "bg-[#3a3a3f]" : "bg-[#ff385c]")}
+            className={cn("h-full rounded-full", isMatured ? "bg-[var(--border-strong)]" : "bg-[var(--primary)]")}
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-[12px] text-[#6e6e73] text-center mt-3">
+        <p className="text-[12px] text-[var(--text-tertiary)] text-center mt-3">
           {formatTenure(activeTenure)} tenure · {isMatured ? "Matured" : `${Math.round(progress)}% elapsed · ${days} days remaining`}
         </p>
       </div>
@@ -155,13 +155,13 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
       {/* Summary cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
         {[
-          { label: "Principal", value: formatINR(activePrincipal), cls: "text-[#ededed]" },
-          { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[#5ee0a4]" },
-          { label: "Total Interest", value: formatINR(totalInterest), cls: "text-[#5ee0a4]" },
-          { label: "Maturity Value", value: formatINR(maturityValue), cls: "text-[#ededed]" },
+          { label: "Principal", value: formatINR(activePrincipal), cls: "text-[var(--text-primary)]" },
+          { label: "Accrued Interest", value: formatINR(accrued), cls: "text-[var(--accent-success)]" },
+          { label: "Total Interest", value: formatINR(totalInterest), cls: "text-[var(--accent-success)]" },
+          { label: "Maturity Value", value: formatINR(maturityValue), cls: "text-[var(--text-primary)]" },
         ].map(({ label, value, cls }) => (
           <div key={label} className="ab-card p-4">
-            <p className="text-[10px] text-[#6e6e73] uppercase tracking-wider font-semibold mb-1">{label}</p>
+            <p className="text-[10px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold mb-1">{label}</p>
             <p className={cn("mono text-[17px] font-semibold", cls)}>{value}</p>
           </div>
         ))}
@@ -170,92 +170,92 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
       {/* Two-column details */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
         <div className="ab-card p-4 sm:p-5 space-y-3">
-          <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Deposit Details</h3>
+          <h3 className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold">Deposit Details</h3>
           <dl className="text-[13px] space-y-0">
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Bank</dt>
-              <dd className="text-[#ededed] text-right">{fd.bankName}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Bank</dt>
+              <dd className="text-[var(--text-primary)] text-right">{fd.bankName}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">FD Number</dt>
-              <dd className="text-[#ededed] mono text-right inline-flex items-center">
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">FD Number</dt>
+              <dd className="text-[var(--text-primary)] mono text-right inline-flex items-center">
                 {fd.fdNumber ?? "—"}
                 {fd.fdNumber && <CopyButton value={fd.fdNumber} label="Copy FD number" />}
               </dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Account Number</dt>
-              <dd className="text-[#ededed] mono text-right inline-flex items-center">
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Account Number</dt>
+              <dd className="text-[var(--text-primary)] mono text-right inline-flex items-center">
                 {fd.accountNumber ?? "—"}
                 {fd.accountNumber && <CopyButton value={fd.accountNumber} label="Copy account number" />}
               </dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Depositor</dt>
-              <dd className="text-[#ededed] text-right">{fd.depositorName ?? "—"}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Depositor</dt>
+              <dd className="text-[var(--text-primary)] text-right">{fd.depositorName ?? "—"}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Second Depositor</dt>
-              <dd className="text-[#ededed] text-right">{fd.depositorSecondName ?? "—"}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Second Depositor</dt>
+              <dd className="text-[var(--text-primary)] text-right">{fd.depositorSecondName ?? "—"}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Interest Type</dt>
-              <dd className="text-[#ededed] mono text-right">{fd.interestType}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Interest Type</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{fd.interestType}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Compound Frequency</dt>
-              <dd className="text-[#ededed] mono text-right">{fd.interestType === "compound" ? (fd.compoundFreq ?? "—") : "—"}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Compound Frequency</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{fd.interestType === "compound" ? (fd.compoundFreq ?? "—") : "—"}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Tenure</dt>
-              <dd className="text-[#ededed] mono text-right">{formatTenure(activeTenure)}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Tenure</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{formatTenure(activeTenure)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Start Date</dt>
-              <dd className="text-[#ededed] mono text-right">{formatDate(activeStart)}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Start Date</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{formatDate(activeStart)}</dd>
             </div>
-            <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-              <dt className="text-[#a0a0a5]">Maturity Date</dt>
-              <dd className="text-[#ededed] mono text-right">{formatDate(activeMaturity)}</dd>
+            <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+              <dt className="text-[var(--text-secondary)]">Maturity Date</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{formatDate(activeMaturity)}</dd>
             </div>
             <div className="flex items-center justify-between gap-4 py-2">
-              <dt className="text-[#a0a0a5]">Created</dt>
-              <dd className="text-[#ededed] mono text-right">{formatDate(fd.createdAt)}</dd>
+              <dt className="text-[var(--text-secondary)]">Created</dt>
+              <dd className="text-[var(--text-primary)] mono text-right">{formatDate(fd.createdAt)}</dd>
             </div>
           </dl>
         </div>
 
         <div className="space-y-5">
           <div className="ab-card p-4 sm:p-5 space-y-3">
-            <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Renewal &amp; Nominee</h3>
+            <h3 className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold">Renewal &amp; Nominee</h3>
             <dl className="text-[13px] space-y-0">
-              <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-                <dt className="text-[#a0a0a5]">Maturity Instruction</dt>
-                <dd className="text-[#ededed] text-right">{formatInstruction(activeInstruction)}</dd>
+              <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+                <dt className="text-[var(--text-secondary)]">Maturity Instruction</dt>
+                <dd className="text-[var(--text-primary)] text-right">{formatInstruction(activeInstruction)}</dd>
               </div>
-              <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-                <dt className="text-[#a0a0a5]">Payout Frequency</dt>
-                <dd className="text-[#ededed] text-right">{formatFrequency(activeFrequency)}</dd>
+              <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+                <dt className="text-[var(--text-secondary)]">Payout Frequency</dt>
+                <dd className="text-[var(--text-primary)] text-right">{formatFrequency(activeFrequency)}</dd>
               </div>
-              <div className="flex items-center justify-between gap-4 py-2 border-b border-[#2a2a2e]">
-                <dt className="text-[#a0a0a5]">Nominee</dt>
-                <dd className="text-[#ededed] text-right">{fd.nomineeName ?? "—"}</dd>
+              <div className="flex items-center justify-between gap-4 py-2 border-b border-[var(--border)]">
+                <dt className="text-[var(--text-secondary)]">Nominee</dt>
+                <dd className="text-[var(--text-primary)] text-right">{fd.nomineeName ?? "—"}</dd>
               </div>
               <div className="flex items-center justify-between gap-4 py-2">
-                <dt className="text-[#a0a0a5]">Nominee Relation</dt>
-                <dd className="text-[#ededed] text-right">{fd.nomineeRelation ?? "—"}</dd>
+                <dt className="text-[var(--text-secondary)]">Nominee Relation</dt>
+                <dd className="text-[var(--text-primary)] text-right">{fd.nomineeRelation ?? "—"}</dd>
               </div>
             </dl>
           </div>
 
           <div className="ab-card p-4 sm:p-5">
-            <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold mb-3">Source Document</h3>
+            <h3 className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold mb-3">Source Document</h3>
             {fd.sourcePdfUrl ? (
               <a
                 href={fd.sourcePdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-[13px] text-[#ededed] font-semibold underline underline-offset-4 hover:text-[#ff385c] transition-colors"
+                className="inline-flex items-center gap-2 text-[13px] text-[var(--text-primary)] font-semibold underline underline-offset-4 hover:text-[var(--primary)] transition-colors"
               >
                 <FileText size={14} /> View PDF
               </a>
@@ -267,20 +267,20 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
                 ].filter((s) => s.url).map(({ url, label }) => (
                   <div key={label} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold">{label}</p>
-                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[12px] text-[#ededed] font-semibold underline underline-offset-4 inline-flex items-center gap-1 hover:text-[#ff385c] transition-colors">
+                      <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold">{label}</p>
+                      <a href={url!} target="_blank" rel="noopener noreferrer" className="text-[12px] text-[var(--text-primary)] font-semibold underline underline-offset-4 inline-flex items-center gap-1 hover:text-[var(--primary)] transition-colors">
                         <FileText size={11} /> Open
                       </a>
                     </div>
                     <a href={url!} target="_blank" rel="noopener noreferrer" className="block">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-xl w-full h-44 object-contain bg-[#1c1c20] border border-[#2a2a2e]" />
+                      <img src={url!} alt={`FD certificate ${label}`} className="rounded-xl w-full h-44 object-contain bg-[var(--surface-muted)] border border-[var(--border)]" />
                     </a>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[13px] text-[#a0a0a5]">No document was attached when this FD was added.</p>
+              <p className="text-[13px] text-[var(--text-secondary)]">No document was attached when this FD was added.</p>
             )}
           </div>
         </div>
@@ -289,35 +289,35 @@ export function FDDetailContent({ fd }: { fd: FDDetailData }) {
       {/* Notes */}
       {fd.notes && (
         <div className="ab-card p-4 sm:p-5">
-          <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold mb-3">Notes</h3>
-          <p className="text-[13px] text-[#a0a0a5] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
+          <h3 className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold mb-3">Notes</h3>
+          <p className="text-[13px] text-[var(--text-secondary)] whitespace-pre-wrap leading-relaxed">{fd.notes}</p>
         </div>
       )}
 
       {/* Renewal history */}
       {fd.renewals.length > 0 && (
         <div className="ab-card p-4 sm:p-5 space-y-3">
-          <h3 className="text-[11px] text-[#6e6e73] uppercase tracking-wider font-semibold">Renewal History</h3>
+          <h3 className="text-[11px] text-[var(--text-tertiary)] uppercase tracking-wider font-semibold">Renewal History</h3>
           <div>
-            <div className="flex items-center justify-between text-[13px] py-3 border-b border-[#2a2a2e]">
+            <div className="flex items-center justify-between text-[13px] py-3 border-b border-[var(--border)]">
               <div className="flex items-center gap-3">
                 <span className="ab-chip">Original</span>
-                <span className="text-[#a0a0a5]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
+                <span className="text-[var(--text-secondary)]">{formatDate(fd.startDate)} → {formatDate(fd.maturityDate)}</span>
               </div>
               <div className="text-right">
-                <span className="mono text-[#ededed] font-semibold">{formatINR(fd.principal)}</span>
-                <span className="text-[#a0a0a5] ml-2">@ {fd.interestRate}%</span>
+                <span className="mono text-[var(--text-primary)] font-semibold">{formatINR(fd.principal)}</span>
+                <span className="text-[var(--text-secondary)] ml-2">@ {fd.interestRate}%</span>
               </div>
             </div>
             {fd.renewals.map((r) => (
-              <div key={r.id} className="flex items-center justify-between text-[13px] py-3 border-b border-[#2a2a2e] last:border-b-0">
+              <div key={r.id} className="flex items-center justify-between text-[13px] py-3 border-b border-[var(--border)] last:border-b-0">
                 <div className="flex items-center gap-3">
                   <span className="ab-chip ab-chip-accent">R{r.renewalNumber}</span>
-                  <span className="text-[#a0a0a5]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
+                  <span className="text-[var(--text-secondary)]">{formatDate(r.startDate)} → {formatDate(r.maturityDate)}</span>
                 </div>
                 <div className="text-right">
-                  <span className="mono text-[#ededed] font-semibold">{formatINR(r.principal)}</span>
-                  <span className="text-[#a0a0a5] ml-2">@ {r.interestRate}%</span>
+                  <span className="mono text-[var(--text-primary)] font-semibold">{formatINR(r.principal)}</span>
+                  <span className="text-[var(--text-secondary)] ml-2">@ {r.interestRate}%</span>
                 </div>
               </div>
             ))}

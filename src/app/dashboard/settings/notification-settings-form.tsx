@@ -53,18 +53,18 @@ export function NotificationSettingsForm({ savedPhone }: Props) {
           onChange={(e) => setPhone(e.target.value)}
           placeholder="+919876543210"
         />
-        <p className="text-[12px] text-[#a0a0a5] mt-1.5">
+        <p className="text-[12px] text-[var(--text-secondary)] mt-1.5">
           International format. Leave blank to skip WhatsApp reminders.
         </p>
       </div>
 
       {error && (
-        <p className="text-[13px] text-[#ff7a6e] bg-[#2a1613] rounded-lg px-3 py-2.5 font-medium">
+        <p className="text-[13px] text-[var(--accent-error)] bg-[var(--chip-error-bg)] rounded-lg px-3 py-2.5 font-medium">
           {error}
         </p>
       )}
       {saved && (
-        <p className="text-[13px] text-[#5ee0a4] bg-[#0f2a19] rounded-lg px-3 py-2.5 font-medium">
+        <p className="text-[13px] text-[var(--accent-success)] bg-[var(--chip-success-bg)] rounded-lg px-3 py-2.5 font-medium">
           Saved successfully.
         </p>
       )}

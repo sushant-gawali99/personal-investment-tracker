@@ -168,19 +168,19 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
               <div
                 className={`w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold transition-colors ${
                   done
-                    ? "bg-[#5ee0a4] text-[#0e0e11]"
+                    ? "bg-[var(--accent-success)] text-[var(--background)]"
                     : active
-                    ? "bg-[#ff385c] text-white"
-                    : "bg-[#1c1c20] text-[#6e6e73] border border-[#2a2a2e]"
+                    ? "bg-[var(--primary)] text-white"
+                    : "bg-[var(--surface-muted)] text-[var(--text-tertiary)] border border-[var(--border)]"
                 }`}
               >
                 {done ? <CheckCircle2 size={14} /> : s.n}
               </div>
-              <span className={`text-[12px] font-semibold ${active ? "text-[#ededed]" : "text-[#6e6e73]"}`}>
+              <span className={`text-[12px] font-semibold ${active ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"}`}>
                 {s.label}
               </span>
               {i < steps.length - 1 && (
-                <div className={`w-8 h-[2px] ${done ? "bg-[#5ee0a4]" : "bg-[#2a2a2e]"}`} />
+                <div className={`w-8 h-[2px] ${done ? "bg-[var(--accent-success)]" : "bg-[var(--border)]"}`} />
               )}
             </div>
           );
@@ -217,10 +217,10 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                 block relative border-2 border-dashed rounded-[14px] p-8 text-center cursor-pointer
                 transition-all
                 ${dragOver
-                  ? "border-[#ff385c] bg-[rgba(255,56,92,0.06)]"
+                  ? "border-[var(--primary)] bg-[rgba(255,56,92,0.06)]"
                   : file
-                  ? "border-[#5ee0a4] bg-[rgba(94,224,164,0.05)]"
-                  : "border-[#3a3a3f] bg-[#1c1c20]/40 hover:border-[#ededed] hover:bg-[#1c1c20]"
+                  ? "border-[var(--accent-success)] bg-[rgba(94,224,164,0.05)]"
+                  : "border-[var(--border-strong)] bg-[var(--surface-muted)]/40 hover:border-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
                 }
                 ${status !== "idle" ? "pointer-events-none opacity-60" : ""}
               `}
@@ -235,20 +235,20 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
               {file ? (
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-[rgba(94,224,164,0.15)] flex items-center justify-center mx-auto">
-                    <FileText size={20} className="text-[#5ee0a4]" />
+                    <FileText size={20} className="text-[var(--accent-success)]" />
                   </div>
-                  <p className="text-[14px] font-semibold text-[#ededed]">{file.name}</p>
-                  <p className="text-[12px] text-[#a0a0a5]">{(file.size / 1024).toFixed(1)} KB · click to replace</p>
+                  <p className="text-[14px] font-semibold text-[var(--text-primary)]">{file.name}</p>
+                  <p className="text-[12px] text-[var(--text-secondary)]">{(file.size / 1024).toFixed(1)} KB · click to replace</p>
                 </div>
               ) : (
                 <div className="space-y-2">
                   <div className="w-12 h-12 rounded-full bg-[rgba(255,56,92,0.12)] flex items-center justify-center mx-auto">
-                    <UploadCloud size={22} className="text-[#ff385c]" />
+                    <UploadCloud size={22} className="text-[var(--primary)]" />
                   </div>
-                  <p className="text-[14px] font-semibold text-[#ededed]">
+                  <p className="text-[14px] font-semibold text-[var(--text-primary)]">
                     Drop your PDF here or click to browse
                   </p>
-                  <p className="text-[12px] text-[#a0a0a5]">
+                  <p className="text-[12px] text-[var(--text-secondary)]">
                     Password-protected PDFs supported — enter password below
                   </p>
                 </div>
@@ -258,7 +258,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
           <div>
             <label className="ab-label">
-              PDF password <span className="text-[#6e6e73] font-normal">(optional)</span>
+              PDF password <span className="text-[var(--text-tertiary)] font-normal">(optional)</span>
             </label>
             <div className="relative">
               <input
@@ -274,14 +274,14 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[#a0a0a5] hover:text-[#ededed] px-2 py-1"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-2 py-1"
                   tabIndex={-1}
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               )}
             </div>
-            <p className="text-[11px] text-[#6e6e73] mt-1">
+            <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
               Used once to decrypt this statement — not stored.
             </p>
           </div>
@@ -299,13 +299,13 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
           {status === "extracting" && (
             <div className="space-y-2">
               {/* Shimmer progress bar */}
-              <div className="h-1 bg-[#1c1c20] rounded-full overflow-hidden relative">
+              <div className="h-1 bg-[var(--surface-muted)] rounded-full overflow-hidden relative">
                 <div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-transparent via-[#ff385c] to-transparent"
+                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-transparent via-[var(--primary)] to-transparent"
                   style={{ width: "40%", animation: "ab-shimmer 1.4s linear infinite" }}
                 />
               </div>
-              <p className="text-[12px] text-[#a0a0a5] text-center">
+              <p className="text-[12px] text-[var(--text-secondary)] text-center">
                 Reading statement — usually 1–5 seconds for known banks, up to 45s for unfamiliar formats.
                 You can leave this page open; progress is saved.
               </p>
@@ -314,12 +314,12 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
           {error && (
             <div className="flex items-start gap-2 p-3 rounded-lg bg-[rgba(255,122,110,0.08)] border border-[rgba(255,122,110,0.25)]">
-              <XCircle size={16} className="text-[#ff7a6e] shrink-0 mt-0.5" />
-              <p className="text-[13px] text-[#ff7a6e]">{error}</p>
+              <XCircle size={16} className="text-[var(--accent-error)] shrink-0 mt-0.5" />
+              <p className="text-[13px] text-[var(--accent-error)]">{error}</p>
             </div>
           )}
 
-          <div className="flex items-center gap-2 text-[11px] text-[#6e6e73] pt-1 border-t border-[#2a2a2e]">
+          <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)] pt-1 border-t border-[var(--border)]">
             <Shield size={12} />
             <span>PDFs are stored locally — never sent to third parties except your chosen AI provider.</span>
           </div>
@@ -336,20 +336,20 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       {step === 2 && (
         <div className="space-y-3">
           {summary && (
-            <p className="text-sm text-[#a0a0a5]">
+            <p className="text-sm text-[var(--text-secondary)]">
               {summary.new} new · {summary.dup} duplicates auto-skipped · edit below, then commit.
             </p>
           )}
           <div className="overflow-x-auto">
           <table className="w-full text-xs ab-card">
-            <thead><tr className="text-left text-[#a0a0a5]">
+            <thead><tr className="text-left text-[var(--text-secondary)]">
               <th className="p-2">Date</th><th className="p-2">Description</th>
               <th className="p-2 text-right">Amount</th><th className="p-2 hidden sm:table-cell">Dir</th>
               <th className="p-2 hidden md:table-cell">Category</th><th className="p-2">Skip</th>
             </tr></thead>
             <tbody>
               {rows.map((r, i) => (
-                <tr key={i} className={`border-t border-[#2a2a2e] ${r.isDuplicate ? "opacity-50" : ""}`}>
+                <tr key={i} className={`border-t border-[var(--border)] ${r.isDuplicate ? "opacity-50" : ""}`}>
                   <td className="p-2">{r.txnDate}</td>
                   <td className="p-2 max-w-[120px] sm:max-w-none truncate">{r.description}</td>
                   <td className="p-2 text-right">{r.amount.toFixed(2)}</td>
@@ -379,13 +379,13 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
       {step === 3 && (
         <div className="ab-card p-10 max-w-2xl mx-auto text-center space-y-5">
           <div className="w-20 h-20 rounded-full bg-[rgba(94,224,164,0.12)] flex items-center justify-center mx-auto">
-            <CheckCircle2 size={36} className="text-[#5ee0a4]" />
+            <CheckCircle2 size={36} className="text-[var(--accent-success)]" />
           </div>
           <div>
-            <h2 className="text-[22px] font-bold text-[#ededed] tracking-tight">Import saved</h2>
+            <h2 className="text-[22px] font-bold text-[var(--text-primary)] tracking-tight">Import saved</h2>
             {summary && (
-              <p className="text-[14px] text-[#a0a0a5] mt-2">
-                <span className="text-[#5ee0a4] font-semibold">{summary.new}</span> new transaction{summary.new === 1 ? "" : "s"} saved
+              <p className="text-[14px] text-[var(--text-secondary)] mt-2">
+                <span className="text-[var(--accent-success)] font-semibold">{summary.new}</span> new transaction{summary.new === 1 ? "" : "s"} saved
                 {summary.dup > 0 && <> · <span className="font-semibold">{summary.dup}</span> duplicate{summary.dup === 1 ? "" : "s"} auto-skipped</>}
               </p>
             )}

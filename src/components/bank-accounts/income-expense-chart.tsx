@@ -26,18 +26,18 @@ export function IncomeExpenseChart({ data }: { data: Row[] }) {
     <div className="ab-card p-6">
       <div className="flex items-start justify-between mb-5 flex-wrap gap-3">
         <div>
-          <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Income vs Expense</h3>
-          <p className="text-[12px] text-[#a0a0a5] mt-0.5">Last {data.length} months</p>
+          <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Income vs Expense</h3>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">Last {data.length} months</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="text-right">
-            <p className="text-[10px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Net</p>
-            <p className={`mono text-[15px] font-semibold ${net >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}`}>
+            <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Net</p>
+            <p className={`mono text-[15px] font-semibold ${net >= 0 ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}`}>
               {net >= 0 ? "+" : ""}{formatINRCompact(net)}
             </p>
           </div>
           <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgba(94,224,164,0.12)]">
-            <Activity size={15} className="text-[#5ee0a4]" />
+            <Activity size={15} className="text-[var(--accent-success)]" />
           </span>
         </div>
       </div>
@@ -46,36 +46,36 @@ export function IncomeExpenseChart({ data }: { data: Row[] }) {
           <AreaChart data={data} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="ie-income" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#5ee0a4" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#5ee0a4" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--accent-success)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="var(--accent-success)" stopOpacity={0} />
               </linearGradient>
               <linearGradient id="ie-spend" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#ff7a6e" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="#ff7a6e" stopOpacity={0} />
+                <stop offset="0%" stopColor="var(--accent-error)" stopOpacity={0.3} />
+                <stop offset="100%" stopColor="var(--accent-error)" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
             <XAxis
               dataKey="month"
               tickFormatter={formatMonthLabel}
-              tick={{ fontSize: 11, fill: "#a0a0a5" }}
+              tick={{ fontSize: 11, fill: "var(--text-secondary)" }}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
               tickFormatter={(v) => formatINRCompact(Number(v))}
-              tick={{ fontSize: 11, fill: "#a0a0a5" }}
+              tick={{ fontSize: 11, fill: "var(--text-secondary)" }}
               tickLine={false}
               axisLine={false}
               width={52}
             />
             <Tooltip
-              cursor={{ stroke: "#3a3a3f", strokeDasharray: "3 3" }}
+              cursor={{ stroke: "var(--border-strong)", strokeDasharray: "3 3" }}
               content={(
                 <ChartTooltip
                   series={[
-                    { dataKey: "income", label: "Income", color: "#5ee0a4" },
-                    { dataKey: "spending", label: "Spending", color: "#ff7a6e" },
+                    { dataKey: "income", label: "Income", color: "var(--accent-success)" },
+                    { dataKey: "spending", label: "Spending", color: "var(--accent-error)" },
                   ]}
                   title={(l) => formatMonthLabel(String(l ?? ""))}
                 />
@@ -84,7 +84,7 @@ export function IncomeExpenseChart({ data }: { data: Row[] }) {
             <Area
               type="monotone"
               dataKey="income"
-              stroke="#5ee0a4"
+              stroke="var(--accent-success)"
               strokeWidth={2}
               fill="url(#ie-income)"
               dot={false}
@@ -93,7 +93,7 @@ export function IncomeExpenseChart({ data }: { data: Row[] }) {
             <Area
               type="monotone"
               dataKey="spending"
-              stroke="#ff7a6e"
+              stroke="var(--accent-error)"
               strokeWidth={2}
               fill="url(#ie-spend)"
               dot={false}

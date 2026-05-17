@@ -27,21 +27,21 @@ export function InterestAccrualChart({ data }: { data: DataPoint[] }) {
       <AreaChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
         <defs>
           <linearGradient id="accrued" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ff385c" stopOpacity={0.22} />
-            <stop offset="95%" stopColor="#ff385c" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.22} />
+            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="projected" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#ff385c" stopOpacity={0.08} />
-            <stop offset="95%" stopColor="#ff385c" stopOpacity={0} />
+            <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.08} />
+            <stop offset="95%" stopColor="var(--primary)" stopOpacity={0} />
           </linearGradient>
         </defs>
-        <CartesianGrid strokeDasharray="3 3" stroke="#2a2a2e" />
-        <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} interval={3} />
-        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: "#a0a0a5" }} tickLine={false} axisLine={false} width={52} />
+        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+        <XAxis dataKey="month" tick={{ fontSize: 11, fill: "var(--text-secondary)" }} tickLine={false} axisLine={false} interval={3} />
+        <YAxis tickFormatter={fmt} tick={{ fontSize: 11, fill: "var(--text-secondary)" }} tickLine={false} axisLine={false} width={52} />
         <Tooltip formatter={(value, name) => [fmt(Number(value)), name === "accrued" ? "Accrued" : "Projected"]} />
-        {todayLabel && <ReferenceLine x={todayLabel} stroke="#3a3a3f" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "#a0a0a5", position: "top" }} />}
-        <Area type="monotone" dataKey="accrued" stroke="#ff385c" strokeWidth={2} fill="url(#accrued)" dot={false} animationDuration={600} />
-        <Area type="monotone" dataKey="projected" stroke="#ff385c" strokeWidth={1.5} fill="url(#projected)" dot={false} strokeDasharray="5 5" animationDuration={600} />
+        {todayLabel && <ReferenceLine x={todayLabel} stroke="var(--border-strong)" strokeDasharray="4 4" label={{ value: "Today", fontSize: 10, fill: "var(--text-secondary)", position: "top" }} />}
+        <Area type="monotone" dataKey="accrued" stroke="var(--primary)" strokeWidth={2} fill="url(#accrued)" dot={false} animationDuration={600} />
+        <Area type="monotone" dataKey="projected" stroke="var(--primary)" strokeWidth={1.5} fill="url(#projected)" dot={false} strokeDasharray="5 5" animationDuration={600} />
       </AreaChart>
     </ResponsiveContainer>
   );

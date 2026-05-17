@@ -45,7 +45,7 @@ export function ChartTooltip({ active, payload, label, series, title }: Props) {
     : payload.map((p) => ({
         dataKey: String(p.dataKey ?? ""),
         label: String(p.name ?? p.dataKey ?? ""),
-        color: p.color ?? "#ededed",
+        color: p.color ?? "var(--text-primary)",
         value: Number(p.value ?? 0),
       }));
 
@@ -54,7 +54,7 @@ export function ChartTooltip({ active, payload, label, series, title }: Props) {
       className="ab-card-flat px-3 py-2.5"
       style={{ minWidth: 180, boxShadow: "0 8px 24px rgba(0,0,0,0.6)" }}
     >
-      <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1.5">
+      <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold mb-1.5">
         {displayTitle}
       </p>
       <div className="space-y-1">
@@ -62,9 +62,9 @@ export function ChartTooltip({ active, payload, label, series, title }: Props) {
           <div key={r.dataKey} className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2 min-w-0">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: r.color }} />
-              <span className="text-[12px] text-[#ededed] truncate">{r.label}</span>
+              <span className="text-[12px] text-[var(--text-primary)] truncate">{r.label}</span>
             </div>
-            <span className="mono text-[13px] font-semibold text-[#ededed]">
+            <span className="mono text-[13px] font-semibold text-[var(--text-primary)]">
               {formatINR(r.value)}
             </span>
           </div>

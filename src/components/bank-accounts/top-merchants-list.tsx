@@ -39,7 +39,7 @@ function avatarBg(s: string): string {
   return palette[h % palette.length];
 }
 function avatarFg(s: string): string {
-  const palette = ["#ff8aa0", "#5aa9ff", "#5ee0a4", "#f5a524", "#a78bfa"];
+  const palette = ["#ff8aa0", "var(--accent-info)", "var(--accent-success)", "var(--accent-warning)", "#a78bfa"];
   let h = 0;
   for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
   return palette[h % palette.length];
@@ -65,25 +65,25 @@ export function TopMerchantsList({
     >
       <div className="flex items-start justify-between mb-4 shrink-0">
         <div>
-          <h3 className="text-[16px] font-semibold text-[#ededed] tracking-tight">Top Merchants</h3>
-          <p className="text-[12px] text-[#a0a0a5] mt-0.5">
+          <h3 className="text-[16px] font-semibold text-[var(--text-primary)] tracking-tight">Top Merchants</h3>
+          <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">
             {items.length > 0
               ? `${items.length} merchant${items.length === 1 ? "" : "s"} this period`
               : "Ranked by total spend this period"}
           </p>
         </div>
         <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[rgba(245,165,36,0.12)]">
-          <Store size={15} className="text-[#f5a524]" />
+          <Store size={15} className="text-[var(--accent-warning)]" />
         </span>
       </div>
       {items.length === 0 ? (
-        <p className="text-[13px] text-[#6e6e73] py-6 text-center">No merchants this period.</p>
+        <p className="text-[13px] text-[var(--text-tertiary)] py-6 text-center">No merchants this period.</p>
       ) : (
         // Scrollable list region. `min-h-0` is the flex-item magic that
         // allows overflow to actually kick in (otherwise the child ul
         // would force the card to grow past its grid cell).
         <div className="flex-1 min-h-0 -mr-3 pr-3 overflow-y-auto ab-scroll">
-          <ul className="divide-y divide-[#2a2a2e]">
+          <ul className="divide-y divide-[var(--border)]">
             {items.map((m, i) => {
               const name = merchantDisplay(m.normalizedDescription);
               return (
@@ -92,7 +92,7 @@ export function TopMerchantsList({
                   className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 group"
                   title={m.normalizedDescription}
                 >
-                  <span className="mono text-[11px] font-semibold text-[#6e6e73] w-5 text-right shrink-0">
+                  <span className="mono text-[11px] font-semibold text-[var(--text-tertiary)] w-5 text-right shrink-0">
                     {i + 1}
                   </span>
                   <span
@@ -102,14 +102,14 @@ export function TopMerchantsList({
                     {initials(name)}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] font-semibold text-[#ededed] truncate">
+                    <p className="text-[13px] font-semibold text-[var(--text-primary)] truncate">
                       {name}
                     </p>
-                    <p className="text-[11px] text-[#a0a0a5] mt-0.5">
+                    <p className="text-[11px] text-[var(--text-secondary)] mt-0.5">
                       {m.count} transaction{m.count === 1 ? "" : "s"}
                     </p>
                   </div>
-                  <p className="mono text-[14px] font-semibold text-[#ededed] shrink-0">
+                  <p className="mono text-[14px] font-semibold text-[var(--text-primary)] shrink-0">
                     {formatINR(m.total)}
                   </p>
                 </li>

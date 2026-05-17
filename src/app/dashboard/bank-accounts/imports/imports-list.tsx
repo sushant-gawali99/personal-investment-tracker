@@ -86,11 +86,11 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
   if (items.length === 0) {
     return (
       <div className="ab-card p-10 text-center">
-        <div className="w-14 h-14 rounded-full bg-[#2a1218] flex items-center justify-center mx-auto mb-4">
-          <Inbox size={22} className="text-[#ff385c]" />
+        <div className="w-14 h-14 rounded-full bg-[var(--primary-tint)] flex items-center justify-center mx-auto mb-4">
+          <Inbox size={22} className="text-[var(--primary)]" />
         </div>
-        <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">No imports yet</p>
-        <p className="text-[13px] text-[#a0a0a5] mt-1 mb-4">Upload your first bank statement PDF to get started.</p>
+        <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">No imports yet</p>
+        <p className="text-[13px] text-[var(--text-secondary)] mt-1 mb-4">Upload your first bank statement PDF to get started.</p>
         <a href="/dashboard/bank-accounts/import" className="ab-btn ab-btn-accent inline-flex">
           Import Statement
         </a>
@@ -100,7 +100,7 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
 
   return (
     <div className="ab-card overflow-hidden">
-      <ul className="divide-y divide-[#2a2a2e]">
+      <ul className="divide-y divide-[var(--border)]">
         {items.map((i) => {
           const badge = statusBadge(i.status);
           const txnsHref = (() => {
@@ -113,14 +113,14 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
           const errorExpanded = expandedErrors.has(i.id);
           const isReimporting = reimportingIds.has(i.id);
           return (
-            <li key={i.id} className="px-4 py-3 hover:bg-[#1c1c20]/50 transition-colors">
+            <li key={i.id} className="px-4 py-3 hover:bg-[var(--surface-muted)]/50 transition-colors">
               <div className="flex items-center gap-3">
-                <FileText size={15} className="text-[#ff385c] shrink-0" />
+                <FileText size={15} className="text-[var(--primary)] shrink-0" />
 
                 {/* Main info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[14px] font-medium text-[#ededed] truncate max-w-[180px] sm:max-w-[340px]">
+                    <span className="text-[14px] font-medium text-[var(--text-primary)] truncate max-w-[180px] sm:max-w-[340px]">
                       {i.fileName}
                     </span>
                     <span className={`ab-chip ${badge.chip}`} style={{ fontSize: 11, padding: "2px 8px" }}>
@@ -129,14 +129,14 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
                     {i.errorMessage && (
                       <button
                         onClick={() => toggleError(i.id)}
-                        className="inline-flex items-center gap-1 text-[11px] text-[#ff7a6e] hover:text-[#ffaa99] transition-colors"
+                        className="inline-flex items-center gap-1 text-[11px] text-[var(--accent-error)] hover:text-[var(--accent-error)] transition-colors"
                       >
                         {errorExpanded ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
                         {errorExpanded ? "Hide error" : "Show error"}
                       </button>
                     )}
                   </div>
-                  <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[12px] text-[#6e6e73]">
+                  <div className="flex items-center gap-2 mt-0.5 flex-wrap text-[12px] text-[var(--text-tertiary)]">
                     <span>{i.account.label}</span>
                     <span>·</span>
                     <span>
@@ -152,7 +152,7 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
                         <span className="mono">
                           {i.openingBalance != null ? formatINR(i.openingBalance) : "?"}
                           {" → "}
-                          <span className={i.closingBalance != null && i.closingBalance < 0 ? "text-[#ff7a6e]" : "text-[#ededed]"}>
+                          <span className={i.closingBalance != null && i.closingBalance < 0 ? "text-[var(--accent-error)]" : "text-[var(--text-primary)]"}>
                             {i.closingBalance != null ? formatINR(i.closingBalance) : "?"}
                           </span>
                         </span>
@@ -160,7 +160,7 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
                     )}
                   </div>
                   {errorExpanded && i.errorMessage && (
-                    <p className="text-[12px] text-[#ff7a6e] mt-1.5 break-words bg-[rgba(255,122,110,0.06)] rounded-lg px-3 py-2">
+                    <p className="text-[12px] text-[var(--accent-error)] mt-1.5 break-words bg-[rgba(255,122,110,0.06)] rounded-lg px-3 py-2">
                       {i.errorMessage}
                     </p>
                   )}
@@ -168,18 +168,18 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
 
                 {/* Txn count + view link */}
                 <div className="text-right shrink-0">
-                  <p className="mono text-[13px] font-semibold text-[#ededed] leading-none">
+                  <p className="mono text-[13px] font-semibold text-[var(--text-primary)] leading-none">
                     {i.newCount}
                     {i.extractedCount > 0 && (
-                      <span className="text-[#6e6e73] font-normal text-[12px]"> / {i.extractedCount}</span>
+                      <span className="text-[var(--text-tertiary)] font-normal text-[12px]"> / {i.extractedCount}</span>
                     )}
                   </p>
                   <div className="flex items-center justify-end gap-2 mt-0.5">
                     {i.duplicateCount > 0 && (
-                      <span className="text-[11px] text-[#6e6e73]">{i.duplicateCount} dup</span>
+                      <span className="text-[11px] text-[var(--text-tertiary)]">{i.duplicateCount} dup</span>
                     )}
                     {txnsHref && (
-                      <Link href={txnsHref} className="text-[11px] text-[#ff385c] hover:underline">
+                      <Link href={txnsHref} className="text-[11px] text-[var(--primary)] hover:underline">
                         View →
                       </Link>
                     )}
@@ -190,7 +190,7 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
                   <button
                     onClick={() => reimport(i.id)}
                     disabled={isReimporting}
-                    className="p-1.5 rounded-lg text-[#6e6e73] hover:text-[#f59e0b] hover:bg-[rgba(245,158,11,0.08)] transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--accent-warning)] hover:bg-[rgba(245,158,11,0.08)] transition-colors shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
                     title="Re-import (super admin)"
                   >
                     {isReimporting
@@ -202,7 +202,7 @@ export function ImportsList({ items, isSuperAdmin = false }: { items: Item[]; is
 
                 <button
                   onClick={() => remove(i.id)}
-                  className="p-1.5 rounded-lg text-[#6e6e73] hover:text-[#ff7a6e] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
+                  className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--accent-error)] hover:bg-[rgba(255,122,110,0.08)] transition-colors shrink-0"
                   title="Delete import"
                 >
                   <Trash2 size={14} />

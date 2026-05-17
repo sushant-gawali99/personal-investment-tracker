@@ -13,7 +13,7 @@ const TABS = [
 export function EquityMFTabs() {
   const pathname = usePathname();
   return (
-    <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[#17171a] border border-[#2a2a2e]">
+    <div className="inline-flex items-center gap-1 p-1 rounded-full bg-[var(--surface-raised)] border border-[var(--border)]">
       {TABS.map(({ href, label, Icon }) => {
         const active = pathname.startsWith(href);
         return (
@@ -23,8 +23,8 @@ export function EquityMFTabs() {
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all",
               active
-                ? "bg-[#ff385c]/10 text-white ring-1 ring-inset ring-[#ff385c]/30 shadow-[0_0_0_1px_rgba(255,56,92,0.15)]"
-                : "text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#1c1c20]"
+                ? "bg-[var(--primary)]/10 text-white ring-1 ring-inset ring-[var(--primary)]/30 shadow-[0_0_0_1px_rgba(255,56,92,0.15)]"
+                : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
             )}
           >
             <Icon size={14} strokeWidth={2.2} />

@@ -57,8 +57,8 @@ export default async function ZerodhaPage() {
       <div className="space-y-6">
         {header}
         <div className="ab-card p-10 text-center">
-          <p className="text-[16px] font-semibold text-[#ededed]">No data yet</p>
-          <p className="text-[14px] text-[#a0a0a5] mt-1.5">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
+          <p className="text-[16px] font-semibold text-[var(--text-primary)]">No data yet</p>
+          <p className="text-[14px] text-[var(--text-secondary)] mt-1.5">Click &quot;Sync Now&quot; above to fetch your Zerodha holdings.</p>
         </div>
       </div>
     );

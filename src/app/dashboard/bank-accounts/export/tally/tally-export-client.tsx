@@ -26,10 +26,10 @@ const KIND_LABELS: Record<string, string> = {
 const VOUCHER_TYPES: VoucherType[] = ["Payment", "Receipt", "Contra", "Journal"];
 
 const KIND_COLORS: Record<string, string> = {
-  expense: "text-[#ff7a6e]",
-  income: "text-[#5ee0a4]",
-  transfer: "text-[#5aa9ff]",
-  "—": "text-[#6e6e73]",
+  expense: "text-[var(--accent-error)]",
+  income: "text-[var(--accent-success)]",
+  transfer: "text-[var(--accent-info)]",
+  "—": "text-[var(--text-tertiary)]",
 };
 
 export function TallyExportClient({
@@ -169,7 +169,7 @@ export function TallyExportClient({
   }
 
   const inputClass =
-    "w-full h-10 px-3 rounded-xl bg-[#111113] border border-[#2a2a2e] text-[13px] text-[#ededed] placeholder-[#3a3a3f] focus:outline-none focus:border-[#ff385c]/40 focus:bg-[#111113] transition-colors";
+    "w-full h-10 px-3 rounded-xl bg-[var(--surface-deep)] border border-[var(--border)] text-[13px] text-[var(--text-primary)] placeholder-[var(--border-strong)] focus:outline-none focus:border-[var(--primary)]/40 focus:bg-[var(--surface-deep)] transition-colors";
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -177,21 +177,21 @@ export function TallyExportClient({
       <div>
         <div className="flex items-center gap-3 mb-3">
           <div className="flex items-center gap-1.5">
-            <div className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold transition-colors ${step === "filters" ? "bg-[#ff385c] text-white" : "bg-[#5ee0a4] text-[#0e0e11]"}`}>
+            <div className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold transition-colors ${step === "filters" ? "bg-[var(--primary)] text-white" : "bg-[var(--accent-success)] text-[var(--background)]"}`}>
               {step === "filters" ? "1" : <Check size={10} strokeWidth={3} />}
             </div>
-            <span className={`text-[12px] font-medium transition-colors ${step === "filters" ? "text-[#ededed]" : "text-[#5ee0a4]"}`}>Select</span>
+            <span className={`text-[12px] font-medium transition-colors ${step === "filters" ? "text-[var(--text-primary)]" : "text-[var(--accent-success)]"}`}>Select</span>
           </div>
-          <div className={`h-px flex-1 max-w-[40px] transition-colors ${step === "ledger-mapping" ? "bg-[#5ee0a4]/40" : "bg-[#2a2a2e]"}`} />
+          <div className={`h-px flex-1 max-w-[40px] transition-colors ${step === "ledger-mapping" ? "bg-[var(--accent-success)]/40" : "bg-[var(--border)]"}`} />
           <div className="flex items-center gap-1.5">
-            <div className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold transition-colors ${step === "ledger-mapping" ? "bg-[#ff385c] text-white" : "bg-[#2a2a2e] text-[#6e6e73]"}`}>2</div>
-            <span className={`text-[12px] font-medium transition-colors ${step === "ledger-mapping" ? "text-[#ededed]" : "text-[#6e6e73]"}`}>Map Ledgers</span>
+            <div className={`flex items-center justify-center w-5 h-5 rounded-full text-[10px] font-semibold transition-colors ${step === "ledger-mapping" ? "bg-[var(--primary)] text-white" : "bg-[var(--surface-muted)] text-[var(--text-tertiary)]"}`}>2</div>
+            <span className={`text-[12px] font-medium transition-colors ${step === "ledger-mapping" ? "text-[var(--text-primary)]" : "text-[var(--text-tertiary)]"}`}>Map Ledgers</span>
           </div>
         </div>
-        <h1 className="text-[26px] font-bold text-[#ededed] tracking-tight">
+        <h1 className="text-[26px] font-bold text-[var(--text-primary)] tracking-tight">
           {step === "filters" ? "Select transactions" : "Map to Tally ledgers"}
         </h1>
-        <p className="text-[13px] text-[#6e6e73] mt-1">
+        <p className="text-[13px] text-[var(--text-tertiary)] mt-1">
           {step === "filters"
             ? "Choose which transactions to include in the Tally export."
             : "Assign a Tally ledger name and voucher type to each category."}
@@ -199,7 +199,7 @@ export function TallyExportClient({
       </div>
 
       {error && (
-        <div className="flex items-start gap-2 p-3 rounded-xl bg-[#ff7a6e]/8 border border-[#ff7a6e]/20 text-[13px] text-[#ff7a6e]">
+        <div className="flex items-start gap-2 p-3 rounded-xl bg-[var(--accent-error)]/8 border border-[var(--accent-error)]/20 text-[13px] text-[var(--accent-error)]">
           {error}
         </div>
       )}
@@ -209,10 +209,10 @@ export function TallyExportClient({
         <div className="space-y-4">
 
           {/* Account & Direction */}
-          <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-4">
+          <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-4">
             <div className="flex items-center gap-2">
-              <Building2 size={13} className="text-[#6e6e73]" />
-              <span className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Account</span>
+              <Building2 size={13} className="text-[var(--text-tertiary)]" />
+              <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Account</span>
             </div>
 
             <select
@@ -228,7 +228,7 @@ export function TallyExportClient({
 
             {/* Direction segmented control */}
             <div>
-              <p className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider mb-2">Direction</p>
+              <p className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider mb-2">Direction</p>
               <div className="flex gap-2">
                 {[
                   { value: "", label: "All", icon: <ArrowLeftRight size={12} /> },
@@ -241,8 +241,8 @@ export function TallyExportClient({
                     onClick={() => setFilters((f) => ({ ...f, direction: value }))}
                     className={`flex items-center gap-1.5 px-3 h-9 rounded-xl text-[12px] font-medium border transition-all ${
                       filters.direction === value
-                        ? "bg-[#ff385c]/10 border-[#ff385c]/40 text-[#ff385c]"
-                        : "bg-[#111113] border-[#2a2a2e] text-[#6e6e73] hover:border-[#3a3a3f] hover:text-[#a0a0a5]"
+                        ? "bg-[var(--primary)]/10 border-[var(--primary)]/40 text-[var(--primary)]"
+                        : "bg-[var(--surface-deep)] border-[var(--border)] text-[var(--text-tertiary)] hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)]"
                     }`}
                   >
                     {icon}
@@ -254,13 +254,13 @@ export function TallyExportClient({
           </div>
 
           {/* Date Range */}
-          <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-3">
+          <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-3">
             <div className="flex items-center gap-2">
-              <span className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Date range</span>
+              <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Date range</span>
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
-                <label className="text-[11px] text-[#6e6e73]">From</label>
+                <label className="text-[11px] text-[var(--text-tertiary)]">From</label>
                 <DatePicker
                   value={filters.from ?? ""}
                   onChange={(v) => setFilters((f) => ({ ...f, from: v }))}
@@ -268,7 +268,7 @@ export function TallyExportClient({
                 />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] text-[#6e6e73]">To</label>
+                <label className="text-[11px] text-[var(--text-tertiary)]">To</label>
                 <DatePicker
                   value={filters.to ?? ""}
                   onChange={(v) => setFilters((f) => ({ ...f, to: v }))}
@@ -279,17 +279,17 @@ export function TallyExportClient({
           </div>
 
           {/* Amount & Search */}
-          <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-3">
+          <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-3">
             <div className="flex items-center gap-2">
-              <IndianRupee size={13} className="text-[#6e6e73]" />
-              <span className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Filters</span>
+              <IndianRupee size={13} className="text-[var(--text-tertiary)]" />
+              <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Filters</span>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
-                <label className="text-[11px] text-[#6e6e73]">Min amount</label>
+                <label className="text-[11px] text-[var(--text-tertiary)]">Min amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3a3a3f] text-[12px]">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--border-strong)] text-[12px]">₹</span>
                   <input
                     type="number"
                     min="0"
@@ -301,9 +301,9 @@ export function TallyExportClient({
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-[11px] text-[#6e6e73]">Max amount</label>
+                <label className="text-[11px] text-[var(--text-tertiary)]">Max amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3a3a3f] text-[12px]">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--border-strong)] text-[12px]">₹</span>
                   <input
                     type="number"
                     min="0"
@@ -317,9 +317,9 @@ export function TallyExportClient({
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-[11px] text-[#6e6e73]">Description</label>
+              <label className="text-[11px] text-[var(--text-tertiary)]">Description</label>
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#3a3a3f]" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--border-strong)]" />
                 <input
                   type="text"
                   value={filters.q}
@@ -333,17 +333,17 @@ export function TallyExportClient({
 
           {/* Categories */}
           {categories.length > 0 && (
-            <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-3">
+            <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Tag size={13} className="text-[#6e6e73]" />
-                  <span className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Categories</span>
+                  <Tag size={13} className="text-[var(--text-tertiary)]" />
+                  <span className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Categories</span>
                 </div>
                 {(filters.categoryIds?.length ?? 0) > 0 && (
                   <button
                     type="button"
                     onClick={() => setFilters((f) => ({ ...f, categoryIds: [] }))}
-                    className="text-[11px] text-[#6e6e73] hover:text-[#a0a0a5] transition-colors"
+                    className="text-[11px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors"
                   >
                     Clear all
                   </button>
@@ -359,8 +359,8 @@ export function TallyExportClient({
                       onClick={() => toggleCategory(c.id)}
                       className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium border transition-all ${
                         active
-                          ? "bg-[#ff385c]/10 border-[#ff385c]/40 text-[#ff385c]"
-                          : "bg-[#111113] border-[#2a2a2e] text-[#a0a0a5] hover:border-[#3a3a3f] hover:text-[#ededed]"
+                          ? "bg-[var(--primary)]/10 border-[var(--primary)]/40 text-[var(--primary)]"
+                          : "bg-[var(--surface-deep)] border-[var(--border)] text-[var(--text-secondary)] hover:border-[var(--border-strong)] hover:text-[var(--text-primary)]"
                       }`}
                     >
                       {active && <Check size={10} strokeWidth={3} />}
@@ -376,11 +376,11 @@ export function TallyExportClient({
           <div className="flex items-center justify-between pt-1">
             <div className="flex items-center gap-2 h-9">
               {countLoading ? (
-                <span className="text-[13px] text-[#6e6e73]">Counting…</span>
+                <span className="text-[13px] text-[var(--text-tertiary)]">Counting…</span>
               ) : txnCount === null ? null : txnCount === 0 ? (
-                <span className="text-[13px] text-[#6e6e73]">No transactions match</span>
+                <span className="text-[13px] text-[var(--text-tertiary)]">No transactions match</span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#5ee0a4]/10 border border-[#5ee0a4]/20 text-[12px] font-semibold text-[#5ee0a4]">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--accent-success)]/10 border border-[var(--accent-success)]/20 text-[12px] font-semibold text-[var(--accent-success)]">
                   {txnCount.toLocaleString()} transaction{txnCount === 1 ? "" : "s"}
                 </span>
               )}
@@ -400,9 +400,9 @@ export function TallyExportClient({
       {/* ── STEP 2: Ledger Mapping ── */}
       {step === "ledger-mapping" && (
         <div className="space-y-4">
-          <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-4">
+          <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-4">
             <div>
-              <label className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Bank ledger in Tally</label>
+              <label className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Bank ledger in Tally</label>
               <input
                 type="text"
                 value={bankLedgerName}
@@ -413,14 +413,14 @@ export function TallyExportClient({
             </div>
           </div>
 
-          <div className="p-4 bg-[#17171a] border border-[#2a2a2e] rounded-2xl space-y-3">
-            <p className="text-[11px] font-semibold text-[#6e6e73] uppercase tracking-wider">Category mapping</p>
+          <div className="p-4 bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl space-y-3">
+            <p className="text-[11px] font-semibold text-[var(--text-tertiary)] uppercase tracking-wider">Category mapping</p>
             <div className="space-y-2">
               {mappings.map((row, i) => (
-                <div key={row.categoryId} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 p-3 bg-[#111113] rounded-xl border border-[#2a2a2e]">
+                <div key={row.categoryId} className="grid grid-cols-[1fr_auto_auto] items-center gap-2 p-3 bg-[var(--surface-deep)] rounded-xl border border-[var(--border)]">
                   <div>
-                    <p className="text-[13px] font-medium text-[#ededed] leading-tight">{row.categoryName}</p>
-                    <p className={`text-[11px] mt-0.5 ${KIND_COLORS[row.kind] ?? "text-[#6e6e73]"}`}>
+                    <p className="text-[13px] font-medium text-[var(--text-primary)] leading-tight">{row.categoryName}</p>
+                    <p className={`text-[11px] mt-0.5 ${KIND_COLORS[row.kind] ?? "text-[var(--text-tertiary)]"}`}>
                       {KIND_LABELS[row.kind] ?? row.kind}
                     </p>
                   </div>
@@ -433,7 +433,7 @@ export function TallyExportClient({
                       )
                     }
                     placeholder="Ledger name"
-                    className="h-9 w-44 px-3 rounded-xl bg-[#17171a] border border-[#2a2a2e] text-[12px] text-[#ededed] placeholder-[#3a3a3f] focus:outline-none focus:border-[#ff385c]/40 transition-colors"
+                    className="h-9 w-44 px-3 rounded-xl bg-[var(--surface-raised)] border border-[var(--border)] text-[12px] text-[var(--text-primary)] placeholder-[var(--border-strong)] focus:outline-none focus:border-[var(--primary)]/40 transition-colors"
                   />
                   <select
                     value={row.voucherType}
@@ -442,7 +442,7 @@ export function TallyExportClient({
                         ms.map((m, j) => j === i ? { ...m, voucherType: e.target.value as VoucherType } : m)
                       )
                     }
-                    className="h-9 px-2 rounded-xl bg-[#17171a] border border-[#2a2a2e] text-[12px] text-[#ededed] focus:outline-none focus:border-[#ff385c]/40 transition-colors"
+                    className="h-9 px-2 rounded-xl bg-[var(--surface-raised)] border border-[var(--border)] text-[12px] text-[var(--text-primary)] focus:outline-none focus:border-[var(--primary)]/40 transition-colors"
                   >
                     {VOUCHER_TYPES.map((v) => (
                       <option key={v} value={v}>{v}</option>
@@ -459,7 +459,7 @@ export function TallyExportClient({
             </button>
             <div className="flex items-center gap-3">
               {txnCount !== null && (
-                <span className="text-[12px] text-[#6e6e73]">
+                <span className="text-[12px] text-[var(--text-tertiary)]">
                   {txnCount.toLocaleString()} transaction{txnCount === 1 ? "" : "s"}
                 </span>
               )}

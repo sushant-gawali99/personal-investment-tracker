@@ -56,12 +56,12 @@ function InlineStatCard({
   label: string; value: string; sub?: string;
   tone?: "positive" | "negative" | "neutral";
 }) {
-  const valueColor = tone === "positive" ? "text-[#5ee0a4]" : tone === "negative" ? "text-[#ff7a6e]" : "text-[#ededed]";
+  const valueColor = tone === "positive" ? "text-[var(--accent-success)]" : tone === "negative" ? "text-[var(--accent-error)]" : "text-[var(--text-primary)]";
   return (
     <div className="ab-card px-4 py-4 sm:px-5">
-      <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
+      <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold mb-1">{label}</p>
       <p className={cn("mono text-[17px] sm:text-[20px] font-semibold break-all", valueColor)}>{value}</p>
-      {sub && <p className="text-[#a0a0a5] text-[12px] mt-1 font-medium">{sub}</p>}
+      {sub && <p className="text-[var(--text-secondary)] text-[12px] mt-1 font-medium">{sub}</p>}
     </div>
   );
 }
@@ -69,7 +69,7 @@ function InlineStatCard({
 function SectionHeader({ title, count }: { title: string; count?: number }) {
   return (
     <div className="flex items-center gap-3">
-      <h2 className="text-[18px] font-semibold text-[#ededed] tracking-tight">{title}</h2>
+      <h2 className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">{title}</h2>
       {count !== undefined && (
         <span className="ab-chip">{count}</span>
       )}
@@ -80,15 +80,15 @@ function SectionHeader({ title, count }: { title: string; count?: number }) {
 function SymbolAvatar({ symbol }: { symbol: string }) {
   const initials = symbol.replace(/[^A-Z]/g, "").slice(0, 2) || symbol.slice(0, 2).toUpperCase();
   return (
-    <div className="w-9 h-9 rounded-full bg-[#222226] flex items-center justify-center shrink-0">
-      <span className="text-[11px] font-bold text-[#ededed]">{initials}</span>
+    <div className="w-9 h-9 rounded-full bg-[var(--surface-subtle)] flex items-center justify-center shrink-0">
+      <span className="text-[11px] font-bold text-[var(--text-primary)]">{initials}</span>
     </div>
   );
 }
 
 function SortIcon({ col, activeKey, dir }: { col: string; activeKey: string; dir: "asc" | "desc" }) {
-  if (col !== activeKey) return <span className="text-[#a0a0a5] ml-1 text-[10px]">⇅</span>;
-  return <span className="text-[#ededed] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
+  if (col !== activeKey) return <span className="text-[var(--text-secondary)] ml-1 text-[10px]">⇅</span>;
+  return <span className="text-[var(--text-primary)] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
 }
 
 export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPositions, mfHoldings: rawMFHoldings }: Props) {
@@ -161,7 +161,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
     });
   }, [mfHoldings, mfSortKey, mfSortDir]);
 
-  const thBase = "px-4 py-3 text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold cursor-pointer hover:text-[#ededed] transition-colors select-none";
+  const thBase = "px-4 py-3 text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold cursor-pointer hover:text-[var(--text-primary)] transition-colors select-none";
   const thL = cn(thBase, "text-left");
   const thR = cn(thBase, "text-right");
 
@@ -197,7 +197,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
         <button
           onClick={handlePrint}
           disabled={printing}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] text-[var(--text-primary)] text-[13px] font-medium hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
           {printing ? "Generating…" : "Print PDF"}
@@ -223,12 +223,12 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
         <div className="flex items-center justify-between flex-wrap gap-3">
           <SectionHeader title="Equity Holdings" count={holdings.length} />
           <div className="relative w-full sm:w-48">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a5]" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search symbol…"
-              className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-full transition-all"
+              className="pl-9 pr-3 py-2 text-[13px] bg-[var(--surface-raised)] border border-[var(--border-strong)] rounded-full text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--text-primary)] focus:shadow-[0_0_0_1px_var(--text-primary)] w-full transition-all"
             />
           </div>
         </div>
@@ -236,7 +236,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
         {/* Mobile cards */}
         <div className="sm:hidden space-y-2">
           {filtered.length === 0 && (
-            <p className="text-center text-[#a0a0a5] text-[13px] py-8">No holdings found.</p>
+            <p className="text-center text-[var(--text-secondary)] text-[13px] py-8">No holdings found.</p>
           )}
           {filtered.map((h) => {
             const gain = h.pnl >= 0;
@@ -248,15 +248,15 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                     <SymbolAvatar symbol={h.tradingsymbol} />
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-semibold text-[14px] text-[#ededed]">{h.tradingsymbol}</span>
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{h.exchange}</span>
+                        <span className="font-semibold text-[14px] text-[var(--text-primary)]">{h.tradingsymbol}</span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono">{h.exchange}</span>
                       </div>
-                      <p className="text-[12px] text-[#a0a0a5] mt-0.5">Qty {h.quantity} · Avg {formatINR(h.average_price)}</p>
+                      <p className="text-[12px] text-[var(--text-secondary)] mt-0.5">Qty {h.quantity} · Avg {formatINR(h.average_price)}</p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="mono text-[15px] font-semibold text-[#ededed]">{formatINR(h.last_price * h.quantity)}</p>
-                    <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                    <p className="mono text-[15px] font-semibold text-[var(--text-primary)]">{formatINR(h.last_price * h.quantity)}</p>
+                    <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                       {gain ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                       {formatINR(Math.abs(h.pnl))}
                       <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
@@ -272,7 +272,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
         <div className="hidden sm:block ab-card overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-[14px]">
-              <thead className="bg-[#1c1c20]">
+              <thead className="bg-[var(--surface-muted)]">
                 <tr>
                   <th className={thL} onClick={() => toggleSort("tradingsymbol")}>Symbol <SortIcon col="tradingsymbol" activeKey={sortKey} dir={sortDir} /></th>
                   <th className={thR} onClick={() => toggleSort("quantity")}>Qty <SortIcon col="quantity" activeKey={sortKey} dir={sortDir} /></th>
@@ -283,31 +283,31 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                   <th className={thR} onClick={() => toggleSort("pnl")}>P&amp;L <SortIcon col="pnl" activeKey={sortKey} dir={sortDir} /></th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#2a2a2e]">
+              <tbody className="divide-y divide-[var(--border)]">
                 {filtered.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No holdings found.</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-[var(--text-secondary)] text-[13px]">No holdings found.</td></tr>
                 )}
                 {filtered.map((h) => {
                   const gain = h.pnl >= 0;
                   const pnlPct = h.average_price > 0 ? (h.pnl / (h.average_price * h.quantity)) * 100 : 0;
                   return (
-                    <tr key={h.tradingsymbol} className="hover:bg-[#1c1c20] transition-colors">
+                    <tr key={h.tradingsymbol} className="hover:bg-[var(--surface-muted)] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <SymbolAvatar symbol={h.tradingsymbol} />
                           <div>
-                            <span className="font-semibold text-[14px] text-[#ededed]">{h.tradingsymbol}</span>
-                            <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{h.exchange}</span>
+                            <span className="font-semibold text-[14px] text-[var(--text-primary)]">{h.tradingsymbol}</span>
+                            <span className="ml-2 text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono">{h.exchange}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{h.quantity}</td>
-                      <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price)}</td>
-                      <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price * h.quantity)}</td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price)}</td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price * h.quantity)}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{h.quantity}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{formatINR(h.average_price)}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{formatINR(h.average_price * h.quantity)}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(h.last_price)}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(h.last_price * h.quantity)}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                        <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", gain ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                           {gain ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                           {formatINR(Math.abs(h.pnl))}
                           <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
@@ -328,7 +328,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
           <div className="ab-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-[14px]">
-                <thead className="bg-[#1c1c20]">
+                <thead className="bg-[var(--surface-muted)]">
                   <tr>
                     <th className={thL}>Symbol</th>
                     <th className={thR}>Product</th>
@@ -337,25 +337,25 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                     <th className={thR}>Unrealised P&amp;L</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#2a2a2e]">
+                <tbody className="divide-y divide-[var(--border)]">
                   {netPositions.map((p) => (
-                    <tr key={`${p.tradingsymbol}-${p.product}`} className="hover:bg-[#1c1c20] transition-colors">
+                    <tr key={`${p.tradingsymbol}-${p.product}`} className="hover:bg-[var(--surface-muted)] transition-colors">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <SymbolAvatar symbol={p.tradingsymbol} />
                           <div>
-                            <span className="font-semibold text-[14px] text-[#ededed]">{p.tradingsymbol}</span>
-                            <span className="ml-2 text-[10px] text-[#a0a0a5]">{p.exchange}</span>
+                            <span className="font-semibold text-[14px] text-[var(--text-primary)]">{p.tradingsymbol}</span>
+                            <span className="ml-2 text-[10px] text-[var(--text-secondary)]">{p.exchange}</span>
                           </div>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <span className="text-[11px] mono px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5]">{p.product}</span>
+                        <span className="text-[11px] mono px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)]">{p.product}</span>
                       </td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed]">{p.quantity}</td>
-                      <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(p.average_price)}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{p.quantity}</td>
+                      <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(p.average_price)}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className={cn("mono font-semibold", p.pnl >= 0 ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                        <span className={cn("mono font-semibold", p.pnl >= 0 ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                           {p.pnl >= 0 ? "+" : ""}{formatINR(p.pnl)}
                         </span>
                       </td>
@@ -393,17 +393,17 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                   <div key={`${h.tradingsymbol}-${h.folio ?? ""}`} className="ab-card px-4 py-3">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-3 min-w-0">
-                        <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0 mt-0.5">
-                          <span className="text-[11px] font-bold text-[#ff385c]">{initials}</span>
+                        <div className="w-9 h-9 rounded-full bg-[var(--primary-tint)] flex items-center justify-center shrink-0 mt-0.5">
+                          <span className="text-[11px] font-bold text-[var(--primary)]">{initials}</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-[13px] text-[#ededed] leading-snug">{h.fund}</p>
-                          <p className="text-[12px] text-[#a0a0a5] mt-1">{h.quantity.toFixed(3)} units · Avg NAV {formatINR(h.average_price)}</p>
+                          <p className="font-semibold text-[13px] text-[var(--text-primary)] leading-snug">{h.fund}</p>
+                          <p className="text-[12px] text-[var(--text-secondary)] mt-1">{h.quantity.toFixed(3)} units · Avg NAV {formatINR(h.average_price)}</p>
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="mono text-[15px] font-semibold text-[#ededed]">{formatINR(h.last_price * h.quantity)}</p>
-                        <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                        <p className="mono text-[15px] font-semibold text-[var(--text-primary)]">{formatINR(h.last_price * h.quantity)}</p>
+                        <span className={cn("inline-flex items-center gap-0.5 mono text-[12px] font-semibold mt-0.5", gain ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                           {gain ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
                           {formatINR(Math.abs(pnl))}
                           <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
@@ -419,7 +419,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
             <div className="hidden sm:block ab-card overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-[14px]">
-                  <thead className="bg-[#1c1c20]">
+                  <thead className="bg-[var(--surface-muted)]">
                     <tr>
                       <th className={thL} onClick={() => toggleMfSort("fund")}>Fund <SortIcon col="fund" activeKey={mfSortKey} dir={mfSortDir} /></th>
                       <th className={thR} onClick={() => toggleMfSort("quantity")}>Units <SortIcon col="quantity" activeKey={mfSortKey} dir={mfSortDir} /></th>
@@ -430,7 +430,7 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                       <th className={thR} onClick={() => toggleMfSort("pnl")}>P&amp;L <SortIcon col="pnl" activeKey={mfSortKey} dir={mfSortDir} /></th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#2a2a2e]">
+                  <tbody className="divide-y divide-[var(--border)]">
                     {sortedMfHoldings.map((h) => {
                       const invested = h.average_price * h.quantity;
                       const pnl = h.last_price * h.quantity - invested;
@@ -438,25 +438,25 @@ export function ZerodhaDashboard({ holdings: rawHoldings, positions: rawPosition
                       const pnlPct = invested > 0 ? (pnl / invested) * 100 : 0;
                       const initials = (h.fund as string).split(" ").slice(0, 2).map((w: string) => w[0]).join("").toUpperCase();
                       return (
-                        <tr key={`${h.tradingsymbol}-${h.folio ?? ""}`} className="hover:bg-[#1c1c20] transition-colors">
+                        <tr key={`${h.tradingsymbol}-${h.folio ?? ""}`} className="hover:bg-[var(--surface-muted)] transition-colors">
                           <td className="px-4 py-3 max-w-xs">
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                                <span className="text-[11px] font-bold text-[#ff385c]">{initials}</span>
+                              <div className="w-9 h-9 rounded-full bg-[var(--primary-tint)] flex items-center justify-center shrink-0">
+                                <span className="text-[11px] font-bold text-[var(--primary)]">{initials}</span>
                               </div>
                               <div>
-                                <p className="font-semibold text-[14px] text-[#ededed] truncate max-w-[260px]">{h.fund}</p>
-                                {h.folio && <p className="text-[11px] text-[#a0a0a5] mono mt-0.5">{h.folio}</p>}
+                                <p className="font-semibold text-[14px] text-[var(--text-primary)] truncate max-w-[260px]">{h.fund}</p>
+                                {h.folio && <p className="text-[11px] text-[var(--text-secondary)] mono mt-0.5">{h.folio}</p>}
                               </div>
                             </div>
                           </td>
-                          <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{h.quantity.toFixed(3)}</td>
-                          <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price)}</td>
-                          <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(h.average_price * h.quantity)}</td>
-                          <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price)}</td>
-                          <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(h.last_price * h.quantity)}</td>
+                          <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{h.quantity.toFixed(3)}</td>
+                          <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{formatINR(h.average_price)}</td>
+                          <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{formatINR(h.average_price * h.quantity)}</td>
+                          <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(h.last_price)}</td>
+                          <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(h.last_price * h.quantity)}</td>
                           <td className="px-4 py-3 text-right">
-                            <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                            <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", gain ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                               {gain ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                               {formatINR(Math.abs(pnl))}
                               <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>

@@ -227,8 +227,8 @@ export function FDList({ fds }: { fds: FD[] }) {
   if (fds.length === 0) {
     return (
       <div className="ab-card p-12 text-center">
-        <p className="text-[18px] font-semibold text-[#ededed] tracking-tight">No fixed deposits added yet</p>
-        <p className="text-[14px] text-[#a0a0a5] mt-1.5">Upload an FD certificate to get started.</p>
+        <p className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">No fixed deposits added yet</p>
+        <p className="text-[14px] text-[var(--text-secondary)] mt-1.5">Upload an FD certificate to get started.</p>
       </div>
     );
   }
@@ -263,27 +263,27 @@ export function FDList({ fds }: { fds: FD[] }) {
           { label: "Interest This Year", value: formatINR(stats.interestThisYear) },
         ].map(({ label, value }) => (
           <div key={label} className="ab-card p-4">
-            <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
-            <p className="mono text-[15px] sm:text-[20px] font-semibold text-[#ededed]">{value}</p>
+            <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold mb-1">{label}</p>
+            <p className="mono text-[15px] sm:text-[20px] font-semibold text-[var(--text-primary)]">{value}</p>
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="ab-card-flat p-4 flex items-center justify-between">
-          <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Principal</p>
-          <p className="mono font-semibold text-[#ededed]">{formatINR(stats.totalPrincipal)}</p>
+          <p className="text-[12px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Total Principal</p>
+          <p className="mono font-semibold text-[var(--text-primary)]">{formatINR(stats.totalPrincipal)}</p>
         </div>
         <div className="ab-card-flat p-4 flex items-center justify-between">
-          <p className="text-[12px] text-[#a0a0a5] uppercase tracking-wider font-semibold">Total Interest Earned</p>
-          <p className="mono font-semibold text-[#5ee0a4]">{formatINR(stats.totalInterest)}</p>
+          <p className="text-[12px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold">Total Interest Earned</p>
+          <p className="mono font-semibold text-[var(--accent-success)]">{formatINR(stats.totalInterest)}</p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-2">
         {/* Status segment */}
-        <div className="flex gap-0.5 p-1 bg-[#0d0d0f] border border-[#2a2a2d] rounded-full overflow-x-auto shrink-0">
+        <div className="flex gap-0.5 p-1 bg-[var(--surface-deep)] border border-[var(--border)] rounded-full overflow-x-auto shrink-0">
           {(["all", "active", "matured", "disabled"] as Filter[]).map((f) => (
             <button
               key={f}
@@ -291,8 +291,8 @@ export function FDList({ fds }: { fds: FD[] }) {
               className={cn(
                 "px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all capitalize whitespace-nowrap",
                 filter === f
-                  ? "bg-[#1e1e22] text-[#ededed] border border-[#2e2e32]"
-                  : "text-[#606065] hover:text-[#d0d0d5] hover:bg-[#1a1a1e]"
+                  ? "bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border)]"
+                  : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
               )}
             >
               {f} ({counts[f]})
@@ -301,15 +301,15 @@ export function FDList({ fds }: { fds: FD[] }) {
         </div>
 
         {/* Divider — desktop only */}
-        <div className="hidden sm:block w-px h-5 bg-[#252528] shrink-0" />
+        <div className="hidden sm:block w-px h-5 bg-[var(--border)] shrink-0" />
 
         {/* Bank select + search — side by side on both mobile and desktop */}
         <div className="flex items-center gap-2">
-          <div className="inline-flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full px-1 h-[38px] flex-1 sm:flex-none">
+          <div className="inline-flex items-center bg-[var(--surface-deep)] border border-[var(--border)] rounded-full px-1 h-[38px] flex-1 sm:flex-none">
             <select
               value={bankFilter}
               onChange={(e) => setBankFilter(e.target.value)}
-              className="bg-transparent text-[13px] font-medium text-[#ededed] outline-none px-3 h-full cursor-pointer w-full sm:min-w-[110px] sm:max-w-[180px]"
+              className="bg-transparent text-[13px] font-medium text-[var(--text-primary)] outline-none px-3 h-full cursor-pointer w-full sm:min-w-[110px] sm:max-w-[180px]"
             >
               <option value="all">All banks</option>
               {banks.map(({ key, label }) => (
@@ -318,20 +318,20 @@ export function FDList({ fds }: { fds: FD[] }) {
             </select>
           </div>
 
-          <div className="inline-flex items-center bg-[#0d0d0f] border border-[#2a2a2d] rounded-full px-3 h-[38px] flex-1 sm:flex-none">
+          <div className="inline-flex items-center bg-[var(--surface-deep)] border border-[var(--border)] rounded-full px-3 h-[38px] flex-1 sm:flex-none">
             <input
               type="text"
               value={fdSearch}
               onChange={(e) => setFdSearch(e.target.value)}
               placeholder="Search FD number…"
-              className="bg-transparent text-[13px] font-medium text-[#ededed] placeholder:text-[#505055] outline-none w-full sm:w-36"
+              className="bg-transparent text-[13px] font-medium text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] outline-none w-full sm:w-36"
             />
           </div>
 
           {(bankFilter !== "all" || filter !== "all" || fdSearch.trim()) && (
             <button
               onClick={() => { setFilter("all"); setBankFilter("all"); setFdSearch(""); }}
-              className="text-[12px] text-[#606065] hover:text-[#b0b0b5] font-semibold transition-colors px-2 shrink-0"
+              className="text-[12px] text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] font-semibold transition-colors px-2 shrink-0"
             >
               Clear
             </button>
@@ -340,9 +340,9 @@ export function FDList({ fds }: { fds: FD[] }) {
       </div>
 
       {/* ── Mobile card list (hidden on sm+) ── */}
-      <div className="sm:hidden ab-card overflow-hidden divide-y divide-[#2a2a2e]">
+      <div className="sm:hidden ab-card overflow-hidden divide-y divide-[var(--border)]">
         {sorted.length === 0 && (
-          <p className="p-6 text-center text-[14px] text-[#a0a0a5]">No FDs match the current filters.</p>
+          <p className="p-6 text-center text-[14px] text-[var(--text-secondary)]">No FDs match the current filters.</p>
         )}
         {sorted.map((fd) => {
           const current = resolveCurrent(fd);
@@ -359,15 +359,15 @@ export function FDList({ fds }: { fds: FD[] }) {
                   fd.disabled
                     ? "opacity-50 hover:opacity-70"
                     : isMatured
-                    ? "bg-[#2a1f0d]"
-                    : "hover:bg-[#1c1c20]",
-                  isExpanded && !isMatured && "bg-[#17171a]"
+                    ? "bg-[var(--chip-warning-bg)]"
+                    : "hover:bg-[var(--surface-muted)]",
+                  isExpanded && !isMatured && "bg-[var(--surface-raised)]"
                 )}
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0 mt-0.5">
-                    <span className="font-bold text-[10px] text-[#ff385c]">
+                  <div className="w-8 h-8 rounded-full bg-[var(--primary-tint)] flex items-center justify-center shrink-0 mt-0.5">
+                    <span className="font-bold text-[10px] text-[var(--primary)]">
                       {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
                     </span>
                   </div>
@@ -375,27 +375,27 @@ export function FDList({ fds }: { fds: FD[] }) {
                   {/* Content */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-semibold text-[#ededed] text-[14px] truncate">{fd.bankName}</span>
+                      <span className="font-semibold text-[var(--text-primary)] text-[14px] truncate">{fd.bankName}</span>
                       <StatusBadge fd={fd} current={current} now={now} />
                     </div>
 
                     {/* Principal → At Maturity */}
                     <div className="flex items-center gap-1.5 mt-1.5">
-                      <span className="mono text-[13px] text-[#a0a0a5]">{formatINR(current.principal)}</span>
-                      <span className="text-[#6e6e73] text-[12px]">&#x2192;</span>
-                      <span className="mono text-[14px] font-bold text-[#ededed]">{formatINR(displayMaturityValue)}</span>
+                      <span className="mono text-[13px] text-[var(--text-secondary)]">{formatINR(current.principal)}</span>
+                      <span className="text-[var(--text-tertiary)] text-[12px]">&#x2192;</span>
+                      <span className="mono text-[14px] font-bold text-[var(--text-primary)]">{formatINR(displayMaturityValue)}</span>
                     </div>
 
                     {/* Rate · Tenure · Maturity date */}
-                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[#a0a0a5] flex-wrap">
+                    <div className="flex items-center gap-1.5 mt-1 text-[11px] text-[var(--text-secondary)] flex-wrap">
                       <span className="mono">{current.interestRate}%</span>
-                      <span className="text-[#6e6e73]">&middot;</span>
+                      <span className="text-[var(--text-tertiary)]">&middot;</span>
                       <span>{formatTenure(current)}</span>
-                      <span className="text-[#6e6e73]">&middot;</span>
+                      <span className="text-[var(--text-tertiary)]">&middot;</span>
                       <span>{formatDate(current.maturityDate)}</span>
                       {fd.fdNumber && (
                         <>
-                          <span className="text-[#6e6e73]">&middot;</span>
+                          <span className="text-[var(--text-tertiary)]">&middot;</span>
                           <span className="mono">{fd.fdNumber}</span>
                         </>
                       )}
@@ -408,7 +408,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                     <ChevronRight
                       size={14}
                       className={cn(
-                        "text-[#6e6e73] transition-transform duration-200",
+                        "text-[var(--text-tertiary)] transition-transform duration-200",
                         isExpanded && "rotate-90"
                       )}
                     />
@@ -417,12 +417,12 @@ export function FDList({ fds }: { fds: FD[] }) {
               </div>
 
               {isExpanded && (
-                <div className="bg-[#0e0e11] px-4 py-5">
+                <div className="bg-[var(--background)] px-4 py-5">
                   <FDDetailContent fd={fd} />
-                  <div className="flex items-center justify-between gap-4 flex-wrap pt-5 mt-5 border-t border-[#2a2a2e]">
+                  <div className="flex items-center justify-between gap-4 flex-wrap pt-5 mt-5 border-t border-[var(--border)]">
                     <Link
                       href={`/dashboard/fd/${fd.id}`}
-                      className="text-[12px] text-[#a0a0a5] hover:text-[#ededed] font-medium inline-flex items-center gap-1 transition-colors"
+                      className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium inline-flex items-center gap-1 transition-colors"
                     >
                       Open full page <ArrowUpRight size={12} />
                     </Link>
@@ -446,7 +446,7 @@ export function FDList({ fds }: { fds: FD[] }) {
       <div className="hidden sm:block ab-card overflow-hidden">
         <table className="w-full text-[14px]">
           <thead>
-            <tr className="bg-[#1c1c20]">
+            <tr className="bg-[var(--surface-muted)]">
               {HEADERS.map((h, i) => {
                 const isActive = h.sortCol !== undefined && sort?.col === h.sortCol;
                 const SortIcon = isActive
@@ -463,8 +463,8 @@ export function FDList({ fds }: { fds: FD[] }) {
                       "text-[11px] uppercase tracking-wider font-semibold px-4 py-3 select-none",
                       h.align === "right" ? "text-right" : h.align === "center" ? "text-center" : "text-left",
                       h.className,
-                      h.sortCol && "cursor-pointer hover:text-[#ededed] transition-colors",
-                      isActive ? "text-[#ededed]" : "text-[#a0a0a5]"
+                      h.sortCol && "cursor-pointer hover:text-[var(--text-primary)] transition-colors",
+                      isActive ? "text-[var(--text-primary)]" : "text-[var(--text-secondary)]"
                     )}
                   >
                     {h.sortCol ? (
@@ -481,7 +481,7 @@ export function FDList({ fds }: { fds: FD[] }) {
               })}
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#2a2a2e]">
+          <tbody className="divide-y divide-[var(--border)]">
             {sorted.map((fd) => {
               const current = resolveCurrent(fd);
               const isMatured = current.maturityDate <= now;
@@ -494,29 +494,29 @@ export function FDList({ fds }: { fds: FD[] }) {
                     onClick={() => toggleExpanded(fd.id)}
                     className={cn(
                       "cursor-pointer transition-colors",
-                      fd.disabled ? "opacity-50 hover:opacity-70 hover:bg-[#1c1c20]" :
-                        isMatured ? "bg-[#2a1f0d] hover:bg-[#2a1f0d]" : "hover:bg-[#1c1c20]",
-                      isExpanded && "bg-[#17171a]"
+                      fd.disabled ? "opacity-50 hover:opacity-70 hover:bg-[var(--surface-muted)]" :
+                        isMatured ? "bg-[var(--chip-warning-bg)] hover:bg-[var(--chip-warning-bg)]" : "hover:bg-[var(--surface-muted)]",
+                      isExpanded && "bg-[var(--surface-raised)]"
                     )}
                   >
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                          <span className="font-bold text-[10px] text-[#ff385c]">
+                        <div className="w-7 h-7 rounded-full bg-[var(--primary-tint)] flex items-center justify-center shrink-0">
+                          <span className="font-bold text-[10px] text-[var(--primary)]">
                             {fd.bankName.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
                           </span>
                         </div>
-                        <span className="font-semibold text-[#ededed] text-[13px]">{fd.bankName}</span>
+                        <span className="font-semibold text-[var(--text-primary)] text-[13px]">{fd.bankName}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-2 text-[12px] text-[#a0a0a5] mono">{fd.fdNumber ?? "—"}</td>
-                    <td className="px-4 py-2 text-right mono text-[#ededed] font-medium text-[13px]">{formatINR(current.principal)}</td>
-                    <td className="px-4 py-2 text-right mono text-[#ededed] font-medium text-[13px]">{current.interestRate}%</td>
-                    <td className="px-4 py-2 text-[13px] text-[#a0a0a5]">{formatTenure(current)}</td>
-                    <td className="px-4 py-2 text-[#a0a0a5] text-[12px] whitespace-nowrap">
-                      {formatDate(current.startDate)} <span className="text-[#6e6e73]">&#x2192;</span> {formatDate(current.maturityDate)}
+                    <td className="px-4 py-2 text-[12px] text-[var(--text-secondary)] mono">{fd.fdNumber ?? "—"}</td>
+                    <td className="px-4 py-2 text-right mono text-[var(--text-primary)] font-medium text-[13px]">{formatINR(current.principal)}</td>
+                    <td className="px-4 py-2 text-right mono text-[var(--text-primary)] font-medium text-[13px]">{current.interestRate}%</td>
+                    <td className="px-4 py-2 text-[13px] text-[var(--text-secondary)]">{formatTenure(current)}</td>
+                    <td className="px-4 py-2 text-[var(--text-secondary)] text-[12px] whitespace-nowrap">
+                      {formatDate(current.startDate)} <span className="text-[var(--text-tertiary)]">&#x2192;</span> {formatDate(current.maturityDate)}
                     </td>
-                    <td className="px-4 py-2 text-right mono text-[#ededed] font-semibold text-[13px]">{formatINR(displayMaturityValue)}</td>
+                    <td className="px-4 py-2 text-right mono text-[var(--text-primary)] font-semibold text-[13px]">{formatINR(displayMaturityValue)}</td>
                     <td className="px-4 py-2"><StatusBadge fd={fd} current={current} now={now} /></td>
                     <td className="px-4 py-2 text-center">
                       <div className="inline-flex items-center gap-1">
@@ -526,7 +526,7 @@ export function FDList({ fds }: { fds: FD[] }) {
                           onClick={(e) => { e.stopPropagation(); toggleExpanded(fd.id); }}
                           aria-label={isExpanded ? "Collapse" : "Expand"}
                           aria-expanded={isExpanded}
-                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[#6e6e73] hover:text-[#ededed] hover:bg-[#1c1c20] transition-colors"
+                          className="inline-flex items-center justify-center w-7 h-7 rounded-md text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
                         >
                           <ChevronRight
                             size={14}
@@ -537,13 +537,13 @@ export function FDList({ fds }: { fds: FD[] }) {
                     </td>
                   </tr>
                   {isExpanded && (
-                    <tr className="bg-[#0e0e11]">
+                    <tr className="bg-[var(--background)]">
                       <td colSpan={COL_COUNT} className="px-6 py-6">
                         <FDDetailContent fd={fd} />
-                        <div className="flex items-center justify-between gap-4 flex-wrap pt-5 mt-5 border-t border-[#2a2a2e]">
+                        <div className="flex items-center justify-between gap-4 flex-wrap pt-5 mt-5 border-t border-[var(--border)]">
                           <Link
                             href={`/dashboard/fd/${fd.id}`}
-                            className="text-[12px] text-[#a0a0a5] hover:text-[#ededed] font-medium inline-flex items-center gap-1 transition-colors"
+                            className="text-[12px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] font-medium inline-flex items-center gap-1 transition-colors"
                           >
                             Open full page <ArrowUpRight size={12} />
                           </Link>

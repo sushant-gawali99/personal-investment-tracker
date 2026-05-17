@@ -13,14 +13,14 @@ export default async function BulkUploadPage() {
       <div>
         <Link
           href="/dashboard/fd"
-          className="text-[13px] text-[#a0a0a5] hover:text-[#ededed] inline-flex items-center gap-1"
+          className="text-[13px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] inline-flex items-center gap-1"
         >
           <ArrowLeft size={14} /> Back to FDs
         </Link>
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight mt-2">
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight mt-2">
           Bulk Upload FDs
         </h1>
-        <p className="text-[14px] text-[#a0a0a5] mt-1">
+        <p className="text-[14px] text-[var(--text-secondary)] mt-1">
           Drop up to 20 files — PDFs, images, or a .zip. Each file becomes one FD.
         </p>
       </div>

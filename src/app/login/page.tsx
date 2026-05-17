@@ -41,19 +41,22 @@ function LoginPageInner() {
   }
 
   return (
-    <div className="min-h-screen bg-[#17171a] flex">
-      <div className="hidden lg:flex lg:w-[48%] flex-col justify-between p-12 bg-[#0e0e11] border-r border-[#2a2a2e]">
+    <div className="min-h-screen flex" style={{ background: "var(--surface-raised)" }}>
+      <div
+        className="hidden lg:flex lg:w-[48%] flex-col justify-between p-12"
+        style={{ background: "var(--background)", borderRight: "1px solid var(--border)" }}
+      >
         <div className="flex items-center gap-2.5">
           <LogoMark />
-          <span className="text-[18px] font-semibold text-[#ededed] tracking-tight">MyFolio</span>
+          <span className="text-[18px] font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>MyFolio</span>
         </div>
 
         <div className="space-y-10">
           <div>
-            <h1 className="text-[44px] font-bold text-[#ededed] leading-[1.05] tracking-tight">
+            <h1 className="text-[44px] font-bold leading-[1.05] tracking-tight" style={{ color: "var(--text-primary)" }}>
               Your wealth,<br />at a glance.
             </h1>
-            <p className="text-[#a0a0a5] text-[15px] mt-5 leading-relaxed max-w-sm">
+            <p className="text-[15px] mt-5 leading-relaxed max-w-sm" style={{ color: "var(--text-secondary)" }}>
               Track equities, mutual funds, and fixed deposits in one unified dashboard. Live P&amp;L, AI-powered FD extraction, and more.
             </p>
           </div>
@@ -65,47 +68,57 @@ function LoginPageInner() {
               { icon: TrendingUp, label: "Portfolio analytics", sub: "CAGR, allocation drift, accrual timeline" },
             ].map(({ icon: Icon, label, sub }) => (
               <div key={label} className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#2a1218] flex items-center justify-center shrink-0">
-                  <Icon size={16} className="text-[#ff385c]" />
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                  style={{ background: "var(--primary-tint)" }}
+                >
+                  <Icon size={16} style={{ color: "#ff385c" }} />
                 </div>
                 <div>
-                  <p className="text-[14px] font-semibold text-[#ededed]">{label}</p>
-                  <p className="text-[13px] text-[#a0a0a5] mt-0.5">{sub}</p>
+                  <p className="text-[14px] font-semibold" style={{ color: "var(--text-primary)" }}>{label}</p>
+                  <p className="text-[13px] mt-0.5" style={{ color: "var(--text-secondary)" }}>{sub}</p>
                 </div>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="text-[12px] text-[#6e6e73]">Personal use only · Data stays in your account</p>
+        <p className="text-[12px]" style={{ color: "var(--text-tertiary)" }}>Personal use only · Data stays in your account</p>
       </div>
 
       <div className="flex-1 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-sm space-y-7">
           <div className="lg:hidden flex items-center gap-2 mb-2">
             <LogoMark />
-            <span className="text-[16px] font-semibold text-[#ededed] tracking-tight">MyFolio</span>
+            <span className="text-[16px] font-semibold tracking-tight" style={{ color: "var(--text-primary)" }}>MyFolio</span>
           </div>
 
           <div>
-            <h2 className="text-[28px] font-bold text-[#ededed] tracking-tight">Welcome back</h2>
-            <p className="text-[#a0a0a5] text-[14px] mt-1.5">Sign in to access your portfolio</p>
+            <h2 className="text-[28px] font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>Welcome back</h2>
+            <p className="text-[14px] mt-1.5" style={{ color: "var(--text-secondary)" }}>Sign in to access your portfolio</p>
           </div>
 
           <button
             onClick={handleGoogle}
             disabled={loadingGoogle}
-            className="w-full flex items-center justify-center gap-3 bg-[#17171a] hover:bg-[#1c1c20] text-[#ededed] font-medium text-[15px] py-3 px-4 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed border border-[#ededed]"
+            className="w-full flex items-center justify-center gap-3 font-medium text-[15px] py-3 px-4 rounded-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+            style={{
+              background: "var(--surface-raised)",
+              color: "var(--text-primary)",
+              border: "1px solid var(--border-strong)",
+            }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-raised)"; }}
           >
             {loadingGoogle ? (
-              <Loader2 size={17} className="animate-spin text-[#a0a0a5]" />
+              <Loader2 size={17} className="animate-spin" style={{ color: "var(--text-secondary)" }} />
             ) : (
               <GoogleIcon />
             )}
             {loadingGoogle ? "Redirecting…" : "Continue with Google"}
           </button>
 
-          <p className="text-center text-[12px] text-[#6e6e73]">
+          <p className="text-center text-[12px]" style={{ color: "var(--text-tertiary)" }}>
             Private app · Only authorised accounts can sign in
           </p>
         </div>

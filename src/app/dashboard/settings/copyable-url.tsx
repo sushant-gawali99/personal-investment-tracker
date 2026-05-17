@@ -13,14 +13,14 @@ export function CopyableUrl({ url }: { url: string }) {
   }
 
   return (
-    <span className="inline-flex items-center gap-1.5 bg-[#1c1c20] px-2 py-1 rounded-md border border-[#2a2a2e]">
-      <code className="text-[12px] mono text-[#ededed]">{url}</code>
+    <span className="inline-flex items-center gap-1.5 bg-[var(--surface-muted)] px-2 py-1 rounded-md border border-[var(--border)]">
+      <code className="text-[12px] mono text-[var(--text-primary)]">{url}</code>
       <button
         onClick={copy}
-        className="text-[#a0a0a5] hover:text-[#ff385c] transition-colors shrink-0"
+        className="text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors shrink-0"
         aria-label="Copy URL"
       >
-        {copied ? <Check size={12} className="text-[#5ee0a4]" /> : <Copy size={12} />}
+        {copied ? <Check size={12} className="text-[var(--accent-success)]" /> : <Copy size={12} />}
       </button>
     </span>
   );

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ChatWidget } from "@/components/chat/ChatWidget";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -29,9 +30,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-[#17171a] text-[#ededed] antialiased">
-        {children}
-        <ChatWidget />
+      <body className="min-h-screen antialiased" style={{ background: "var(--background)", color: "var(--foreground)" }}>
+        <ThemeProvider>
+          {children}
+          <ChatWidget />
+        </ThemeProvider>
       </body>
     </html>
   );

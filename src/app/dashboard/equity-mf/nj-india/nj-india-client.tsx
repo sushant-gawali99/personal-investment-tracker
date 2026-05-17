@@ -180,8 +180,8 @@ export function NJIndiaClient({ statements, schemes }: Props) {
         className={cn(
           "relative overflow-hidden rounded-2xl border border-dashed p-8 transition-all cursor-pointer group",
           isDragActive
-            ? "border-[#ff385c] bg-[#ff385c]/5"
-            : "border-[#3a3a3f] bg-gradient-to-br from-[#17171a] to-[#131316] hover:border-[#5a5a60]",
+            ? "border-[var(--primary)] bg-[var(--primary)]/5"
+            : "border-[var(--border-strong)] bg-gradient-to-br from-[var(--surface-raised)] to-[var(--surface-deep)] hover:border-[var(--border-strong)]",
           uploading && "pointer-events-none opacity-70"
         )}
       >
@@ -190,32 +190,32 @@ export function NJIndiaClient({ statements, schemes }: Props) {
           <div className={cn(
             "w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 transition-all",
             isDragActive
-              ? "bg-[#ff385c] text-white"
-              : "bg-[#1c1c20] text-[#ededed] group-hover:bg-[#222226]"
+              ? "bg-[var(--primary)] text-white"
+              : "bg-[var(--surface-muted)] text-[var(--text-primary)] group-hover:bg-[var(--surface-subtle)]"
           )}>
             {uploading ? <Loader2 size={22} className="animate-spin" /> : <Upload size={22} strokeWidth={2.2} />}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-[15px] font-semibold text-[#ededed]">
+            <p className="text-[15px] font-semibold text-[var(--text-primary)]">
               {uploading ? "Parsing your statement…" : isDragActive ? "Drop to upload" : "Upload NJ India valuation statement"}
             </p>
-            <p className="text-[13px] text-[#a0a0a5] mt-0.5">
+            <p className="text-[13px] text-[var(--text-secondary)] mt-0.5">
               Drag & drop a PDF here, or click to browse. Max 5 MB. Uploads replace the current holdings view.
             </p>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1c1c20] border border-[#2a2a2e]">
-            <Sparkles size={12} className="text-[#ff385c]" />
-            <span className="text-[11px] font-medium text-[#a0a0a5]">Auto-parse</span>
+          <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[var(--surface-muted)] border border-[var(--border)]">
+            <Sparkles size={12} className="text-[var(--primary)]" />
+            <span className="text-[11px] font-medium text-[var(--text-secondary)]">Auto-parse</span>
           </div>
         </div>
         {error && (
-          <div className="mt-4 flex items-start gap-2 text-[13px] text-[#ff7a6e] bg-[#ff7a6e]/10 border border-[#ff7a6e]/20 rounded-lg px-3 py-2">
+          <div className="mt-4 flex items-start gap-2 text-[13px] text-[var(--accent-error)] bg-[var(--accent-error)]/10 border border-[var(--accent-error)]/20 rounded-lg px-3 py-2">
             <AlertCircle size={14} className="mt-0.5 shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && !error && (
-          <div className="mt-4 flex items-start gap-2 text-[13px] text-[#5ee0a4] bg-[#5ee0a4]/10 border border-[#5ee0a4]/20 rounded-lg px-3 py-2">
+          <div className="mt-4 flex items-start gap-2 text-[13px] text-[var(--accent-success)] bg-[var(--accent-success)]/10 border border-[var(--accent-success)]/20 rounded-lg px-3 py-2">
             <CheckCircle2 size={14} className="mt-0.5 shrink-0" />
             <span>{success}</span>
           </div>
@@ -228,9 +228,9 @@ export function NJIndiaClient({ statements, schemes }: Props) {
 
       {!latest && (
         <div className="ab-card p-10 text-center">
-          <FileText size={32} className="mx-auto text-[#a0a0a5]" />
-          <p className="text-[16px] font-semibold text-[#ededed] mt-3">No statements uploaded yet</p>
-          <p className="text-[13px] text-[#a0a0a5] mt-1">Upload your NJ India Scheme-Wise Valuation Report to see your mutual fund holdings.</p>
+          <FileText size={32} className="mx-auto text-[var(--text-secondary)]" />
+          <p className="text-[16px] font-semibold text-[var(--text-primary)] mt-3">No statements uploaded yet</p>
+          <p className="text-[13px] text-[var(--text-secondary)] mt-1">Upload your NJ India Scheme-Wise Valuation Report to see your mutual fund holdings.</p>
         </div>
       )}
     </div>
@@ -243,11 +243,11 @@ function LatestSnapshotCards({ latest, onPrint, printing }: { latest: NJStatemen
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <div className="flex items-center gap-2 text-[12px] text-[#a0a0a5]">
+        <div className="flex items-center gap-2 text-[12px] text-[var(--text-secondary)]">
           <CalendarDays size={13} />
           <span>
             As on{" "}
-            <span className="text-[#ededed] font-semibold">
+            <span className="text-[var(--text-primary)] font-semibold">
               {latest.reportDate ? formatDate(latest.reportDate) : formatDate(latest.createdAt)}
             </span>
           </span>
@@ -256,7 +256,7 @@ function LatestSnapshotCards({ latest, onPrint, printing }: { latest: NJStatemen
           <button
             onClick={onPrint}
             disabled={printing}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[#2a2a2e] bg-[#17171a] text-[#ededed] text-[13px] font-medium hover:bg-[#1c1c20] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-[var(--border)] bg-[var(--surface-raised)] text-[var(--text-primary)] text-[13px] font-medium hover:bg-[var(--surface-muted)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {printing ? <Loader2 size={14} className="animate-spin" /> : <Printer size={14} />}
             {printing ? "Generating…" : "Print PDF"}
@@ -284,12 +284,12 @@ function LatestSnapshotCards({ latest, onPrint, printing }: { latest: NJStatemen
 }
 
 function StatCard({ label, value, sub, tone }: { label: string; value: string; sub?: string; tone?: "positive" | "negative" | "neutral" }) {
-  const color = tone === "positive" ? "text-[#5ee0a4]" : tone === "negative" ? "text-[#ff7a6e]" : "text-[#ededed]";
+  const color = tone === "positive" ? "text-[var(--accent-success)]" : tone === "negative" ? "text-[var(--accent-error)]" : "text-[var(--text-primary)]";
   return (
     <div className="ab-card p-4">
-      <p className="text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold mb-1">{label}</p>
+      <p className="text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold mb-1">{label}</p>
       <p className={cn("mono text-[15px] sm:text-[18px] lg:text-[20px] font-semibold tabular-nums", color)}>{value}</p>
-      {sub && <p className="text-[#a0a0a5] text-[12px] mt-1 font-medium">{sub}</p>}
+      {sub && <p className="text-[var(--text-secondary)] text-[12px] mt-1 font-medium">{sub}</p>}
     </div>
   );
 }
@@ -335,7 +335,7 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
 
   const totalRows = grouped.reduce((n, g) => n + g.items.length, 0);
 
-  const thBase = "px-4 py-3 text-[11px] text-[#a0a0a5] uppercase tracking-wider font-semibold cursor-pointer hover:text-[#ededed] transition-colors select-none";
+  const thBase = "px-4 py-3 text-[11px] text-[var(--text-secondary)] uppercase tracking-wider font-semibold cursor-pointer hover:text-[var(--text-primary)] transition-colors select-none";
   const thL = cn(thBase, "text-left");
   const thR = cn(thBase, "text-right");
 
@@ -343,33 +343,33 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
     <section className="space-y-4">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-3">
-          <h2 className="text-[18px] font-semibold text-[#ededed] tracking-tight">Holdings</h2>
+          <h2 className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Holdings</h2>
           <span className="ab-chip">{schemes.length}</span>
         </div>
         <div className="relative w-full sm:w-auto">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#a0a0a5]" />
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search scheme…"
-            className="pl-9 pr-3 py-2 text-[13px] bg-[#17171a] border border-[#3a3a3f] rounded-full text-[#ededed] placeholder:text-[#6e6e73] focus:outline-none focus:border-[#ededed] focus:shadow-[0_0_0_1px_#ededed] w-full sm:w-56 transition-all"
+            className="pl-9 pr-3 py-2 text-[13px] bg-[var(--surface-raised)] border border-[var(--border-strong)] rounded-full text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] focus:outline-none focus:border-[var(--text-primary)] focus:shadow-[0_0_0_1px_var(--text-primary)] w-full sm:w-56 transition-all"
           />
         </div>
       </div>
 
       {/* Mobile card list */}
-      <div className="md:hidden ab-card overflow-auto max-h-[560px] divide-y divide-[#2a2a2e]">
+      <div className="md:hidden ab-card overflow-auto max-h-[560px] divide-y divide-[var(--border)]">
         {grouped.map((g) => {
           const groupPositive = g.gain >= 0;
           const groupPnlPct = g.invested > 0 ? (g.gain / g.invested) * 100 : 0;
           return (
             <Fragment key={g.amc}>
-              <div className="bg-[#1c1c20]/70 px-4 py-2.5 flex items-center justify-between gap-2">
+              <div className="bg-[var(--surface-muted)]/70 px-4 py-2.5 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="text-[11px] font-bold text-[#ededed] uppercase tracking-wider truncate">{g.amc}</span>
-                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono shrink-0">{g.items.length}</span>
+                  <span className="text-[11px] font-bold text-[var(--text-primary)] uppercase tracking-wider truncate">{g.amc}</span>
+                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono shrink-0">{g.items.length}</span>
                 </div>
-                <span className={cn("mono text-[11px] font-semibold shrink-0", groupPositive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                <span className={cn("mono text-[11px] font-semibold shrink-0", groupPositive ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                   {groupPositive ? "+" : ""}{formatINR(g.gain)}
                   <span className="opacity-70 ml-1">({formatPercent(groupPnlPct)})</span>
                 </span>
@@ -382,49 +382,49 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
                 return (
                   <div key={s.serial} className="px-4 py-3 space-y-2.5">
                     <div className="flex items-start gap-3">
-                      <div className="w-9 h-9 rounded-full bg-[#1a2a20] flex items-center justify-center shrink-0 ring-1 ring-[#2a3a2e]">
-                        <span className="text-[11px] font-bold text-[#5ee0a4]">{initials}</span>
+                      <div className="w-9 h-9 rounded-full bg-[var(--chip-success-bg)] flex items-center justify-center shrink-0 ring-1 ring-[var(--chip-success-border)]">
+                        <span className="text-[11px] font-bold text-[var(--accent-success)]">{initials}</span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-[13px] text-[#ededed] leading-tight">{s.scheme}</p>
+                        <p className="font-semibold text-[13px] text-[var(--text-primary)] leading-tight">{s.scheme}</p>
                         <div className="flex items-center gap-1.5 mt-1 flex-wrap">
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{s.subType}</span>
-                          <span className="text-[10px] text-[#6e6e73]">{s.units.toFixed(3)} units · {s.tenure}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono">{s.subType}</span>
+                          <span className="text-[10px] text-[var(--text-tertiary)]">{s.units.toFixed(3)} units · {s.tenure}</span>
                         </div>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Invested</p>
-                        <p className="mono text-[12px] text-[#a0a0a5] font-medium">{formatINR(s.invested)}</p>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">Invested</p>
+                        <p className="mono text-[12px] text-[var(--text-secondary)] font-medium">{formatINR(s.invested)}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Value</p>
-                        <p className="mono text-[12px] text-[#ededed] font-medium">{formatINR(s.currentValue)}</p>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">Value</p>
+                        <p className="mono text-[12px] text-[var(--text-primary)] font-medium">{formatINR(s.currentValue)}</p>
                       </div>
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Gain</p>
-                        <p className={cn("mono text-[12px] font-semibold", positive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">Gain</p>
+                        <p className={cn("mono text-[12px] font-semibold", positive ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                           {positive ? "+" : ""}{formatINR(gain)}
                         </p>
                       </div>
                     </div>
                     <div className="grid grid-cols-3 gap-2">
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Abs %</p>
-                        <p className={cn("mono text-[12px] font-medium", s.absoluteReturnPct != null && s.absoluteReturnPct >= 0 ? "text-[#5ee0a4]" : s.absoluteReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">Abs %</p>
+                        <p className={cn("mono text-[12px] font-medium", s.absoluteReturnPct != null && s.absoluteReturnPct >= 0 ? "text-[var(--accent-success)]" : s.absoluteReturnPct != null ? "text-[var(--accent-error)]" : "text-[var(--text-secondary)]")}>
                           {s.absoluteReturnPct != null ? `${s.absoluteReturnPct.toFixed(2)}%` : "—"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">XIRR</p>
-                        <p className={cn("mono text-[12px] font-medium", s.annualizedReturnPct != null && s.annualizedReturnPct >= 0 ? "text-[#5ee0a4]" : s.annualizedReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">XIRR</p>
+                        <p className={cn("mono text-[12px] font-medium", s.annualizedReturnPct != null && s.annualizedReturnPct >= 0 ? "text-[var(--accent-success)]" : s.annualizedReturnPct != null ? "text-[var(--accent-error)]" : "text-[var(--text-secondary)]")}>
                           {s.annualizedReturnPct != null ? `${s.annualizedReturnPct.toFixed(2)}%` : "—"}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[9px] uppercase tracking-wider text-[#6e6e73] font-semibold">Holding</p>
-                        <p className="mono text-[12px] text-[#a0a0a5] font-medium">{s.holdingPct.toFixed(2)}%</p>
+                        <p className="text-[9px] uppercase tracking-wider text-[var(--text-tertiary)] font-semibold">Holding</p>
+                        <p className="mono text-[12px] text-[var(--text-secondary)] font-medium">{s.holdingPct.toFixed(2)}%</p>
                       </div>
                     </div>
                   </div>
@@ -434,7 +434,7 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
           );
         })}
         {totalRows === 0 && (
-          <div className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No schemes match.</div>
+          <div className="px-4 py-10 text-center text-[var(--text-secondary)] text-[13px]">No schemes match.</div>
         )}
       </div>
 
@@ -442,7 +442,7 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
       <div className="hidden md:block ab-card overflow-hidden">
         <div className="overflow-auto max-h-[560px]">
           <table className="w-full text-[14px]">
-            <thead className="bg-[#1c1c20] sticky top-0 z-10 shadow-[0_1px_0_0_#2a2a2e]">
+            <thead className="bg-[var(--surface-muted)] sticky top-0 z-10 shadow-[0_1px_0_0_var(--border)]">
               <tr>
                 <th className={thL} onClick={() => toggle("scheme")}>Scheme <SortIndicator col="scheme" active={sortKey} dir={sortDir} /></th>
                 <th className={thR} onClick={() => toggle("invested")}>Invested <SortIndicator col="invested" active={sortKey} dir={sortDir} /></th>
@@ -453,22 +453,22 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
                 <th className={thR} onClick={() => toggle("holdingPct")}>% Holding <SortIndicator col="holdingPct" active={sortKey} dir={sortDir} /></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#2a2a2e]">
+            <tbody className="divide-y divide-[var(--border)]">
               {grouped.map((g) => {
                 const groupPositive = g.gain >= 0;
                 const groupPnlPct = g.invested > 0 ? (g.gain / g.invested) * 100 : 0;
                 return (
                   <Fragment key={g.amc}>
-                    <tr className="bg-[#1c1c20]/70 sticky-group">
+                    <tr className="bg-[var(--surface-muted)]/70 sticky-group">
                       <td className="px-4 py-2.5">
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] font-bold text-[#ededed] uppercase tracking-wider">{g.amc}</span>
-                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{g.items.length}</span>
+                          <span className="text-[12px] font-bold text-[var(--text-primary)] uppercase tracking-wider">{g.amc}</span>
+                          <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono">{g.items.length}</span>
                         </div>
                       </td>
                       <td colSpan={2} />
                       <td colSpan={4} className="px-4 py-2.5 text-right mono text-[11px]">
-                        <span className={cn("font-semibold", groupPositive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                        <span className={cn("font-semibold", groupPositive ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                           {groupPositive ? "+" : ""}{formatINR(g.gain)}
                           <span className="opacity-70 ml-1">({formatPercent(groupPnlPct)})</span>
                         </span>
@@ -480,37 +480,37 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
                       const positive = gain >= 0;
                       const initials = s.scheme.split(" ").slice(0, 2).map((w) => w[0]).join("").toUpperCase();
                       return (
-                        <tr key={s.serial} className="hover:bg-[#1c1c20] transition-colors">
+                        <tr key={s.serial} className="hover:bg-[var(--surface-muted)] transition-colors">
                     <td className="px-4 py-3 max-w-xs">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#1a2a20] flex items-center justify-center shrink-0 ring-1 ring-[#2a3a2e]">
-                          <span className="text-[11px] font-bold text-[#5ee0a4]">{initials}</span>
+                        <div className="w-9 h-9 rounded-full bg-[var(--chip-success-bg)] flex items-center justify-center shrink-0 ring-1 ring-[var(--chip-success-border)]">
+                          <span className="text-[11px] font-bold text-[var(--accent-success)]">{initials}</span>
                         </div>
                         <div className="min-w-0">
-                          <p className="font-semibold text-[13px] text-[#ededed] truncate max-w-[260px]">{s.scheme}</p>
+                          <p className="font-semibold text-[13px] text-[var(--text-primary)] truncate max-w-[260px]">{s.scheme}</p>
                           <div className="flex items-center gap-1.5 mt-0.5">
-                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#222226] text-[#a0a0a5] mono">{s.subType}</span>
-                            <span className="text-[10px] text-[#6e6e73]">· {s.units.toFixed(3)} units · {s.tenure}</span>
+                            <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--surface-subtle)] text-[var(--text-secondary)] mono">{s.subType}</span>
+                            <span className="text-[10px] text-[var(--text-tertiary)]">· {s.units.toFixed(3)} units · {s.tenure}</span>
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{formatINR(s.invested)}</td>
-                    <td className="px-4 py-3 text-right mono text-[#ededed]">{formatINR(s.currentValue)}</td>
+                    <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{formatINR(s.invested)}</td>
+                    <td className="px-4 py-3 text-right mono text-[var(--text-primary)]">{formatINR(s.currentValue)}</td>
                     <td className="px-4 py-3 text-right">
-                      <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", positive ? "text-[#5ee0a4]" : "text-[#ff7a6e]")}>
+                      <span className={cn("inline-flex items-center gap-0.5 mono font-semibold", positive ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]")}>
                         {positive ? <ArrowUpRight size={14} /> : <ArrowDownRight size={14} />}
                         {formatINR(Math.abs(gain))}
                         <span className="text-[11px] opacity-80">({formatPercent(pnlPct)})</span>
                       </span>
                     </td>
-                    <td className={cn("px-4 py-3 text-right mono", s.absoluteReturnPct != null && s.absoluteReturnPct >= 0 ? "text-[#5ee0a4]" : s.absoluteReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                    <td className={cn("px-4 py-3 text-right mono", s.absoluteReturnPct != null && s.absoluteReturnPct >= 0 ? "text-[var(--accent-success)]" : s.absoluteReturnPct != null ? "text-[var(--accent-error)]" : "text-[var(--text-secondary)]")}>
                       {s.absoluteReturnPct != null ? `${s.absoluteReturnPct.toFixed(2)}%` : "—"}
                     </td>
-                    <td className={cn("px-4 py-3 text-right mono", s.annualizedReturnPct != null && s.annualizedReturnPct >= 0 ? "text-[#5ee0a4]" : s.annualizedReturnPct != null ? "text-[#ff7a6e]" : "text-[#a0a0a5]")}>
+                    <td className={cn("px-4 py-3 text-right mono", s.annualizedReturnPct != null && s.annualizedReturnPct >= 0 ? "text-[var(--accent-success)]" : s.annualizedReturnPct != null ? "text-[var(--accent-error)]" : "text-[var(--text-secondary)]")}>
                       {s.annualizedReturnPct != null ? `${s.annualizedReturnPct.toFixed(2)}%` : "—"}
                     </td>
-                    <td className="px-4 py-3 text-right mono text-[#a0a0a5]">{s.holdingPct.toFixed(2)}%</td>
+                    <td className="px-4 py-3 text-right mono text-[var(--text-secondary)]">{s.holdingPct.toFixed(2)}%</td>
                   </tr>
                       );
                     })}
@@ -518,7 +518,7 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
                 );
               })}
               {totalRows === 0 && (
-                <tr><td colSpan={7} className="px-4 py-10 text-center text-[#a0a0a5] text-[13px]">No schemes match.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-10 text-center text-[var(--text-secondary)] text-[13px]">No schemes match.</td></tr>
               )}
             </tbody>
           </table>
@@ -529,8 +529,8 @@ function SchemesTable({ schemes }: { schemes: NJSchemeRow[] }) {
 }
 
 function SortIndicator({ col, active, dir }: { col: string; active: string; dir: "asc" | "desc" }) {
-  if (col !== active) return <span className="text-[#6e6e73] ml-1 text-[10px]">⇅</span>;
-  return <span className="text-[#ededed] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
+  if (col !== active) return <span className="text-[var(--text-tertiary)] ml-1 text-[10px]">⇅</span>;
+  return <span className="text-[var(--text-primary)] ml-1 text-[10px]">{dir === "asc" ? "▲" : "▼"}</span>;
 }
 
 function UploadsList({ statements, onDelete, deletingId }: { statements: NJStatementSummary[]; onDelete: (id: string) => void; deletingId: string | null }) {
@@ -538,26 +538,26 @@ function UploadsList({ statements, onDelete, deletingId }: { statements: NJState
   return (
     <section className="space-y-3">
       <div className="flex items-center gap-3">
-        <h2 className="text-[18px] font-semibold text-[#ededed] tracking-tight">Uploads</h2>
+        <h2 className="text-[18px] font-semibold text-[var(--text-primary)] tracking-tight">Uploads</h2>
         <span className="ab-chip">{statements.length}</span>
       </div>
-      <div className="ab-card overflow-hidden divide-y divide-[#2a2a2e]">
+      <div className="ab-card overflow-hidden divide-y divide-[var(--border)]">
         {statements.map((s, idx) => {
           const isLatest = idx === 0;
           const gain = s.totalGainLoss >= 0;
           return (
-            <div key={s.id} className="flex items-center gap-4 px-4 py-3 hover:bg-[#1c1c20] transition-colors">
-              <div className="w-10 h-10 rounded-lg bg-[#1c1c20] flex items-center justify-center shrink-0">
-                <FileText size={16} className="text-[#a0a0a5]" />
+            <div key={s.id} className="flex items-center gap-4 px-4 py-3 hover:bg-[var(--surface-muted)] transition-colors">
+              <div className="w-10 h-10 rounded-lg bg-[var(--surface-muted)] flex items-center justify-center shrink-0">
+                <FileText size={16} className="text-[var(--text-secondary)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[13px] font-semibold text-[#ededed] truncate">{s.fileName}</span>
-                  {isLatest && <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#5ee0a4]/15 text-[#5ee0a4]">Active</span>}
+                  <span className="text-[13px] font-semibold text-[var(--text-primary)] truncate">{s.fileName}</span>
+                  {isLatest && <span className="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-[var(--accent-success)]/15 text-[var(--accent-success)]">Active</span>}
                 </div>
-                <p className="text-[11px] text-[#a0a0a5] mono mt-0.5">
+                <p className="text-[11px] text-[var(--text-secondary)] mono mt-0.5">
                   {s.reportDate ? formatDate(s.reportDate) : formatDate(s.createdAt)} · {s.schemeCount} schemes · {formatINR(s.totalCurrentValue)}{" "}
-                  <span className={gain ? "text-[#5ee0a4]" : "text-[#ff7a6e]"}>
+                  <span className={gain ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}>
                     ({gain ? "+" : ""}{formatINR(s.totalGainLoss)})
                   </span>
                 </p>
@@ -567,7 +567,7 @@ function UploadsList({ statements, onDelete, deletingId }: { statements: NJState
                   href={s.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 rounded-lg text-[#a0a0a5] hover:text-[#ededed] hover:bg-[#222226] transition-colors"
+                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-subtle)] transition-colors"
                   title="Open PDF"
                 >
                   <ExternalLink size={15} />
@@ -575,7 +575,7 @@ function UploadsList({ statements, onDelete, deletingId }: { statements: NJState
                 <button
                   onClick={() => onDelete(s.id)}
                   disabled={deletingId === s.id}
-                  className="p-2 rounded-lg text-[#a0a0a5] hover:text-[#ff7a6e] hover:bg-[#ff7a6e]/10 transition-colors disabled:opacity-50"
+                  className="p-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--accent-error)] hover:bg-[var(--accent-error)]/10 transition-colors disabled:opacity-50"
                   title="Delete"
                 >
                   {deletingId === s.id ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}

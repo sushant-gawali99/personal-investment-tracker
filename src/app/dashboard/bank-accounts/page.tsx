@@ -43,14 +43,14 @@ export default async function BankAccountsOverview() {
       <div className="space-y-4">
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Bank Accounts</h1>
-            <p className="text-[14px] text-[#a0a0a5] mt-1">Import statements and analyse spending.</p>
+            <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Bank Accounts</h1>
+            <p className="text-[14px] text-[var(--text-secondary)] mt-1">Import statements and analyse spending.</p>
           </div>
           <Link
             href="/dashboard/bank-accounts/import"
             className="ab-btn ab-btn-secondary shrink-0 gap-2"
           >
-            <Upload size={14} className="text-[#ff385c]" /> Import Statement
+            <Upload size={14} className="text-[var(--primary)]" /> Import Statement
           </Link>
         </div>
         <BankBalanceStrip balances={balances} />

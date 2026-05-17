@@ -24,8 +24,8 @@ export default async function CategoriesPage() {
     <div className="space-y-6">
       <div className="space-y-2">
         <BackLink />
-        <h1 className="text-[28px] font-bold text-[#ededed] tracking-tight">Categories & Rules</h1>
-        <p className="text-[14px] text-[#a0a0a5]">Preset + custom categories and your learned merchant rules.</p>
+        <h1 className="text-[28px] font-bold text-[var(--text-primary)] tracking-tight">Categories & Rules</h1>
+        <p className="text-[14px] text-[var(--text-secondary)]">Preset + custom categories and your learned merchant rules.</p>
       </div>
       <CategoriesClient categories={categories.map((c) => ({ ...c, createdAt: c.createdAt.toISOString(), updatedAt: c.updatedAt.toISOString() }))} rules={rules.map((r) => ({ ...r, createdAt: r.createdAt.toISOString(), updatedAt: r.updatedAt.toISOString(), category: { ...r.category, createdAt: r.category.createdAt.toISOString(), updatedAt: r.category.updatedAt.toISOString() } }))} />
     </div>
