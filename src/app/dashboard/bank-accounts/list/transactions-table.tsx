@@ -34,6 +34,8 @@ interface Row {
   notes: string | null;
   fdId: string | null;
   fd: { id: string; bankName: string; fdNumber: string | null; accountNumber: string | null } | null;
+  /** Real running balance after this transaction (single-account view only). */
+  balanceAfter: number | null;
 }
 
 export function TransactionsTable({
@@ -435,25 +437,13 @@ export function TransactionsTable({
                     <button onClick={clearAllFilters} className="text-[12px] text-[var(--primary)] mt-2 underline">Clear filters</button>
                   )}
                 </td></tr>
-              ) : (() => {
-                // Build a running-balance map keyed by row id.
-                // We walk the rows in chronological order (oldest → newest)
-                // regardless of display sort so the cumulative number is
-                // consistent. NOTE: this is a page-level cumulative, not the
-                // real bank balance — proper balance needs backend support
-                // (per-transaction balance from the account opening balance).
-                const chrono = [...rows].sort((a, b) => a.txnDate.localeCompare(b.txnDate));
-                const balanceMap = new Map<string, number>();
-                let runningBalance = 0;
-                for (const row of chrono) {
-                  runningBalance += row.direction === "credit" ? row.amount : -row.amount;
-                  balanceMap.set(row.id, runningBalance);
-                }
-                return rows.map((r) => {
+              ) : rows.map((r) => {
                 // Use AI-generated prettyDescription when available (non-Axis banks);
                 // fall back to regex-based prettifyDescription for Axis/JS-parsed txns.
                 const pretty = prettifyDescription(r.description);
-                const rowBalance = balanceMap.get(r.id) ?? 0;
+                // Real running balance comes from the API (single-account view only);
+                // null when the user is viewing all accounts.
+                const rowBalance = r.balanceAfter;
                 const displayLabel = r.prettyDescription ?? pretty.merchant;
                 const isCredit = r.direction === "credit";
                 const isEditingCategory = editingCategoryId === r.id;
@@ -553,14 +543,17 @@ export function TransactionsTable({
                   </td>
                   {/* Balance */}
                   <td className="px-3 py-2.5 text-right whitespace-nowrap align-middle mono">
-                    <span className={`font-semibold ${rowBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
-                      {rowBalance >= 0 ? "" : "-"}{formatINR(Math.abs(rowBalance))}
-                    </span>
+                    {rowBalance != null ? (
+                      <span className={`font-semibold ${rowBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
+                        {rowBalance >= 0 ? "" : "-"}{formatINR(Math.abs(rowBalance))}
+                      </span>
+                    ) : (
+                      <span className="text-[var(--text-tertiary)]" title="Balance is shown only when filtered to a single account">—</span>
+                    )}
                   </td>
                 </tr>
                 );
-              });
-              })()}
+              })}
             </tbody>
           </table>
         </div>

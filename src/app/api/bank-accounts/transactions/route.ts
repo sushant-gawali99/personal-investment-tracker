@@ -69,13 +69,50 @@ export async function GET(req: NextRequest) {
       ? prisma.transaction.count({ where: { ...where, category: { is: { kind: "transfer" } } } })
       : Promise.resolve(0),
   ]);
+
+  // ── Running balance (single-account view only) ──────────────────────────
+  // When the user filters to a single account we compute a real, per-txn
+  // running balance anchored to the earliest known opening balance from
+  // any saved StatementImport for that account. Without an anchor we start
+  // from 0 — the column then represents net cumulative flow since the
+  // first imported transaction.
+  const balanceById = new Map<string, number>();
+  if (accountId) {
+    const anchorImport = await prisma.statementImport.findFirst({
+      where: { accountId, userId, openingBalance: { not: null }, status: "saved" },
+      orderBy: { statementPeriodStart: "asc" },
+      select: { openingBalance: true },
+    });
+    const anchorBalance = anchorImport?.openingBalance ?? 0;
+
+    // All transactions for the account in chronological order so the running
+    // balance is correct regardless of the current page or sort.
+    const chronoAll = await prisma.transaction.findMany({
+      where: { userId, accountId },
+      orderBy: [{ txnDate: "asc" }, { createdAt: "asc" }],
+      select: { id: true, amount: true, direction: true },
+    });
+    let running = anchorBalance;
+    for (const t of chronoAll) {
+      running += t.direction === "credit" ? t.amount : -t.amount;
+      balanceById.set(t.id, running);
+    }
+  }
+  const itemsWithBalance = items.map((it) => ({
+    ...it,
+    balanceAfter: accountId ? (balanceById.get(it.id) ?? null) : null,
+  }));
+
   return NextResponse.json({
-    items, total, page, pageSize,
+    items: itemsWithBalance, total, page, pageSize,
     totalDebit:  debitAgg._sum.amount  ?? 0,
     totalCredit: creditAgg._sum.amount ?? 0,
     // Number of rows in the current filter that are transfers (and therefore
     // excluded from totalDebit/totalCredit). The UI uses this to show
     // "excl. N transfers" next to the summary.
     transferCount: excludedCount,
+    // True when the response includes a real per-transaction balance anchored
+    // to an opening balance. UI uses this to label the column accurately.
+    hasRunningBalance: !!accountId,
   });
 }
