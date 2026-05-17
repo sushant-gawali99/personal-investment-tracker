@@ -3,6 +3,8 @@ import type { ExtractedTxn } from "./types";
 export interface JsParseResult {
   statementPeriodStart: string | null;
   statementPeriodEnd: string | null;
+  openingBalance: number | null;
+  closingBalance: number | null;
   transactions: ExtractedTxn[];
   /** True when we recognised the bank and confidently parsed >= 1 transaction. */
   confident: boolean;
@@ -20,7 +22,7 @@ export function parseStatementText(text: string): JsParseResult {
     const r = p(text);
     if (r.confident) return r;
   }
-  return { statementPeriodStart: null, statementPeriodEnd: null, transactions: [], confident: false, unparsedBlocks: [] };
+  return { statementPeriodStart: null, statementPeriodEnd: null, openingBalance: null, closingBalance: null, transactions: [], confident: false, unparsedBlocks: [] };
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -68,7 +70,7 @@ const AXIS_ROW_RX =
 
 export function parseAxis(text: string): JsParseResult {
   if (!isAxisStatement(text)) {
-    return { statementPeriodStart: null, statementPeriodEnd: null, transactions: [], confident: false, unparsedBlocks: [] };
+    return { statementPeriodStart: null, statementPeriodEnd: null, openingBalance: null, closingBalance: null, transactions: [], confident: false, unparsedBlocks: [] };
   }
 
   const period = text.match(/From\s*:\s*(\d{2}-\d{2}-\d{4})\s*To\s*:\s*(\d{2}-\d{2}-\d{4})/);
@@ -77,23 +79,28 @@ export function parseAxis(text: string): JsParseResult {
 
   const opening = text.match(/OPENING BALANCE\s+([\d,]+\.\d{2})/);
   if (!opening) {
-    return { statementPeriodStart, statementPeriodEnd, transactions: [], confident: false, unparsedBlocks: [] };
+    return { statementPeriodStart, statementPeriodEnd, openingBalance: null, closingBalance: null, transactions: [], confident: false, unparsedBlocks: [] };
   }
-  let runningBalance = parseNumber(opening[1]);
+  const openingBalance = parseNumber(opening[1]);
+  let runningBalance = openingBalance;
 
   // Group lines into candidate blocks (each starting with a date), stopping
   // at the closing balance / end-of-statement markers.
   const lines = text.split(/\r?\n/);
   const rawBlocks: string[] = [];
   let cur: string[] | null = null;
+  let closingBalance: number | null = null;
   for (const ln of lines) {
     if (/^\d{2}-\d{2}-\d{4}\s/.test(ln)) {
       if (cur) rawBlocks.push(cur.join(" "));
       cur = [ln];
     } else if (cur) {
-      if (/^CLOSING BALANCE|^TRANSACTION TOTAL|^\+\+\+\+ End of Statement/i.test(ln.trim())) {
+      const trimmed = ln.trim();
+      if (/^CLOSING BALANCE|^TRANSACTION TOTAL|^\+\+\+\+ End of Statement/i.test(trimmed)) {
         rawBlocks.push(cur.join(" "));
         cur = null;
+        const balM = trimmed.match(/([\d,]+\.\d{2})\s*$/);
+        if (balM) closingBalance = parseNumber(balM[1]);
         break;
       }
       if (ln.trim()) cur.push(ln);
@@ -160,6 +167,8 @@ export function parseAxis(text: string): JsParseResult {
   return {
     statementPeriodStart,
     statementPeriodEnd,
+    openingBalance,
+    closingBalance,
     transactions,
     confident: transactions.length > 0,
     unparsedBlocks,

@@ -122,10 +122,8 @@ export async function extractTransactions(
       return {
         statementPeriodStart: jsParsed.statementPeriodStart,
         statementPeriodEnd: jsParsed.statementPeriodEnd,
-        // JS parsers don't capture opening/closing — downstream can infer
-        // from the first/last runningBalance if needed.
-        openingBalance: null,
-        closingBalance: null,
+        openingBalance: jsParsed.openingBalance,
+        closingBalance: jsParsed.closingBalance,
         transactions: jsParsed.transactions,
         inputTokens: 0,
         outputTokens: 0,
