@@ -32,6 +32,7 @@ function LogoMark() {
 function LoginPageInner() {
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+  const reason = searchParams.get("reason");
 
   const [loadingGoogle, setLoadingGoogle] = useState(false);
 
@@ -97,6 +98,19 @@ function LoginPageInner() {
             <h2 className="text-[28px] font-bold tracking-tight" style={{ color: "var(--text-primary)" }}>Welcome back</h2>
             <p className="text-[14px] mt-1.5" style={{ color: "var(--text-secondary)" }}>Sign in to access your portfolio</p>
           </div>
+
+          {reason === "timeout" && (
+            <p
+              className="text-[13px] py-2.5 px-3 rounded-lg"
+              style={{
+                color: "var(--text-secondary)",
+                background: "var(--surface-muted)",
+                border: "1px solid var(--border)",
+              }}
+            >
+              You were signed out due to inactivity.
+            </p>
+          )}
 
           <button
             onClick={handleGoogle}
