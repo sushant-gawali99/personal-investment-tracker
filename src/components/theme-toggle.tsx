@@ -10,19 +10,7 @@ export function ThemeToggle() {
     <button
       onClick={toggle}
       aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-      className="relative p-2 rounded-full transition-colors"
-      style={{
-        color: "var(--text-secondary)",
-        background: "transparent",
-      }}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)";
-        (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-        (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
-      }}
+      className="relative p-2 rounded-full transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
     >
       <span
         className="absolute inset-0 flex items-center justify-center transition-all duration-200"

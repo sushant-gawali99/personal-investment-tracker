@@ -89,25 +89,10 @@ export function TopNav({ impersonatedUser }: Props) {
                   href={href}
                   className={cn(
                     "px-3 py-2 rounded-full text-sm font-medium transition-colors",
-                    active ? "bg-[#ff385c]/[0.12] ring-2 ring-inset ring-[#ff385c]/[0.35]" : ""
-                  )}
-                  style={
                     active
-                      ? { color: "var(--text-primary)" }
-                      : { color: "var(--text-secondary)" }
-                  }
-                  onMouseEnter={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-primary)";
-                      (e.currentTarget as HTMLAnchorElement).style.background = "var(--surface-muted)";
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!active) {
-                      (e.currentTarget as HTMLAnchorElement).style.color = "var(--text-secondary)";
-                      (e.currentTarget as HTMLAnchorElement).style.background = "";
-                    }
-                  }}
+                      ? "bg-[#ff385c]/[0.12] ring-2 ring-inset ring-[#ff385c]/[0.35] text-[var(--text-primary)]"
+                      : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+                  )}
                 >
                   {label}
                 </Link>
@@ -121,32 +106,16 @@ export function TopNav({ impersonatedUser }: Props) {
 
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors"
-            style={{ color: "var(--text-secondary)" }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-primary)";
-              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.color = "var(--text-secondary)";
-              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            }}
+            className="hidden sm:inline-flex items-center gap-2 px-3 py-2 rounded-full text-sm font-medium transition-colors text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
           >
             <LogOut size={14} />
             Sign out
           </button>
 
           <button
-            className="sm:hidden p-2 rounded-full transition-colors"
-            style={{ color: "var(--text-primary)" }}
+            className="sm:hidden p-2 rounded-full transition-colors text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
             onClick={() => setOpen((o) => !o)}
             aria-label="Toggle menu"
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "var(--surface-muted)";
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.background = "transparent";
-            }}
           >
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
