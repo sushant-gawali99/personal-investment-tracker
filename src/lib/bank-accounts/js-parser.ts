@@ -86,21 +86,23 @@ export function parseAxis(text: string): JsParseResult {
 
   // Group lines into candidate blocks (each starting with a date), stopping
   // at the closing balance / end-of-statement markers.
+  // Closing balance lives on its own "CLOSING BALANCE  NNN.NN" line, which
+  // follows TRANSACTION TOTAL. Extract it separately before the line scan so
+  // the loop can stop at TRANSACTION TOTAL without missing the value.
+  const closingM = text.match(/CLOSING BALANCE\s+([\d,]+\.\d{2})/i);
+  const closingBalance = closingM ? parseNumber(closingM[1]) : null;
+
   const lines = text.split(/\r?\n/);
   const rawBlocks: string[] = [];
   let cur: string[] | null = null;
-  let closingBalance: number | null = null;
   for (const ln of lines) {
     if (/^\d{2}-\d{2}-\d{4}\s/.test(ln)) {
       if (cur) rawBlocks.push(cur.join(" "));
       cur = [ln];
     } else if (cur) {
-      const trimmed = ln.trim();
-      if (/^CLOSING BALANCE|^TRANSACTION TOTAL|^\+\+\+\+ End of Statement/i.test(trimmed)) {
+      if (/^CLOSING BALANCE|^TRANSACTION TOTAL|^\+\+\+\+ End of Statement/i.test(ln.trim())) {
         rawBlocks.push(cur.join(" "));
         cur = null;
-        const balM = trimmed.match(/([\d,]+\.\d{2})\s*$/);
-        if (balM) closingBalance = parseNumber(balM[1]);
         break;
       }
       if (ln.trim()) cur.push(ln);

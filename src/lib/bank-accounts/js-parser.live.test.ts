@@ -22,6 +22,8 @@ describe("js-parser on real Axis statement (5265324706)", () => {
     expect(r.confident).toBe(true);
     expect(r.statementPeriodStart).toBe("2026-03-01");
     expect(r.statementPeriodEnd).toBe("2026-03-31");
+    expect(r.openingBalance).toBe(395241.78);
+    expect(r.closingBalance).toBe(308012.7);
     expect(r.transactions.length).toBeGreaterThan(100);
     // Every parsed transaction must have a date, amount, direction, and balance
     for (const t of r.transactions) {
