@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { prisma } from "@/lib/prisma";
 import { extractTransactions } from "@/lib/bank-accounts/extract-transactions";
+import { excelToText } from "@/lib/bank-accounts/excel-text";
 import { categorizeRows } from "@/lib/bank-accounts/categorize";
 import { markDuplicates } from "@/lib/bank-accounts/dedup";
 import { normalizeDescription } from "@/lib/bank-accounts/normalize-description";
@@ -35,7 +36,23 @@ export async function runExtraction(importId: string, userId: string, pdfPasswor
       categories.map((c) => [c.name, { id: c.id, name: c.name, kind: c.kind as CategoryLite["kind"], userId: c.userId }]),
     );
 
-    const extraction = await extractTransactions(Buffer.from(bytes), categoryNames, pdfPassword);
+    const isExcel = /\.(xlsx|xls)$/i.test(imp.fileUrl);
+    let preExtractedText: string | undefined;
+    if (isExcel) {
+      const tExcel = Date.now();
+      const result = await excelToText(Buffer.from(bytes));
+      preExtractedText = result.text;
+      console.log(
+        `[extract] excel-to-text ${Date.now() - tExcel}ms, sheets=${result.sheetCount} (${result.sheetNames.join(", ")}), textLen=${preExtractedText.length}`,
+      );
+    }
+
+    const extraction = await extractTransactions(
+      Buffer.from(bytes),
+      categoryNames,
+      isExcel ? undefined : pdfPassword,
+      preExtractedText,
+    );
 
     // Include system-wide rules (userId=null) so newly-seeded users
     // benefit from the shared starter set on their very first import.

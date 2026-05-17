@@ -35,6 +35,11 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [accountId, setAccountId] = useState(accounts[0]?.id ?? "");
   const [file, setFile] = useState<File | null>(null);
+  const isExcelFile = file !== null && (
+    file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+    file.type === "application/vnd.ms-excel" ||
+    /\.(xlsx|xls)$/i.test(file.name)
+  );
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [importId, setImportId] = useState<string | null>(null);
@@ -203,7 +208,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
           </div>
 
           <div>
-            <label className="ab-label">Statement PDF</label>
+            <label className="ab-label">Statement file</label>
             <label
               onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
               onDragLeave={() => setDragOver(false)}
@@ -211,7 +216,13 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                 e.preventDefault();
                 setDragOver(false);
                 const f = e.dataTransfer.files?.[0];
-                if (f && f.type === "application/pdf") setFile(f);
+                if (!f) return;
+                const accepted =
+                  f.type === "application/pdf" ||
+                  f.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+                  f.type === "application/vnd.ms-excel" ||
+                  /\.(xlsx|xls)$/i.test(f.name);
+                if (accepted) setFile(f);
               }}
               className={`
                 block relative border-2 border-dashed rounded-[14px] p-8 text-center cursor-pointer
@@ -227,7 +238,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
             >
               <input
                 type="file"
-                accept="application/pdf"
+                accept="application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,.xlsx,.xls"
                 className="sr-only"
                 onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 disabled={status !== "idle"}
@@ -249,42 +260,44 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                     Drop your PDF here or click to browse
                   </p>
                   <p className="text-[12px] text-[var(--text-secondary)]">
-                    Password-protected PDFs supported — enter password below
+                    PDF and Excel (.xlsx, .xls) files supported
                   </p>
                 </div>
               )}
             </label>
           </div>
 
-          <div>
-            <label className="ab-label">
-              PDF password <span className="text-[var(--text-tertiary)] font-normal">(optional)</span>
-            </label>
-            <div className="relative">
-              <input
-                type={showPassword ? "text" : "password"}
-                className="ab-input pr-16"
-                placeholder="Leave blank if not protected"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={status !== "idle"}
-                autoComplete="off"
-              />
-              {password && (
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-2 py-1"
-                  tabIndex={-1}
-                >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
-              )}
+          {!isExcelFile && (
+            <div>
+              <label className="ab-label">
+                PDF password <span className="text-[var(--text-tertiary)] font-normal">(optional)</span>
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="ab-input pr-16"
+                  placeholder="Leave blank if not protected"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={status !== "idle"}
+                  autoComplete="off"
+                />
+                {password && (
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-[var(--text-secondary)] hover:text-[var(--text-primary)] px-2 py-1"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? "Hide" : "Show"}
+                  </button>
+                )}
+              </div>
+              <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
+                Used once to decrypt this statement — not stored.
+              </p>
             </div>
-            <p className="text-[11px] text-[var(--text-tertiary)] mt-1">
-              Used once to decrypt this statement — not stored.
-            </p>
-          </div>
+          )}
 
           <button
             type="submit"
@@ -321,7 +334,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
 
           <div className="flex items-center gap-2 text-[11px] text-[var(--text-tertiary)] pt-1 border-t border-[var(--border)]">
             <Shield size={12} />
-            <span>PDFs are stored locally — never sent to third parties except your chosen AI provider.</span>
+            <span>Files are stored locally — never sent to third parties except your chosen AI provider.</span>
           </div>
 
           <style jsx>{`

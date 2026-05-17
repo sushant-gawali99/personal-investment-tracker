@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { formatDate, formatINR } from "@/lib/format";
 import { useTheme } from "@/components/theme-provider";
 
@@ -47,10 +48,17 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
       {balances.map((b) => {
         const accent = bankAccent(b.bankName);
         const hasBalance = b.closingBalance != null;
+        // Click → transactions filtered by this account when balance is known.
+        // No balance → take the user to the Statements/import flow instead.
+        const href = hasBalance
+          ? `/dashboard/bank-accounts/list?accountId=${b.id}`
+          : `/dashboard/bank-accounts/imports`;
         return (
-          <div
+          <Link
             key={b.id}
-            className="rounded-2xl overflow-hidden transition-all duration-200 hover:scale-[1.015]"
+            href={href}
+            aria-label={hasBalance ? `View transactions for ${b.bankName}` : `Import statement for ${b.bankName}`}
+            className="block rounded-2xl overflow-hidden transition-all duration-200 hover:scale-[1.015] hover:-translate-y-0.5 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--background)]"
             style={{
               background: "var(--surface-raised)",
               border: `1px solid color-mix(in srgb, ${accent.color} ${borderOp}%, transparent)`,
@@ -95,7 +103,7 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
                 </>
               )}
             </div>
-          </div>
+          </Link>
         );
       })}
 

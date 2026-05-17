@@ -16,8 +16,15 @@ export async function POST(req: NextRequest) {
   const accountId = (form.get("accountId") as string | null)?.trim();
   if (!file) return NextResponse.json({ error: "No file" }, { status: 400 });
   if (!accountId) return NextResponse.json({ error: "accountId required" }, { status: 400 });
-  if (file.type !== "application/pdf") return NextResponse.json({ error: "PDF only" }, { status: 400 });
-  if (file.size > MAX_BYTES) return NextResponse.json({ error: "PDF exceeds 5 MB" }, { status: 400 });
+  const ACCEPTED_TYPES = new Set([
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-excel",
+  ]);
+  if (!ACCEPTED_TYPES.has(file.type)) {
+    return NextResponse.json({ error: "Only PDF and Excel files (.xlsx, .xls) are supported" }, { status: 400 });
+  }
+  if (file.size > MAX_BYTES) return NextResponse.json({ error: "File exceeds 5 MB" }, { status: 400 });
 
   const account = await prisma.bankAccount.findFirst({ where: { id: accountId, userId } });
   if (!account) return NextResponse.json({ error: "Account not found" }, { status: 404 });
@@ -26,7 +33,10 @@ export async function POST(req: NextRequest) {
     ? path.join(process.env.UPLOAD_DIR, "bank-statements")
     : path.join(process.cwd(), "public", "uploads", "bank-statements");
   await mkdir(uploadDir, { recursive: true });
-  const name = `${randomBytes(10).toString("hex")}.pdf`;
+  const ext = file.type === "application/pdf" ? "pdf"
+    : file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ? "xlsx"
+    : "xls";
+  const name = `${randomBytes(10).toString("hex")}.${ext}`;
   await writeFile(path.join(uploadDir, name), Buffer.from(await file.arrayBuffer()));
   const fileUrl = `/api/bank-accounts/import/file/${name}`;
 
