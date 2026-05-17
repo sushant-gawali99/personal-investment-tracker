@@ -26,7 +26,12 @@ export async function proxy(req: NextRequest) {
     const loginUrl = new URL("/login", req.url);
     loginUrl.searchParams.set("reason", "timeout");
     loginUrl.searchParams.set("callbackUrl", req.nextUrl.pathname + req.nextUrl.search);
-    return NextResponse.redirect(loginUrl);
+    const res = NextResponse.redirect(loginUrl);
+    // Delete the stale cookie so re-login lands on a clean slate.
+    // Without this, the stale cookie survives the re-auth redirect and
+    // immediately triggers another timeout on the first post-login request.
+    res.cookies.delete(COOKIE_NAME);
+    return res;
   }
 
   return NextResponse.next();
