@@ -189,8 +189,7 @@ model Transaction {
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
-  @@unique([userId, accountId, bankRef, direction])
-  @@unique([userId, accountId, txnDate, amount, normalizedDescription])
+  @@unique([userId, accountId, txnDate, amount, normalizedDescription, bankRef])
   @@index([userId, txnDate])
   @@index([accountId, txnDate])
   @@index([categoryId])

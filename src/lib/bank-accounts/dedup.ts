@@ -22,7 +22,7 @@ export function markDuplicates<T extends StagedKey>(
   const byFallback = new Map<string, string>();
   for (const e of existing) {
     if (e.bankRef) byRef.set(`${e.bankRef}|${e.direction}`, e.id);
-    const fk = `${e.txnDate}|${amountToPaise(e.amount)}|${e.normalizedDescription}`;
+    const fk = `${e.txnDate}|${amountToPaise(e.amount)}|${e.normalizedDescription}|${e.bankRef ?? ""}`;
     byFallback.set(fk, e.id);
   }
   return staged.map((s) => {
@@ -30,7 +30,7 @@ export function markDuplicates<T extends StagedKey>(
     const refKey = `${s.bankRef}|${s.direction}`;
     if (s.bankRef && byRef.has(refKey)) matchId = byRef.get(refKey)!;
     else {
-      const fk = `${s.txnDate}|${amountToPaise(s.amount)}|${s.normalizedDescription}`;
+      const fk = `${s.txnDate}|${amountToPaise(s.amount)}|${s.normalizedDescription}|${s.bankRef ?? ""}`;
       if (byFallback.has(fk)) matchId = byFallback.get(fk)!;
     }
     return { ...s, isDuplicate: matchId !== null, duplicateOfId: matchId };

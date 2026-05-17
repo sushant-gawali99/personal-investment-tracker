@@ -53,4 +53,27 @@ describe("markDuplicates", () => {
     const out = markDuplicates(staged, [{ id: "z", bankRef: null, txnDate: "2026-04-05", amount: 10, normalizedDescription: "Y", direction: "debit" }]);
     expect(out[0].isDuplicate).toBe(false);
   });
+
+  it("does not flag fallback match when same date/amount/desc but different bankRef (SBI same-amount transfers)", () => {
+    const existing2 = [
+      { id: "s1", bankRef: "REF001", txnDate: "2026-05-12", amount: 85400, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const staged = [
+      { bankRef: "REF002", txnDate: "2026-05-12", amount: 85400, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const out = markDuplicates(staged, existing2);
+    expect(out[0].isDuplicate).toBe(false);
+  });
+
+  it("flags fallback match when same date/amount/desc and same bankRef (true re-import)", () => {
+    const existing2 = [
+      { id: "s1", bankRef: "REF001", txnDate: "2026-05-12", amount: 85400, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const staged = [
+      { bankRef: "REF001", txnDate: "2026-05-12", amount: 85400, normalizedDescription: "WDL TFR FD", direction: "debit" },
+    ];
+    const out = markDuplicates(staged, existing2);
+    expect(out[0].isDuplicate).toBe(true);
+    expect(out[0].duplicateOfId).toBe("s1");
+  });
 });
