@@ -257,7 +257,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Account[]; ca
                     <UploadCloud size={22} className="text-[var(--primary)]" />
                   </div>
                   <p className="text-[14px] font-semibold text-[var(--text-primary)]">
-                    Drop your PDF here or click to browse
+                    Drop your file here or click to browse
                   </p>
                   <p className="text-[12px] text-[var(--text-secondary)]">
                     PDF and Excel (.xlsx, .xls) files supported
