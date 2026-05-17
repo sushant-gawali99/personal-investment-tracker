@@ -75,8 +75,8 @@ export function DatePicker({ value, onChange, placeholder = "Pick a date", class
                 "w-9 h-9 rounded-full text-[13px] font-medium transition-colors",
                 "text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
               ),
-              selected: "bg-[var(--text-primary)]! text-white! font-semibold rounded-full",
-              today: "text-[var(--primary)] font-bold",
+              selected: "bg-[var(--text-primary)]! text-[var(--background)]! font-semibold rounded-full",
+              today: "text-[var(--primary)] font-bold ring-1 ring-inset ring-[var(--primary)]/40 rounded-full",
               outside: "opacity-40",
               disabled: "opacity-25 cursor-not-allowed",
             }}
