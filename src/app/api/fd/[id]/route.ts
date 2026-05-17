@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
+import { findOrCreateFdBank } from "@/lib/fd-bank";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUserId();
@@ -16,10 +17,21 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
+
+  // If bankName is being changed, resolve to FdBank and update bankId so
+  // the relation stays in sync. Always store the bank's canonical name in
+  // the denormalised bankName field.
+  let bankPatch: { bankName: string; bankId: string } | undefined;
+  if (typeof body.bankName === "string" && body.bankName.trim()) {
+    const bank = await findOrCreateFdBank(prisma, userId, body.bankName);
+    bankPatch = { bankName: bank.name, bankId: bank.id };
+  }
+
   const fd = await prisma.fixedDeposit.update({
     where: { id },
     data: {
       ...body,
+      ...bankPatch,
       principal: body.principal ? Number(body.principal) : undefined,
       interestRate: body.interestRate ? Number(body.interestRate) : undefined,
       tenureMonths: body.tenureMonths !== undefined ? Number(body.tenureMonths) : undefined,

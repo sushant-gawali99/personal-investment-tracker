@@ -39,6 +39,18 @@ function normalizeBankName(name: string) {
   return name.trim().toLowerCase().split(/\s+/).slice(0, 2).join(" ");
 }
 
+/**
+ * Stable filter key for a deposit. Prefers the resolved bankId (post-backfill);
+ * falls back to the normalised bankName for rows that haven't been linked yet.
+ * Branch is included so multiple branches of the same bank stay separate
+ * filter entries (matches the previous behaviour).
+ */
+function bankKey(fd: { bankId?: string | null; bankName: string; branchName: string | null }): string {
+  const branch = (fd.branchName ?? "").trim().toLowerCase();
+  const bankPart = fd.bankId ?? `name:${normalizeBankName(fd.bankName)}`;
+  return `${bankPart}|${branch}`;
+}
+
 type Resolved = ReturnType<typeof resolveCurrent>;
 
 function resolveCurrent(fd: FD) {
@@ -90,7 +102,7 @@ export function FDList({ fds }: { fds: FD[] }) {
     return fds
       .filter((fd) => {
         if (fd.disabled) return false;
-        if (bankFilter !== "all" && (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) !== bankFilter) return false;
+        if (bankFilter !== "all" && bankKey(fd) !== bankFilter) return false;
         return true;
       })
       .map((fd) => {
@@ -126,7 +138,7 @@ export function FDList({ fds }: { fds: FD[] }) {
 
   const bankMap = new Map<string, { label: string; count: number }>();
   for (const fd of fds) {
-    const key = normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase();
+    const key = bankKey(fd);
     const entry = bankMap.get(key);
     const label = fd.bankName.trim() + (fd.branchName ? ", " + fd.branchName.trim() : "");
     if (!entry) {
@@ -148,7 +160,7 @@ export function FDList({ fds }: { fds: FD[] }) {
       if (filter === "active" && matured) return false;
       if (filter === "matured" && !matured) return false;
     }
-    if (bankFilter !== "all" && (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) !== bankFilter) return false;
+    if (bankFilter !== "all" && bankKey(fd) !== bankFilter) return false;
     if (fdSearch.trim()) {
       const q = fdSearch.trim().toLowerCase();
       const matchesFd = (fd.fdNumber ?? "").toLowerCase().includes(q);
@@ -195,7 +207,7 @@ export function FDList({ fds }: { fds: FD[] }) {
     try {
       const printFDs = bankFilter === "all"
         ? fds
-        : fds.filter((fd) => (normalizeBankName(fd.bankName) + "|" + (fd.branchName ?? "").trim().toLowerCase()) === bankFilter);
+        : fds.filter((fd) => bankKey(fd) === bankFilter);
       await generateFDPdf({
         generatedAt: new Date(),
         stats,

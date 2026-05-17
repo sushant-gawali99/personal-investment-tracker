@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
+import { findOrCreateFdBank } from "@/lib/fd-bank";
 
 export async function GET() {
   const result = await requireUserId();
@@ -57,9 +58,15 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Resolve the bank to an FdBank record so the filter/lookup works
+  // reliably across capitalisation / branch differences. Keeps the
+  // denormalised bankName in sync with the bank's canonical name.
+  const bank = await findOrCreateFdBank(prisma, userId, bankName);
+
   const fdData = {
     userId,
-    bankName,
+    bankName: bank.name,
+    bankId: bank.id,
     branchName: branchName || null,
     fdNumber: fdNumber || null,
     accountNumber: accountNumber || null,

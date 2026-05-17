@@ -7,10 +7,29 @@ datasource db {
   provider = "sqlite"
 }
 
+model FdBank {
+  id             String   @id @default(cuid())
+  userId         String
+  /// Canonical display name shown in the UI.
+  name           String
+  /// Lower-cased / collapsed form used for de-dup and lookup. Unique per user.
+  normalizedName String
+  deposits       FixedDeposit[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, normalizedName])
+  @@index([userId])
+}
+
 model FixedDeposit {
   id             String   @id @default(cuid())
   userId         String   @default("")
+  /// Denormalized bank name kept for backward compatibility. New code
+  /// should prefer reading from bank.name via the relation.
   bankName       String
+  bankId         String?
+  bank           FdBank?  @relation(fields: [bankId], references: [id], onDelete: SetNull)
   branchName     String?
   fdNumber       String?
   accountNumber  String?

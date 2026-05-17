@@ -24,6 +24,8 @@ export interface FDRenewalData {
 export interface FDDetailData {
   id: string;
   bankName: string;
+  /** Set after the backfill. New code should prefer bankId for filters. */
+  bankId?: string | null;
   branchName: string | null;
   fdNumber: string | null;
   accountNumber: string | null;

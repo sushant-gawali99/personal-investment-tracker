@@ -1,6 +1,7 @@
 "use client";
 
 import { DatePicker } from "@/components/ui/date-picker";
+import { BankCombobox } from "@/components/fd/bank-combobox";
 import type { BulkRow, EditableFields } from "./bulk-state";
 
 type Props = {
@@ -16,10 +17,9 @@ export function BulkRowEditor({ row, onEditField }: Props) {
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div className="sm:col-span-2 lg:col-span-3">
         <label className="ab-label">Bank Name *</label>
-        <input
-          className="ab-input"
+        <BankCombobox
           value={v("bankName")}
-          onChange={(e) => onEditField("bankName", e.target.value)}
+          onChange={(val) => onEditField("bankName", val)}
           required
         />
       </div>
