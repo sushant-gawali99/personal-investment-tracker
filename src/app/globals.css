@@ -198,8 +198,8 @@
   --loss-bg: #fff0ee;
   --loss-border: #f4b5ad;
 
-  /* Subtle surface */
-  --surface-deep: #ebebee;
+  /* Subtle surface — noticeably darker than surface-muted so containers are distinct */
+  --surface-deep: #d8d8dc;
 
   /* Statement report status */
   --status-matured: #15803d;

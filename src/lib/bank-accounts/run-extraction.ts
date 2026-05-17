@@ -48,7 +48,7 @@ export async function runExtraction(importId: string, userId: string, pdfPasswor
 
     const existing = await prisma.transaction.findMany({
       where: { userId, accountId: imp.accountId },
-      select: { id: true, bankRef: true, txnDate: true, amount: true, normalizedDescription: true },
+      select: { id: true, bankRef: true, txnDate: true, amount: true, normalizedDescription: true, direction: true },
     });
     const existingForDedup = existing.map((e) => ({
       id: e.id,
@@ -56,6 +56,7 @@ export async function runExtraction(importId: string, userId: string, pdfPasswor
       txnDate: e.txnDate.toISOString().slice(0, 10),
       amount: e.amount,
       normalizedDescription: e.normalizedDescription,
+      direction: e.direction,
     }));
     const withDupes = markDuplicates(
       staged.map((s) => ({

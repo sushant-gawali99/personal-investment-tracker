@@ -291,8 +291,8 @@ export function FDList({ fds }: { fds: FD[] }) {
               className={cn(
                 "px-3 py-1.5 rounded-full text-[12px] font-semibold transition-all capitalize whitespace-nowrap",
                 filter === f
-                  ? "bg-[var(--surface-muted)] text-[var(--text-primary)] border border-[var(--border)]"
-                  : "text-[var(--text-tertiary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
+                  ? "bg-[var(--surface-raised)] text-[var(--text-primary)] shadow-sm border border-[var(--border)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
               )}
             >
               {f} ({counts[f]})

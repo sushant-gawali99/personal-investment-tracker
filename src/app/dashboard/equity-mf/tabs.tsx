@@ -23,7 +23,7 @@ export function EquityMFTabs() {
             className={cn(
               "flex items-center gap-2 px-4 py-2 rounded-full text-[13px] font-medium transition-all",
               active
-                ? "bg-[var(--primary)]/10 text-white ring-1 ring-inset ring-[var(--primary)]/30 shadow-[0_0_0_1px_rgba(255,56,92,0.15)]"
+                ? "bg-[var(--primary)]/[0.12] text-[var(--primary)] ring-2 ring-inset ring-[var(--primary)]/[0.35]"
                 : "text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)]"
             )}
           >

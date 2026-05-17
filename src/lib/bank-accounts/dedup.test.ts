@@ -14,14 +14,14 @@ describe("amountToPaise", () => {
 
 describe("markDuplicates", () => {
   const existing = [
-    { id: "e1", bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "SWIGGY" },
-    { id: "e2", bankRef: null,     txnDate: "2026-04-02", amount: 250, normalizedDescription: "DMART" },
+    { id: "e1", bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "SWIGGY", direction: "debit" },
+    { id: "e2", bankRef: null,     txnDate: "2026-04-02", amount: 250, normalizedDescription: "DMART",  direction: "debit" },
   ];
 
-  it("flags bankRef match", () => {
+  it("flags bankRef match for same direction", () => {
     const staged = [
-      { bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "SWIGGY" },
-      { bankRef: "UPI999", txnDate: "2026-04-03", amount: 500, normalizedDescription: "AMAZON" },
+      { bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "SWIGGY", direction: "debit" },
+      { bankRef: "UPI999", txnDate: "2026-04-03", amount: 500, normalizedDescription: "AMAZON", direction: "debit" },
     ];
     const out = markDuplicates(staged, existing);
     expect(out[0].isDuplicate).toBe(true);
@@ -29,10 +29,18 @@ describe("markDuplicates", () => {
     expect(out[1].isDuplicate).toBe(false);
   });
 
+  it("does not flag bankRef match when direction differs (reversal)", () => {
+    const staged = [
+      { bankRef: "UPI123", txnDate: "2026-04-01", amount: 100, normalizedDescription: "IMPS REV SWIGGY", direction: "credit" },
+    ];
+    const out = markDuplicates(staged, existing);
+    expect(out[0].isDuplicate).toBe(false);
+  });
+
   it("flags fallback key when bankRef is null", () => {
     const staged = [
-      { bankRef: null, txnDate: "2026-04-02", amount: 250, normalizedDescription: "DMART" },
-      { bankRef: null, txnDate: "2026-04-02", amount: 250, normalizedDescription: "AMAZON" },
+      { bankRef: null, txnDate: "2026-04-02", amount: 250, normalizedDescription: "DMART",  direction: "debit" },
+      { bankRef: null, txnDate: "2026-04-02", amount: 250, normalizedDescription: "AMAZON", direction: "debit" },
     ];
     const out = markDuplicates(staged, existing);
     expect(out[0].isDuplicate).toBe(true);
@@ -41,8 +49,8 @@ describe("markDuplicates", () => {
   });
 
   it("does not collide on bankRef when both sides have null", () => {
-    const staged = [{ bankRef: null, txnDate: "2026-04-05", amount: 10, normalizedDescription: "X" }];
-    const out = markDuplicates(staged, [{ id: "z", bankRef: null, txnDate: "2026-04-05", amount: 10, normalizedDescription: "Y" }]);
+    const staged = [{ bankRef: null, txnDate: "2026-04-05", amount: 10, normalizedDescription: "X", direction: "debit" }];
+    const out = markDuplicates(staged, [{ id: "z", bankRef: null, txnDate: "2026-04-05", amount: 10, normalizedDescription: "Y", direction: "debit" }]);
     expect(out[0].isDuplicate).toBe(false);
   });
 });

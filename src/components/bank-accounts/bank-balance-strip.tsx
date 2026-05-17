@@ -1,4 +1,7 @@
+"use client";
+
 import { formatDate, formatINR } from "@/lib/format";
+import { useTheme } from "@/components/theme-provider";
 
 export interface BankBalance {
   id: string;
@@ -22,9 +25,20 @@ function bankAccent(bankName: string): { fg: string; color: string } {
 }
 
 export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
+
   if (balances.length === 0) return null;
 
   const knownBalances = balances.filter((b) => b.closingBalance != null);
+
+  // Light mode needs higher opacity since accent colors are darker (on white bg)
+  const borderOp   = isLight ? 50 : 22;
+  const gradFrom   = isLight ? 30 : 13;
+  const gradTo     = isLight ? 10 : 3;
+  const shadowOp   = isLight ? 10 : 4;
+  const importOp   = isLight ? 75 : 44;
+  const dateOp     = isLight ? 65 : 38;
   const netTotal = knownBalances.reduce((sum, b) => sum + b.closingBalance!, 0);
   const allKnown = knownBalances.length === balances.length;
 
@@ -38,17 +52,17 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
             key={b.id}
             className="rounded-2xl overflow-hidden transition-all duration-200 hover:scale-[1.015]"
             style={{
-              background: "var(--background)",
-              border: `1px solid color-mix(in srgb, ${accent.color} 22%, transparent)`,
-              boxShadow: `0 0 20px color-mix(in srgb, ${accent.color} 4%, transparent)`,
+              background: "var(--surface-raised)",
+              border: `1px solid color-mix(in srgb, ${accent.color} ${borderOp}%, transparent)`,
+              boxShadow: `0 0 20px color-mix(in srgb, ${accent.color} ${shadowOp}%, transparent)`,
             }}
           >
             {/* Header zone — colored wash */}
             <div
               className="px-4 pt-4 pb-3"
               style={{
-                background: `linear-gradient(135deg, color-mix(in srgb, ${accent.color} 13%, transparent) 0%, color-mix(in srgb, ${accent.color} 3%, transparent) 100%)`,
-                borderBottom: `1px solid color-mix(in srgb, ${accent.color} 9%, transparent)`,
+                background: `linear-gradient(135deg, color-mix(in srgb, ${accent.color} ${gradFrom}%, transparent) 0%, color-mix(in srgb, ${accent.color} ${gradTo}%, transparent) 100%)`,
+                borderBottom: `1px solid color-mix(in srgb, ${accent.color} ${Math.round(borderOp * 0.4)}%, transparent)`,
               }}
             >
               <div className="flex items-center gap-1.5 mb-1.5">
@@ -67,7 +81,7 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
                     {formatINR(b.closingBalance!)}
                   </p>
                   {b.asOf && (
-                    <p className="text-[11px] mt-2.5 uppercase tracking-[0.1em] font-bold" style={{ color: `color-mix(in srgb, ${accent.color} 38%, transparent)` }}>
+                    <p className="text-[11px] mt-2.5 uppercase tracking-[0.1em] font-bold" style={{ color: `color-mix(in srgb, ${accent.color} ${dateOp}%, transparent)` }}>
                       {formatDate(b.asOf)}
                     </p>
                   )}
@@ -75,7 +89,7 @@ export function BankBalanceStrip({ balances }: { balances: BankBalance[] }) {
               ) : (
                 <>
                   <p className="mono text-[24px] font-bold leading-none text-[var(--surface-subtle)]">₹ —,—,—</p>
-                  <p className="text-[11px] mt-2.5 font-semibold" style={{ color: `color-mix(in srgb, ${accent.color} 44%, transparent)` }}>
+                  <p className="text-[11px] mt-2.5 font-semibold" style={{ color: `color-mix(in srgb, ${accent.color} ${importOp}%, transparent)` }}>
                     Import statement →
                   </p>
                 </>
