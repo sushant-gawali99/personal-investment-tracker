@@ -5,7 +5,7 @@ import { getToken } from "next-auth/jwt";
 const INACTIVITY_LIMIT_MS = 60 * 60 * 1000; // 1 hour
 const COOKIE_NAME = "pit-last-activity";
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
   if (!token) {
