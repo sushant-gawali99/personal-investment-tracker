@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
+import { findOrCreateFdBank, findOrCreateFdBranch } from "@/lib/fd-bank";
 
 export async function GET() {
   const result = await requireUserId();
@@ -57,10 +58,20 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Resolve the bank to an FdBank record so the filter/lookup works
+  // reliably across capitalisation / branch differences. Keeps the
+  // denormalised bankName in sync with the bank's canonical name.
+  const bank = await findOrCreateFdBank(prisma, userId, bankName);
+  // Branch is optional; when present, scope it to the bank we just
+  // resolved so filter granularity (HDFC Pune vs HDFC Mumbai) works.
+  const branch = await findOrCreateFdBranch(prisma, userId, bank.id, branchName);
+
   const fdData = {
     userId,
-    bankName,
-    branchName: branchName || null,
+    bankName: bank.name,
+    bankId: bank.id,
+    branchName: branch?.name ?? (branchName || null),
+    branchId: branch?.id ?? null,
     fdNumber: fdNumber || null,
     accountNumber: accountNumber || null,
     depositorName: depositorName || null,

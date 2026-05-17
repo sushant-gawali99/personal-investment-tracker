@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "test": "vitest run",
-    "db:seed:categories": "tsx prisma/seeds/preset-categories.ts"
+    "db:seed:categories": "tsx prisma/seeds/preset-categories.ts",
+    "db:backfill:fd-banks": "tsx prisma/seeds/backfill-fd-banks.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

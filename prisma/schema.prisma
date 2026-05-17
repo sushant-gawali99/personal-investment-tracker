@@ -7,11 +7,55 @@ datasource db {
   provider = "sqlite"
 }
 
+model FdBank {
+  id             String   @id @default(cuid())
+  userId         String
+  /// Canonical display name shown in the UI.
+  name           String
+  /// Lower-cased / collapsed form used for de-dup and lookup. Unique per user.
+  normalizedName String
+  deposits       FixedDeposit[]
+  branches       FdBranch[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([userId, normalizedName])
+  @@index([userId])
+}
+
+model FdBranch {
+  id             String   @id @default(cuid())
+  userId         String
+  bankId         String
+  bank           FdBank   @relation(fields: [bankId], references: [id], onDelete: Cascade)
+  /// Canonical display name shown in the UI.
+  name           String
+  /// Lower-cased / trimmed form used for de-dup and lookup. Unique per bank.
+  normalizedName String
+  deposits       FixedDeposit[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  /// One branch row per (bank, normalised name). User scoping is implicit
+  /// via bankId since FdBank is per-user.
+  @@unique([bankId, normalizedName])
+  @@index([userId])
+  @@index([bankId])
+}
+
 model FixedDeposit {
   id             String   @id @default(cuid())
   userId         String   @default("")
+  /// Denormalized bank name kept for backward compatibility. New code
+  /// should prefer reading from bank.name via the relation.
   bankName       String
+  bankId         String?
+  bank           FdBank?  @relation(fields: [bankId], references: [id], onDelete: SetNull)
+  /// Denormalised branch name kept for backward compatibility. New code
+  /// should read from branch.name via the relation.
   branchName     String?
+  branchId       String?
+  branch         FdBranch? @relation(fields: [branchId], references: [id], onDelete: SetNull)
   fdNumber       String?
   accountNumber  String?
   principal      Float

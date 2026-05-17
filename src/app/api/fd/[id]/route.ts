@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
+import { findOrCreateFdBank, findOrCreateFdBranch } from "@/lib/fd-bank";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const result = await requireUserId();
@@ -16,10 +17,42 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   const body = await req.json();
+
+  // If bankName is being changed, resolve to FdBank and update bankId so
+  // the relation stays in sync. Always store the bank's canonical name in
+  // the denormalised bankName field. Branch is resolved against the
+  // resolved (or existing) bank — if the user only changes the branch,
+  // we keep the existing bank.
+  let bankPatch: { bankName: string; bankId: string } | undefined;
+  let bankIdForBranch: string | null = existing.bankId ?? null;
+  if (typeof body.bankName === "string" && body.bankName.trim()) {
+    const bank = await findOrCreateFdBank(prisma, userId, body.bankName);
+    bankPatch = { bankName: bank.name, bankId: bank.id };
+    bankIdForBranch = bank.id;
+  }
+
+  // Resolve branch only when branchName is present in the patch (allow
+  // null/empty string to clear it). Requires we know the bank — if the FD
+  // has no bankId yet (unbackfilled) we just store the raw name.
+  let branchPatch: { branchName: string | null; branchId: string | null } | undefined;
+  if (Object.prototype.hasOwnProperty.call(body, "branchName")) {
+    const raw = typeof body.branchName === "string" ? body.branchName.trim() : "";
+    if (!raw) {
+      branchPatch = { branchName: null, branchId: null };
+    } else if (bankIdForBranch) {
+      const branch = await findOrCreateFdBranch(prisma, userId, bankIdForBranch, raw);
+      branchPatch = branch ? { branchName: branch.name, branchId: branch.id } : { branchName: raw, branchId: null };
+    } else {
+      branchPatch = { branchName: raw, branchId: null };
+    }
+  }
+
   const fd = await prisma.fixedDeposit.update({
     where: { id },
     data: {
       ...body,
+      ...bankPatch,
+      ...branchPatch,
       principal: body.principal ? Number(body.principal) : undefined,
       interestRate: body.interestRate ? Number(body.interestRate) : undefined,
       tenureMonths: body.tenureMonths !== undefined ? Number(body.tenureMonths) : undefined,
