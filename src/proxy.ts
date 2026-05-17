@@ -19,7 +19,7 @@ export async function proxy(req: NextRequest) {
 
   // Only enforce timeout if the cookie exists. A missing cookie means a fresh
   // login — the client hook hasn't mounted yet and will write it on first render.
-  if (!isNaN(lastActivity) && (lastActivity > Date.now() || Date.now() - lastActivity > INACTIVITY_LIMIT_MS)) {
+  if (!isNaN(lastActivity) && Date.now() - lastActivity > INACTIVITY_LIMIT_MS) {
     if (req.nextUrl.pathname.startsWith("/api")) {
       return NextResponse.json({ error: "Session expired" }, { status: 401 });
     }
