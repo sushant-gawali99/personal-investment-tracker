@@ -217,6 +217,9 @@
   * {
     @apply border-border;
   }
+  html {
+    font-size: 17px;
+  }
   html, body {
     background: var(--background);
     color: var(--foreground);
@@ -270,7 +273,7 @@
   justify-content: center;
   gap: 8px;
   font-weight: 600;
-  font-size: 13.5px;
+  font-size: 14.5px;
   letter-spacing: -0.01em;
   border-radius: 10px;
   padding: 10px 16px;
@@ -360,7 +363,7 @@
   border: 1px solid var(--border);
   border-radius: 10px;
   padding: 11px 14px;
-  font-size: 14px;
+  font-size: 15px;
   transition: background-color 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
 }
 .ab-input::placeholder { color: var(--text-tertiary); }
@@ -408,7 +411,7 @@ select.ab-input option {
 
 .ab-label {
   display: block;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 6px;
@@ -421,7 +424,7 @@ select.ab-input option {
   gap: 4px;
   padding: 4px 10px;
   border-radius: 9999px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   line-height: 1.2;
   background: var(--surface-subtle);

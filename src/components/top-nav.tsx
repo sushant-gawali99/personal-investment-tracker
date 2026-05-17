@@ -62,7 +62,7 @@ export function TopNav({ impersonatedUser }: Props) {
         </div>
       )}
 
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-[1440px] mx-auto px-8 h-[68px] flex items-center justify-between">
         <div className="flex items-center gap-10">
           <Link href="/dashboard" className="flex items-center gap-2">
             <span
