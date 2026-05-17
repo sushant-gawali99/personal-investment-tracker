@@ -196,11 +196,12 @@ export async function extractTransactions(
     claudeCategory: r.suggestedCategory && allowed.has(r.suggestedCategory) ? r.suggestedCategory : null,
   }));
 
+  const closingBalance = parsed.closingBalance ?? transactions.at(-1)?.runningBalance ?? null;
   return {
     statementPeriodStart: parsed.statementPeriodStart ?? null,
     statementPeriodEnd: parsed.statementPeriodEnd ?? null,
     openingBalance: parsed.openingBalance ?? null,
-    closingBalance: parsed.closingBalance ?? null,
+    closingBalance,
     transactions,
     inputTokens: res.usage.input_tokens,
     outputTokens: res.usage.output_tokens,
