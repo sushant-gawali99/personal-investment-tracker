@@ -3,6 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { requireUserId } from "@/lib/session";
 import { linkTransactionsForFd } from "@/lib/fd-link/link-batch";
 import { findOrCreateFdBank, findOrCreateFdBranch } from "@/lib/fd-bank";
+import { buildFdDuplicateWhere } from "@/lib/fd-duplicate";
 
 export async function GET() {
   const result = await requireUserId();
@@ -43,13 +44,12 @@ export async function POST(req: NextRequest) {
   }
 
   const duplicate = await prisma.fixedDeposit.findFirst({
-    where: {
-      userId,
-      OR: [
-        { bankName, principal: Number(principal), startDate: new Date(startDate) },
-        ...(fdNumber ? [{ fdNumber }] : []),
-      ],
-    },
+    where: buildFdDuplicateWhere(userId, {
+      bankName,
+      principal: Number(principal),
+      startDate: new Date(startDate),
+      fdNumber,
+    }),
   });
   if (duplicate && !overwrite) {
     return NextResponse.json(
