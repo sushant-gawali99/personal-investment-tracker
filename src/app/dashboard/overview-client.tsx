@@ -222,12 +222,14 @@ export function OverviewClient({ summary, timeline, holdings, mfHoldings, upcomi
           positive={hasEquity ? equity.totalPnL >= 0 : undefined}
           Icon={BarChart2}
         />
-        <StatCard
-          label="Fixed Deposits"
-          value={hasFD ? formatINR(fd.totalPrincipal) : "—"}
-          sub={hasFD ? `→ ${formatINR(fd.totalMaturity)} @ ${fd.weightedRate.toFixed(2)}%` : "No FDs added"}
-          Icon={PiggyBank}
-        />
+        <Link href="/dashboard/fd" className="block hover:brightness-110 transition h-full">
+          <StatCard
+            label="Fixed Deposits"
+            value={hasFD ? formatINR(fd.totalPrincipal) : "—"}
+            sub={hasFD ? `→ ${formatINR(fd.totalMaturity)} @ ${fd.weightedRate.toFixed(2)}%` : "No FDs added"}
+            Icon={PiggyBank}
+          />
+        </Link>
         <Link href="/dashboard/equity-mf" className="block hover:brightness-110 transition h-full">
           <StatCard
             label="Mutual Funds"
