@@ -227,10 +227,10 @@ function Toolbar({
       {/* Spacer — only meaningful in the inline xl layout */}
       <div className="hidden xl:block xl:flex-1" />
 
-      {/* Section nav — horizontally scrollable pill strip on small screens,
-          inline on the right at xl. min-w-0 lets it shrink + scroll when the
-          row is tight instead of overflowing the page. */}
-      <nav className="flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full p-1 gap-0.5 overflow-x-auto min-w-0">
+      {/* Section nav — pills wrap to multiple rows on small screens (rounded-2xl
+          so wrapped rows read as a block), collapsing to a single inline
+          rounded-full row on the right at xl. */}
+      <nav className="flex flex-wrap items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-2xl xl:rounded-full xl:flex-nowrap p-1 gap-0.5">
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
