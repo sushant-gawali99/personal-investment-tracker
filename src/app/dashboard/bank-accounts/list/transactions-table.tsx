@@ -398,8 +398,8 @@ export function TransactionsTable({
         )}
       </div>
 
-      {/* Table */}
-      <div className="ab-card overflow-hidden">
+      {/* Table — desktop / tablet (md and up) */}
+      <div className="ab-card overflow-hidden hidden md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead className="bg-[var(--surface-muted)] sticky top-0 z-10">
@@ -559,6 +559,44 @@ export function TransactionsTable({
         </div>
       </div>
 
+      {/* Card list — phones / small tablets (below md) */}
+      <div className="md:hidden space-y-2">
+        {loading && rows.length === 0 ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] p-3.5 animate-pulse"
+            >
+              <div className="h-4 w-1/2 rounded bg-[var(--surface-muted)]" />
+              <div className="mt-2.5 h-3 w-1/3 rounded bg-[var(--surface-muted)]" />
+              <div className="mt-3 h-6 w-24 rounded-full bg-[var(--surface-muted)]" />
+            </div>
+          ))
+        ) : rows.length === 0 ? (
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] p-10 text-center">
+            <p className="text-[14px] font-semibold text-[var(--text-primary)]">No transactions match your filters</p>
+            {hasActiveFilters && (
+              <button onClick={clearAllFilters} className="text-[12px] text-[var(--primary)] mt-2 underline">Clear filters</button>
+            )}
+          </div>
+        ) : (
+          rows.map((r) => (
+            <TransactionCard
+              key={r.id}
+              r={r}
+              categories={categories}
+              isEditing={editingCategoryId === r.id}
+              onEdit={() => setEditingCategoryId(r.id)}
+              onCancelEdit={() => setEditingCategoryId(null)}
+              onCategoryChange={(newId) => {
+                updateCategory(r.id, newId);
+                setEditingCategoryId(null);
+              }}
+            />
+          ))
+        )}
+      </div>
+
       {/* Pagination */}
       <div className="flex items-center justify-between text-[12px] text-[var(--text-secondary)]">
         <span>
@@ -591,6 +629,122 @@ export function TransactionsTable({
 }
 
 // ─── Helper components ──────────────────────────────────────────────────
+
+/**
+ * Mobile presentation of a single transaction. Renders the same fields as a
+ * table row (date, description, account, category, amount, balance, FD link)
+ * stacked into a card, since the table's Account/Category columns are hidden
+ * below md and horizontal scrolling is awkward on touch. Category stays
+ * tap-to-edit, mirroring the desktop pencil-edit flow.
+ */
+function TransactionCard({
+  r,
+  categories,
+  isEditing,
+  onEdit,
+  onCancelEdit,
+  onCategoryChange,
+}: {
+  r: Row;
+  categories: { id: string; name: string }[];
+  isEditing: boolean;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+  onCategoryChange: (newCategoryId: string) => void;
+}) {
+  const pretty = prettifyDescription(r.description);
+  const rowBalance = r.balanceAfter;
+  const displayLabel = r.prettyDescription ?? pretty.merchant;
+  const isCredit = r.direction === "credit";
+  const catName = r.category?.name ?? null;
+
+  return (
+    <div className="rounded-xl border border-[var(--border)] bg-[var(--surface-raised)] p-3.5">
+      {/* Merchant + amount */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1 flex items-center gap-1.5 flex-wrap">
+          {pretty.transferDir && (
+            <span className="text-[10px] font-semibold uppercase tracking-wide text-[var(--text-tertiary)]">
+              {pretty.transferDir === "to" ? "To" : "From"}
+            </span>
+          )}
+          <span className="text-[14px] font-semibold text-[var(--text-primary)] break-words">{displayLabel}</span>
+          {pretty.method && (
+            <span className={`ab-chip ${methodChipClass(pretty.method)}`} style={{ fontSize: 10, padding: "1px 7px", lineHeight: 1.5 }}>
+              {pretty.method}
+            </span>
+          )}
+        </div>
+        <span
+          className={`mono text-[15px] font-bold whitespace-nowrap ${isCredit ? "text-[var(--accent-success)]" : "text-[var(--accent-error)]"}`}
+        >
+          {isCredit ? "+" : "−"}{formatINR(r.amount)}
+        </span>
+      </div>
+
+      {/* FD link */}
+      {r.fd && (
+        <div className="mt-1.5">
+          <Link
+            href={`/dashboard/fd/${r.fd.id}`}
+            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-[var(--primary-tint)] text-[var(--primary)] border-[var(--chip-error-border)] hover:bg-[var(--chip-error-border)] transition-colors"
+            title={`Linked to FD at ${r.fd.bankName}`}
+          >
+            <Link2 size={10} />
+            FD · {r.fd.bankName.split(" ")[0]}
+            {r.fd.fdNumber ? ` · ${r.fd.fdNumber}` : r.fd.accountNumber ? ` · ${r.fd.accountNumber.slice(-4)}` : ""}
+          </Link>
+        </div>
+      )}
+
+      {/* Date · account */}
+      <div className="mt-1.5 flex items-center gap-1.5 text-[12px] text-[var(--text-secondary)] min-w-0">
+        <span className="mono whitespace-nowrap">{formatDate(r.txnDate)}</span>
+        <span className="text-[var(--text-tertiary)]">·</span>
+        <span className="truncate">{r.account.label}</span>
+      </div>
+
+      {/* Category + running balance */}
+      <div className="mt-2.5 flex items-center justify-between gap-2">
+        {isEditing ? (
+          <select
+            autoFocus
+            className="ab-input py-1 text-[12px] min-w-[140px]"
+            style={{ padding: "4px 8px" }}
+            value={r.categoryId ?? ""}
+            onChange={(e) => onCategoryChange(e.target.value)}
+            onBlur={onCancelEdit}
+          >
+            <option value="">— none —</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        ) : (
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex items-center gap-1.5 text-[12px] px-2.5 py-1 rounded-full border border-[var(--border)] bg-[var(--surface-deep)] hover:bg-[var(--surface-muted)] transition-colors"
+            title="Tap to change category"
+          >
+            {catName ? (
+              <span className="text-[var(--text-primary)] font-medium">{catName}</span>
+            ) : (
+              <span className="text-[var(--text-tertiary)] italic">Uncategorized</span>
+            )}
+            <Pencil size={11} className="text-[var(--text-tertiary)]" />
+          </button>
+        )}
+        {rowBalance != null && (
+          <span className="text-[12px] mono text-[var(--text-secondary)] whitespace-nowrap">
+            Bal{" "}
+            <span className={`font-semibold ${rowBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
+              {rowBalance >= 0 ? "" : "-"}{formatINR(Math.abs(rowBalance))}
+            </span>
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
 
 /**
  * Pill-styled facet filter — native select under the hood for zero-extra-work
