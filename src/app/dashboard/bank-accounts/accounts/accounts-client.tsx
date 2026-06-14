@@ -174,7 +174,9 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
           </button>
         </div>
       ) : (
-        <div className="ab-card overflow-hidden">
+        <>
+        {/* Table — desktop / tablet (md and up) */}
+        <div className="ab-card overflow-hidden hidden md:block">
           <div className="overflow-x-auto">
             <table className="w-full text-[14px]">
               <thead>
@@ -299,7 +301,121 @@ export function AccountsClient({ accounts }: { accounts: Account[] }) {
             </table>
           </div>
         </div>
+
+        {/* Card list — phones / small tablets (below md) */}
+        <div className="md:hidden space-y-3">
+          {accounts.map((a) => (
+            <AccountCard
+              key={a.id}
+              a={a}
+              onToggleDisabled={() => toggleDisabled(a)}
+              onRemove={() => remove(a)}
+            />
+          ))}
+        </div>
+        </>
       )}
+    </div>
+  );
+}
+
+/**
+ * Mobile presentation of a single bank account. Stacks the table's columns
+ * (label/bank, type, number, balance, txns, last txn, status, actions) into a
+ * card, since the table hides most columns below md. Actions stay visible
+ * (no hover) so they work on touch.
+ */
+function AccountCard({
+  a,
+  onToggleDisabled,
+  onRemove,
+}: {
+  a: Account;
+  onToggleDisabled: () => void;
+  onRemove: () => void;
+}) {
+  const accent = bankAccent(a.bankName);
+  return (
+    <div className={`ab-card p-4 ${a.disabled ? "opacity-50" : ""}`}>
+      {/* Header: icon + label/bank + status */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <span
+            className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0"
+            style={{ background: accent.bg, color: accent.fg }}
+          >
+            <CreditCard size={18} />
+          </span>
+          <div className="min-w-0">
+            <p className="text-[15px] font-semibold text-[var(--text-primary)] truncate">{a.label}</p>
+            <p className="text-[13px] font-medium text-[var(--text-secondary)] truncate mt-0.5">{a.bankName}</p>
+          </div>
+        </div>
+        <span
+          className={`ab-chip shrink-0 ${a.disabled ? "" : "ab-chip-success"}`}
+          style={a.disabled ? { background: "var(--surface-subtle)", color: "var(--text-secondary)" } : undefined}
+        >
+          {a.disabled ? <AlertTriangle size={11} /> : <CheckCircle2 size={11} />}
+          {a.disabled ? "Disabled" : "Active"}
+        </span>
+      </div>
+
+      {/* Type + masked number */}
+      <div className="flex items-center flex-wrap gap-2 mt-3">
+        <span className={`ab-chip ${typeBadgeClass(a.accountType)}`}>{a.accountType}</span>
+        {a.accountNumberLast4 ? (
+          <span className="mono text-[13px] font-medium text-[var(--text-secondary)] tracking-widest">···· {a.accountNumberLast4}</span>
+        ) : (
+          <span className="text-[13px] text-[var(--text-tertiary)]">No number</span>
+        )}
+      </div>
+
+      {/* Balance + transactions */}
+      <div className="flex items-end justify-between gap-3 mt-3">
+        <div className="min-w-0">
+          <p className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-tertiary)] mb-1">Balance</p>
+          {a.closingBalance != null ? (
+            <>
+              <p className={`mono text-[18px] font-bold leading-none ${a.closingBalance >= 0 ? "text-[var(--text-primary)]" : "text-[var(--accent-error)]"}`}>
+                {formatINR(a.closingBalance)}
+              </p>
+              {a.balanceAsOf && (
+                <p className="text-[11px] text-[var(--text-secondary)] mt-1">as of {formatDate(a.balanceAsOf)}</p>
+              )}
+            </>
+          ) : (
+            <p className="text-[var(--text-tertiary)]">—</p>
+          )}
+        </div>
+        <div className="text-right shrink-0">
+          <p className="mono text-[15px] font-bold text-[var(--text-primary)]">
+            {a.txnCount}<span className="text-[11px] font-medium text-[var(--text-tertiary)]"> txns</span>
+          </p>
+          {a.lastTxnDate && (
+            <p className="text-[11px] text-[var(--text-secondary)] mt-1">last {formatDate(a.lastTxnDate)}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-end gap-1 mt-3 pt-3 border-t border-[var(--border)]">
+        <button
+          onClick={onToggleDisabled}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--surface-muted)] transition-colors"
+        >
+          {a.disabled ? <Eye size={15} /> : <EyeOff size={15} />}
+          {a.disabled ? "Enable" : "Disable"}
+        </button>
+        <button
+          onClick={onRemove}
+          disabled={a.txnCount > 0}
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:text-[var(--accent-error)] hover:bg-[rgba(255,122,110,0.08)] transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+          title={a.txnCount > 0 ? "Can't delete — has transactions" : "Delete"}
+        >
+          <Trash2 size={15} />
+          Delete
+        </button>
+      </div>
     </div>
   );
 }
