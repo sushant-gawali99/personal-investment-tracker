@@ -207,25 +207,30 @@ function Toolbar({
 }) {
   const pathname = usePathname();
   return (
-    <div className="flex items-center gap-2">
-      {/* Filters — left */}
-      <MonthPicker year={year} month={month} onChange={onMonthChange} />
-      <div className="inline-flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full px-1 h-[42px] shrink-0">
-        <select
-          className="bg-transparent text-[14px] font-medium text-[var(--text-primary)] outline-none px-3 h-full cursor-pointer min-w-[130px] max-w-[200px]"
-          value={accountId}
-          onChange={(e) => onAccountChange(e.target.value)}
-        >
-          <option value="">All accounts</option>
-          {accounts.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
-        </select>
+    <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:gap-2">
+      {/* Filters — month + account. Wrap on mobile; account selector grows to
+          fill the row (or its own line) and reverts to a fixed width on xl. */}
+      <div className="flex flex-wrap items-center gap-2 shrink-0">
+        <MonthPicker year={year} month={month} onChange={onMonthChange} />
+        <div className="inline-flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full px-1 h-[42px] flex-1 min-w-[150px] xl:flex-none">
+          <select
+            className="bg-transparent text-[14px] font-medium text-[var(--text-primary)] outline-none px-3 h-full cursor-pointer w-full xl:min-w-[130px] xl:max-w-[200px]"
+            value={accountId}
+            onChange={(e) => onAccountChange(e.target.value)}
+          >
+            <option value="">All accounts</option>
+            {accounts.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
+          </select>
+        </div>
       </div>
 
-      {/* Spacer */}
-      <div className="flex-1" />
+      {/* Spacer — only meaningful in the inline xl layout */}
+      <div className="hidden xl:block xl:flex-1" />
 
-      {/* Nav — right */}
-      <nav className="flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full p-1 gap-0.5 shrink-0">
+      {/* Section nav — horizontally scrollable pill strip on small screens,
+          inline on the right at xl. min-w-0 lets it shrink + scroll when the
+          row is tight instead of overflowing the page. */}
+      <nav className="flex items-center bg-[var(--surface-raised)] border border-[var(--border)] rounded-full p-1 gap-0.5 overflow-x-auto min-w-0">
         {NAV_ITEMS.map(({ href, label, icon }) => {
           const active = pathname === href || pathname.startsWith(href + "/");
           return (
@@ -233,7 +238,7 @@ function Toolbar({
               key={href}
               href={href}
               className={[
-                "flex items-center gap-2 px-4 py-2 rounded-full text-[14px] font-semibold whitespace-nowrap transition-all",
+                "flex items-center gap-2 px-4 py-2 rounded-full text-[14px] font-semibold whitespace-nowrap transition-all shrink-0",
                 active
                   ? "bg-[var(--primary)]/[0.12] text-[var(--primary)] ring-2 ring-inset ring-[var(--primary)]/[0.35]"
                   : "text-[var(--text-primary)] hover:bg-[var(--surface-muted)]",
