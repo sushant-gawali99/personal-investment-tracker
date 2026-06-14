@@ -247,11 +247,11 @@ export function TransactionsTable({
           )}
         </div>
 
-        {/* Filters row */}
-        <div className="px-4 py-3 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-max">
-            {/* Date range pills */}
-            <div className="inline-flex items-center gap-0.5 p-1 rounded-full bg-[var(--surface-deep)] border border-[var(--border)] shrink-0">
+        {/* Filters row — stacks vertically on mobile, single scrollable row on md+ */}
+        <div className="px-4 py-3 md:overflow-x-auto">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-2 md:min-w-max">
+            {/* Date range pills — wrap on mobile, single segmented control on md+ */}
+            <div className="flex flex-wrap items-center gap-0.5 p-1 w-full md:w-auto rounded-2xl md:rounded-full bg-[var(--surface-deep)] border border-[var(--border)] md:shrink-0">
               <Calendar size={13} className="ml-2 mr-0.5 text-[var(--text-secondary)] shrink-0" />
               {RANGE_PRESETS.map((p) => (
                 <button
@@ -278,8 +278,8 @@ export function TransactionsTable({
               </button>
             </div>
 
-            {/* Divider */}
-            <div className="w-px h-5 bg-[var(--border)] shrink-0" />
+            {/* Divider — only meaningful in the inline md+ layout */}
+            <div className="hidden md:block w-px h-5 bg-[var(--border)] shrink-0" />
 
             {/* Facet pills */}
             <FacetSelect
@@ -770,18 +770,21 @@ function FacetSelect({
   const selectedLabel =
     options.find((o) => o.value === value)?.label ?? allLabel;
   return (
-    <div className="relative">
+    <div className="relative w-full md:w-auto">
       <div
         className={
-          active
-            ? "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold bg-[rgba(255,56,92,0.18)] text-[var(--primary)] border border-[rgba(255,56,92,0.4)] transition-colors"
-            : "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold text-[var(--text-primary)] bg-[var(--surface-raised)] border border-[var(--border-strong)] hover:border-[var(--text-tertiary)] hover:bg-[var(--surface-muted)] transition-colors"
+          "flex w-full md:w-auto md:inline-flex items-center justify-between md:justify-start gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold transition-colors " +
+          (active
+            ? "bg-[rgba(255,56,92,0.18)] text-[var(--primary)] border border-[rgba(255,56,92,0.4)]"
+            : "text-[var(--text-primary)] bg-[var(--surface-raised)] border border-[var(--border-strong)] hover:border-[var(--text-tertiary)] hover:bg-[var(--surface-muted)]")
         }
       >
-        {icon}
-        <span className="text-[11px] uppercase tracking-wider font-bold text-[var(--text-secondary)]">{label}:</span>
-        <span>{selectedLabel}</span>
-        <ChevronRight size={11} className="rotate-90 opacity-70 -mr-0.5" />
+        <span className="flex items-center gap-1.5 min-w-0">
+          {icon}
+          <span className="text-[11px] uppercase tracking-wider font-bold text-[var(--text-secondary)] shrink-0">{label}:</span>
+          <span className="truncate">{selectedLabel}</span>
+        </span>
+        <ChevronRight size={11} className="rotate-90 opacity-70 shrink-0 md:-mr-0.5" />
       </div>
       {/* Native <select> stacked on top, invisible but clickable. */}
       <select
