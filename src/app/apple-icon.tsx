@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 
 // Apple touch icon for iOS "Add to Home Screen" (iOS needs a PNG, not the SVG /
-// manifest icons). Same branded MyFolio "M" as icon.tsx, sized for iOS.
+// manifest icons). Same branded rupee ₹ as icon.tsx, sized for iOS.
 export const size = { width: 180, height: 180 };
 export const contentType = "image/png";
 
@@ -16,14 +16,13 @@ export default function AppleIcon() {
           alignItems: "center",
           justifyContent: "center",
           color: "#ffffff",
-          fontSize: 108,
+          fontSize: 120,
           fontWeight: 700,
-          letterSpacing: -3,
           background: "#ff385c",
           backgroundImage: "linear-gradient(135deg, #ff385c 0%, #e00b41 100%)",
         }}
       >
-        M
+        ₹
       </div>
     ),
     { ...size },
