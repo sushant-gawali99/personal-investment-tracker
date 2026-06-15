@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ChatWidget } from "@/components/chat/ChatWidget";
@@ -21,6 +21,17 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: "MyFolio",
   description: "Personal investment portfolio tracker",
+  // Installed-app name + iOS standalone behaviour for "Add to Home Screen".
+  applicationName: "MyFolio",
+  appleWebApp: {
+    capable: true,
+    title: "MyFolio",
+    statusBarStyle: "black-translucent",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#ff385c",
 };
 
 export default function RootLayout({
