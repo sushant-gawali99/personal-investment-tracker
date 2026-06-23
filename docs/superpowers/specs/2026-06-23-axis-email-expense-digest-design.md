@@ -25,7 +25,9 @@ configured via server environment variables. It reuses the existing in-process
 
 ### Non-goals (this version)
 
-- No per-user UI / multi-tenant configuration.
+- No per-user / multi-tenant configuration UI. (There **is** a single **owner-only test
+  panel** on the settings page — see "Manual trigger & UI test panel" — but no per-user
+  setup screens.)
 - No integration into the existing statement-import `Transaction` ledger (kept separate
   to avoid duplicate/conflicting rows — see "Relationship to existing modules").
 - No continuous polling — a single fetch at 22:00 IST is sufficient.
@@ -44,7 +46,10 @@ instrumentation.ts
               ├── src/lib/bank-alerts/digest-message.ts  (pure — build WhatsApp template params)
               └── src/lib/notifications/whatsapp-service.ts  (Meta Cloud API — NEW sendWhatsAppTemplate())
 
-src/app/api/bank-alerts/digest/run/route.ts    (admin-only manual trigger, for testing)
+src/app/api/bank-alerts/digest/run/route.ts    (owner-only trigger; ?dryRun=true → preview, no send)
+src/app/dashboard/settings/
+  ├── page.tsx                                   (NEW "Daily Expense Digest" card, owner-only)
+  └── expense-digest-test-panel.tsx              (client component → "Preview" + "Send test now" buttons)
 ```
 
 ### Startup
@@ -239,12 +244,45 @@ falling back to `EXPENSE_DIGEST_PHONE` if the profile has none.
 
 ---
 
-## Manual trigger — `app/api/bank-alerts/digest/run/route.ts`
+## Manual trigger & UI test panel
 
-`POST` route, **admin/owner-only** (reuse the existing admin auth guard used by
-`/api/admin/*`). Invokes `runDailyExpenseDigest()` and returns the summary JSON. Lets the
-user test end-to-end without waiting for 22:00. Built per the local Next.js route-handler
-docs (see AGENTS.md).
+So the digest can be tested on demand (and parsing validated *before* the Meta template is
+approved), the orchestrator is split so the build is reusable:
+
+```ts
+// digest-service.ts
+buildDigest(): Promise<DigestResult>          // fetch → parse → store → aggregate → render. NO send.
+runDailyExpenseDigest(): Promise<DigestResult> // buildDigest() then sendWhatsAppTemplate()
+```
+
+`DigestResult` = `{ summary, params: [p1,p2,p3,p4], debits: ParsedAlert[], unparsedCount, sent }`.
+
+### Route — `app/api/bank-alerts/digest/run/route.ts`
+
+`POST`, **owner-only** — gated by the existing super-admin check (`isSupAdmin` /
+`src/lib/session.ts`), the same gate used by the impersonation selector. Body `{ dryRun?: boolean }`:
+
+- `dryRun: true` → `buildDigest()` only; returns the rendered `params` + `debits` +
+  `unparsedCount`, **nothing sent** (`sent:false`).
+- `dryRun: false` → `runDailyExpenseDigest()`; full pipeline incl. WhatsApp (`sent:true`).
+
+Returns the `DigestResult` JSON either way. Built per the local Next.js route-handler docs
+(see AGENTS.md). Note both modes run fetch+parse+**store** (upsert is idempotent), so a
+preview also populates `BankAlert` and a later real run dedups cleanly.
+
+### UI — `expense-digest-test-panel.tsx`
+
+A client component in a new **"Daily Expense Digest"** `ab-card` on `/dashboard/settings`,
+rendered **only when `isSA`** (owner), mirroring `ImpersonationSelector`. Two buttons:
+
+- **Preview** → `POST { dryRun:true }`; renders the exact WhatsApp text (assembled from the
+  returned `params`) plus the parsed expense list and any unparsed count. No phone needed.
+- **Send test now** → `POST { dryRun:false }`; sends the real WhatsApp and shows the summary.
+  Disabled with a hint if `WHATSAPP_ENABLED !== "true"` (surfaced via the route response).
+
+Loading/disabled states and success/error messaging reuse the existing form styling
+(`ab-btn ab-btn-accent`, `ab-input`, the `--chip-*` message boxes) from
+`notification-settings-form.tsx`.
 
 ---
 
@@ -297,6 +335,8 @@ Built **test-first (TDD)**:
 - `gmail-client.test.ts` — date-window + sender query construction, with imapflow mocked.
 - Window/IST date math — unit-tested (reuse/adapt the `getISTDateRange` pattern from
   `fd-reminder-service.ts`).
+- `digest/run` route — `dryRun:true` returns rendered params + debit list and **does not**
+  call the WhatsApp sender; `dryRun:false` does; non-owner requests are rejected (auth gate).
 
 ---
 
@@ -339,10 +379,12 @@ Built **test-first (TDD)**:
 | `src/lib/bank-alerts/alert-parser.ts` | Create — pre-filter + Claude Haiku structured extract |
 | `src/lib/bank-alerts/alert-store.ts` | Create — upsert/dedup + 24h debit query |
 | `src/lib/bank-alerts/digest-message.ts` | Create — pure template-param builder |
-| `src/lib/bank-alerts/digest-service.ts` | Create — `runDailyExpenseDigest()` orchestrator |
+| `src/lib/bank-alerts/digest-service.ts` | Create — `buildDigest()` + `runDailyExpenseDigest()` orchestrator |
 | `src/lib/notifications/whatsapp-service.ts` | Modify — add `sendWhatsAppTemplate()` |
 | `src/lib/notifications/scheduler.ts` | Modify — add `0 22 * * *` IST cron entry |
-| `src/app/api/bank-alerts/digest/run/route.ts` | Create — admin-only manual trigger |
+| `src/app/api/bank-alerts/digest/run/route.ts` | Create — owner-only trigger; `dryRun` preview vs real send |
+| `src/app/dashboard/settings/expense-digest-test-panel.tsx` | Create — Preview + Send-test client panel |
+| `src/app/dashboard/settings/page.tsx` | Modify — render the digest panel when `isSA` (owner) |
 | `prisma/schema.prisma` | Modify — add `BankAlert` model + migration |
 | `.env.example` | Modify — add new env vars |
 | `package.json` | Modify — add `imapflow` dependency |
