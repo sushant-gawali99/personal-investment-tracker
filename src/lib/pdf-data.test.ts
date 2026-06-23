@@ -58,6 +58,7 @@ describe('buildPdfData', () => {
       maturityAmount: 107000, interestType: 'compound', compoundFreq: 'quarterly', tenureText: null,
     }] as FDRecord[],
     fdsByBank: [{ bankName: 'SBI', total: 200000 }, { bankName: 'HDFC', total: 150000 }],
+    bankBalances: [],
   }
 
   it('picks top holdings by value', () => {
