@@ -307,3 +307,24 @@ model FDStatementReport {
 
   @@index([userId, createdAt])
 }
+
+model BankAlert {
+  id               String   @id @default(cuid())
+  userId           String
+  emailMessageId   String
+  emailDate        DateTime
+  txnTime          DateTime?
+  direction        String   // "debit" | "credit"
+  amount           Float
+  merchant         String?
+  accountLast4     String?
+  availableBalance Float?
+  channel          String?  // card | upi | atm | neft | imps | emi | netbanking | other
+  rawSubject       String?
+  rawSnippet       String?
+  parseStatus      String   @default("parsed") // parsed | unparsed | ignored
+  createdAt        DateTime @default(now())
+
+  @@unique([userId, emailMessageId])
+  @@index([userId, emailDate])
+}
